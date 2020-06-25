@@ -51,57 +51,56 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-fonts:
-  - family: CustomSocial
-    fonts:
-      - asset: assets/CustomSocial.ttf
-  - family: Timesroman
-    fonts:
-      - asset: assets/serif-regular.ttf
-      - asset: assets/serifbold.ttf
-        weight: 700
+  fonts:
+    - family: CustomSocial
+      fonts:
+        - asset: assets/CustomSocial.ttf
+    - family: Timesroman
+      fonts:
+        - asset: assets/serif-regular.ttf
+        - asset: assets/serifbold.ttf
+          weight: 700
 
-  - family: Quicksand
-    fonts:
-      - asset: assets/Quicksand-Regular.ttf
-  - assets:
-    - assets/
-    - assets/home_background.jpeg
-    - assets/food1.jpg
-    - assets/food2.jpg
-    - assets/food3.jpg
-    - assets/food4.jpg
-    - assets/food5.jpg
-    - assets/food6.jpg
-    - assets/food7.jpg
-    - assets/food8.jpg
-    - assets/food9.jpg
-    - assets/food10.jpg
-    - assets/food11.jpg
-    - assets/food12.jpg
-    - assets/food13.jpg
-    - assets/food14.jpg
-    - assets/profil.jpg
-    - assets/profile2.jpg
-    - assets/profile3.jpg
-    - assets/profil4.jpg
-    - assets/sun.png
-    - assets/moon.png
-    - assets/switcher.flr
-    - assets/Walkthrough/Best_Chef_day.png
-    - assets/Walkthrough/Best_Chef_night.png
-    - assets/Walkthrough/Perfect_Price_day.png
-    - assets/Walkthrough/Perfect_Price_night.png
-    - assets/Walkthrough/Perfect_Taste_day.png
-    - assets/Walkthrough/Perfect_Taste_night.png
-    - assets/Walkthrough/Relaxed_Atmosphere_day.png
-    - assets/Walkthrough/Relaxed_Atmosphere_night.png
-    - assets/Walkthrough/transparent.png
-    - assets/icons&splashs/splash_day.png
-    - assets/icons&splashs/splash_night.png
-    - assets/icons&splashs/Asset 61.png
-    - assets/icons&splashs/Asset 51.png
-    - assets/icons&splashs/Asset 41.png
-    - assets/icons&splashs/Asset 31.png
-    - assets/Walkthrough/
-    - assets/icons&splashs/
+    - family: Quicksand
+      fonts:
+        - asset: assets/Quicksand-Regular.ttf
+  assets:
+      - assets/home_background.jpeg
+      - assets/food1.jpg
+      - assets/food2.jpg
+      - assets/food3.jpg
+      - assets/food4.jpg
+      - assets/food5.jpg
+      - assets/food6.jpg
+      - assets/food7.jpg
+      - assets/food8.jpg
+      - assets/food9.jpg
+      - assets/food10.jpg
+      - assets/food11.jpg
+      - assets/food12.jpg
+      - assets/food13.jpg
+      - assets/food14.jpg
+      - assets/profil.jpg
+      - assets/profile2.jpg
+      - assets/profile3.jpg
+      - assets/profil4.jpg
+      - assets/sun.png
+      - assets/moon.png
+      - assets/switcher.flr
+      - assets/Walkthrough/Best_Chef_day.png
+      - assets/Walkthrough/Best_Chef_night.png
+      - assets/Walkthrough/Perfect_Price_day.png
+      - assets/Walkthrough/Perfect_Price_night.png
+      - assets/Walkthrough/Perfect_Taste_day.png
+      - assets/Walkthrough/Perfect_Taste_night.png
+      - assets/Walkthrough/Relaxed_Atmosphere_day.png
+      - assets/Walkthrough/Relaxed_Atmosphere_night.png
+      - assets/Walkthrough/transparent.png
+      - assets/icons&splashs/splash_day.png
+      - assets/icons&splashs/splash_night.png
+      - assets/icons&splashs/Asset 61.png
+      - assets/icons&splashs/Asset 51.png
+      - assets/icons&splashs/Asset 41.png
+      - assets/icons&splashs/Asset 31.png
+      - assets/Walkthrough/
+      - assets/icons&splashs/
