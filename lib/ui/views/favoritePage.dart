@@ -15,7 +15,7 @@ class FavoriteList extends StatelessWidget {
       child: Column(
         children: <Widget>[
           ChangeNotifierProvider<FoodList>(
-            builder: (context) => locator<FoodList>(),
+            create: (context) => locator<FoodList>(),
             child: Consumer<FoodList>(
               builder: (context, model, child) {
                 return Expanded(

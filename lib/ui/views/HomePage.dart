@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import './signupPage.dart';
 import './loginScreen.dart';
 
@@ -15,58 +16,49 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget HomePage() {
     return Container(
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height,
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: MikroMartColors.transparentGray,
         image: DecorationImage(
           colorFilter: new ColorFilter.mode(
-              Colors.black.withOpacity(0.1), BlendMode.dstATop),
+              Colors.deepPurple.withOpacity(0.1), BlendMode.dstATop),
           image: AssetImage('assets/home_background.jpeg'),
           fit: BoxFit.cover,
         ),
       ),
       child: Column(
         children: <Widget>[
+          SizedBox(
+            height: 40,
+          ),
           Container(
-            padding:
-                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.3),
-            child: Center(
-              child: Image.asset(
-                "assets/icons&splashs/Asset 51.png",
-                color: Colors.white,
-                height: MediaQuery.of(context).size.height * 0.1,
-                width: MediaQuery.of(context).size.width * 0.2,
-              ),
+            child: Image.asset(
+              "assets/logo.png",
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.8,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.8,
             ),
           ),
           Container(
-            padding: EdgeInsets.only(top: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Restaurant",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                  ),
-                ),
-                Text(
-                  "App",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             margin: EdgeInsets.only(
                 left: 30.0,
                 right: 30.0,
-                top: MediaQuery.of(context).size.height * 0.2),
+                top: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.2),
             alignment: Alignment.center,
             child: Row(
               children: <Widget>[
@@ -74,13 +66,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: OutlineButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0)),
-                    color: Colors.redAccent,
-                    highlightedBorderColor: Colors.redAccent,
-                    textColor: Colors.white,
+                    color: MikroMartColors.transparentGray,
+                    highlightedBorderColor: MikroMartColors.transparentGray,
+                    textColor: MikroMartColors.colorPrimary,
                     borderSide: BorderSide(
-                      color: Colors.white, //Color of the border
+                      color: MikroMartColors.colorPrimary, //Color of the border
                       style: BorderStyle.solid, //Style of the border
-                      width: 0.8, //width of the border
+                      width: 0.9, //width of the border
                     ),
                     onPressed: () => gotoSignup(),
                     child: Container(
@@ -96,7 +88,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               "SIGN UP",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: MikroMartColors.colorPrimary,
                                   fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -108,8 +100,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-           Container(
-            width: MediaQuery.of(context).size.width,
+          Container(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 30.0),
             alignment: Alignment.center,
             child: Row(
@@ -118,13 +113,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0)),
-                    color: Colors.white,
-                    splashColor: Colors.redAccent,
+                    color: MikroMartColors.colorPrimary,
+                    splashColor: MikroMartColors.colorPrimary,
                     //highlightColor: Colors.blue,
-                    highlightColor: Colors.white,
+                    highlightColor: MikroMartColors.colorPrimary,
                     onPressed: () => gotoLogin(),
                     child: Container(
-                      padding:  EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         vertical: 20.0,
                         horizontal: 20.0,
                       ),
@@ -136,7 +131,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               "LOGIN",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
+                                  color: MikroMartColors.white,
                                   fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -170,17 +165,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   PageController _controller =
-       PageController(initialPage: 1, viewportFraction: 1.0);
+  PageController(initialPage: 1, viewportFraction: 1.0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           child: PageView(
             controller: _controller,
-            physics:  AlwaysScrollableScrollPhysics(),
-            children: <Widget>[LoginScreen(), HomePage(), SignUpPage()],
+            physics: AlwaysScrollableScrollPhysics(),
+            children: <Widget>[
+              LoginScreen(),
+              HomePage(),
+              SignUpPage(onLoginClicked: () {
+                gotoLogin();
+              },)
+            ],
             scrollDirection: Axis.horizontal,
           )),
     );

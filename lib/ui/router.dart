@@ -5,6 +5,7 @@ import 'package:userapp/ui/views/PhonenumberRegister.dart';
 import 'package:userapp/ui/views/card_type.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
 import 'package:userapp/ui/views/onBording.dart';
+import 'package:userapp/ui/widgets/auth_wrapper.dart';
 import './views/loginScreen.dart';
 import './views/HomePage.dart';
 import './views/mainHome.dart';
@@ -17,15 +18,13 @@ import 'views/walletpage.dart';
 import 'views/card_create.dart';
 import 'views/card_wallet.dart';
 
-
-
 const String initialRoute = "login";
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-      return MaterialPageRoute(builder: (_) => HomePage());
+        return MaterialPageRoute(builder: (_) => HomePage());
       case '/phoneNumberRegister':
         return MaterialPageRoute(builder: (_) => PhoneNumberRegister());
       case '/otpPage':
@@ -47,20 +46,22 @@ class Router {
       case '/favoritePage':
         return MaterialPageRoute(builder: (_) => FavoriteList());
       case '/mainHome':
-        return MaterialPageRoute(builder: (_)=> MainHome());
+        return MaterialPageRoute(builder: (_) => MainHome());
       case '/notification':
-        return MaterialPageRoute(builder: (context) => NotificationPage()) ;
+        return MaterialPageRoute(builder: (context) => NotificationPage());
       case '/shoppingCart':
         return MaterialPageRoute(builder: (context) => ShoppingCart());
-      case '/onBoarding' :
-        return MaterialPageRoute(builder: (context) => OnBoarding()) ;
+      case '/onBoarding':
+        return MaterialPageRoute(builder: (context) => OnBoarding());
+      case '/authWrapper':
+        return MaterialPageRoute(builder: (context) => Wrapper());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(
-              body: Center(
-                child: Text('No route defined for ${settings.name}'),
-              ),
-            ));
+                  body: Center(
+                    child: Text('No route defined for ${settings.name}'),
+                  ),
+                ));
     }
   }
 }

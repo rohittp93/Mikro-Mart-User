@@ -49,7 +49,9 @@ class OtpPageState extends State<OtpPage> {
         child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Color.fromRGBO(0, 0, 0, 0.1)
+                    : Colors.grey,
                 border:
                     Border.all(width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
                 borderRadius: BorderRadius.circular(4.0)),
@@ -69,7 +71,9 @@ class OtpPageState extends State<OtpPage> {
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(0, 0, 0, 0.1)
+                  : Colors.grey,
               border:
                   Border.all(width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
               borderRadius: BorderRadius.circular(4.0)),
@@ -91,7 +95,9 @@ class OtpPageState extends State<OtpPage> {
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(0, 0, 0, 0.1)
+                  : Colors.grey,
               border:
                   Border.all(width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
               borderRadius: BorderRadius.circular(4.0)),
@@ -113,7 +119,9 @@ class OtpPageState extends State<OtpPage> {
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(0, 0, 0, 0.1)
+                  : Colors.grey,
               border:
                   Border.all(width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
               borderRadius: BorderRadius.circular(4.0)),
@@ -125,7 +133,9 @@ class OtpPageState extends State<OtpPage> {
             controller: controller4,
             autofocus: false,
             enabled: false,
-            style: TextStyle(fontSize: 24.0,),
+            style: TextStyle(
+              fontSize: 24.0,
+            ),
           ),
         ),
       ),
@@ -134,7 +144,9 @@ class OtpPageState extends State<OtpPage> {
         child: new Container(
           alignment: Alignment.center,
           decoration: new BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(0, 0, 0, 0.1)
+                  : Colors.grey,
               border: new Border.all(
                   width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
               borderRadius: new BorderRadius.circular(4.0)),
@@ -155,7 +167,9 @@ class OtpPageState extends State<OtpPage> {
         child: new Container(
           alignment: Alignment.center,
           decoration: new BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.light ?Color.fromRGBO(0, 0, 0, 0.1):Colors.grey,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Color.fromRGBO(0, 0, 0, 0.1)
+                  : Colors.grey,
               border: new Border.all(
                   width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.1)),
               borderRadius: new BorderRadius.circular(4.0)),
@@ -167,7 +181,9 @@ class OtpPageState extends State<OtpPage> {
             controller: controller6,
             autofocus: false,
             enabled: false,
-            style: TextStyle(fontSize: 24.0,),
+            style: TextStyle(
+              fontSize: 24.0,
+            ),
           ),
         ),
       ),
@@ -186,52 +202,56 @@ class OtpPageState extends State<OtpPage> {
           child: Container(
             child: Column(
               children: <Widget>[
-                SizedBox(height: MediaQuery.of(context).size.height*0.07,),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    "Verifying your number!",
-                    style: TextStyle(
-                        fontSize: 18.0, fontWeight: FontWeight.bold),
-                  ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.07,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, top: 4.0, right: 16.0),
-                  child: Text(
-                    "Please type the verification code sent to",
-                    style: TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.normal),
-                    textAlign: TextAlign.center,
-                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "Verifying your number!",
+                        style: TextStyle(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, top: 4.0, right: 16.0),
+                      child: Text(
+                        "Please type the verification code sent to",
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.normal),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 30.0, top: 2.0, right: 30.0),
+                      child: Text(
+                        "+91 9876543210",
+                        style: TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Image(
+                        image: AssetImage('assets/otp2.png'),
+                        height: 120.0,
+                        width: 120.0,
+                      ),
+                    )
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 30.0, top: 2.0, right: 30.0),
-                  child: Text(
-                    "+91 9876543210",
-                    style: TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor),
-                    textAlign: TextAlign.center,
-                  ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.05,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: Image(
-                    image: AssetImage('assets/otp2.png'),
-                    height: 120.0,
-                    width: 120.0,
-                  ),
-                )
-              ],
-            ),
-                SizedBox(height: MediaQuery.of(context).size.height*0.05,),
                 Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -244,10 +264,12 @@ class OtpPageState extends State<OtpPage> {
                           scrollDirection: Axis.vertical,
                           children: List<Container>.generate(
                               8,
-                                  (int index) =>
+                              (int index) =>
                                   Container(child: widgetList[index]))),
                     ]),
-                SizedBox(height: MediaQuery.of(context).size.height*0.05,),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                ),
                 Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -390,8 +412,12 @@ class OtpPageState extends State<OtpPage> {
                                 onPressed: () {
                                   deleteText();
                                 },
-                                child: Image.asset('assets/delete.png',
-                                    width: 25.0, height: 25.0,color: Theme.of(context).textSelectionColor,)),
+                                child: Image.asset(
+                                  'assets/delete.png',
+                                  width: 25.0,
+                                  height: 25.0,
+                                  color: Theme.of(context).textSelectionColor,
+                                )),
                             MaterialButton(
                               onPressed: () {
                                 inputTextToField("0");
@@ -406,7 +432,11 @@ class OtpPageState extends State<OtpPage> {
                                 onPressed: () {
                                   matchOtp();
                                 },
-                                child: Icon(Icons.check_circle,size: 25,color: Theme.of(context).primaryColor,)),
+                                child: Icon(
+                                  Icons.check_circle,
+                                  size: 25,
+                                  color: Theme.of(context).primaryColor,
+                                )),
                           ],
                         ),
                       ),

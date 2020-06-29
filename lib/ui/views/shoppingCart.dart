@@ -172,7 +172,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
               ],
             ),
             ChangeNotifierProvider(
-              builder: (context) => locator<FoodList>(),
+              create: (context) => locator<FoodList>(),
               child: Consumer<FoodList>(builder: (context, model, child) {
                 return Transform.translate(
                   offset: Offset(0, -deviceSize.height * 0.15),

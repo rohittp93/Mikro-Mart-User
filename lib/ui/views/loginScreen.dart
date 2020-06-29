@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
 import '../shared/custom_social_icons.dart';
 
@@ -11,6 +13,7 @@ class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   AnimationController _loginButtonController;
   var animationStatus = 0;
+  final AuthService _auth = AuthService();
 
   @override
   void initState() {
@@ -55,19 +58,14 @@ class _LoginScreenState extends State<LoginScreen>
           children: <Widget>[
             Column(
               children: <Widget>[
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 100,
-                      vertical: MediaQuery.of(context).size.height > 600
-                          ? MediaQuery.of(context).size.height * 0.1
-                          : MediaQuery.of(context).size.height * 0.05),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/icons&splashs/Asset 51.png",
-                      color: Theme.of(context).primaryColor,
-                      height: MediaQuery.of(context).size.height * 0.15,
-                      width: MediaQuery.of(context).size.width * 0.2,
-                    ),
+                  child: Image.asset(
+                    "assets/logo.png",
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.width * 0.7,
                   ),
                 ),
                 Row(
@@ -79,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen>
                           "EMAIL",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
+                            color: MikroMartColors.colorPrimary,
                             fontSize: 15.0,
                           ),
                         ),
@@ -95,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                          color: Theme.of(context).primaryColor,
+                          color: MikroMartColors.colorPrimary,
                           width: 0.5,
                           style: BorderStyle.solid),
                     ),
@@ -111,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen>
                           textAlign: TextAlign.left,
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: 'restaurantapp@live.com',
+                            hintText: 'Email',
                             hintStyle:
                                 TextStyle(color: Theme.of(context).hintColor),
                           ),
@@ -133,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen>
                           "PASSWORD",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
+                            color: MikroMartColors.colorPrimary,
                             fontSize: 15.0,
                           ),
                         ),
@@ -149,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen>
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                          color: Theme.of(context).primaryColor,
+                          color: MikroMartColors.colorPrimary,
                           width: 0.5,
                           style: BorderStyle.solid),
                     ),
@@ -188,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen>
                           "Forgot Password?",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
+                            color: MikroMartColors.colorPrimary,
                             fontSize: 15.0,
                           ),
                           textAlign: TextAlign.end,
@@ -244,62 +242,6 @@ class _LoginScreenState extends State<LoginScreen>
                         children: <Widget>[
                           Expanded(
                             child: Container(
-                              margin: EdgeInsets.only(right: 8.0),
-                              alignment: Alignment.center,
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.0),
-                                      ),
-                                      color: Color(0Xff3B5998),
-                                      onPressed: () => {},
-                                      child: Container(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: FlatButton(
-                                                onPressed: () {},
-                                                padding: EdgeInsets.only(
-                                                  top: 20.0,
-                                                  bottom: 20.0,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      CustomSocial.facebook,
-                                                      color: Colors.white,
-                                                      size: 15.0,
-                                                    ),
-                                                    Text(
-                                                      "FACEBOOK",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
                               margin: EdgeInsets.only(left: 8.0),
                               alignment: Alignment.center,
                               child: Row(
@@ -323,23 +265,28 @@ class _LoginScreenState extends State<LoginScreen>
                                                   top: 20.0,
                                                   bottom: 20.0,
                                                 ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
+                                                child: Stack(
                                                   children: <Widget>[
-                                                    Icon(
-                                                      CustomSocial.google,
-                                                      color: Colors.white,
-                                                      size: 15.0,
-                                                    ),
-                                                    Text(
-                                                      "GOOGLE",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          CustomSocial.google,
                                                           color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                          size: 15.0,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Center(
+                                                      child: Text(
+                                                        "GOOGLE",
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -375,8 +322,10 @@ class _LoginScreenState extends State<LoginScreen>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
                           ),
-                          color: Theme.of(context).primaryColor,
+                          color: MikroMartColors.colorPrimary,
                           onPressed: () {
+                            // TODO : Validate if Email & PW are entered & then proceed if valid.
+                            // Use the auth object to invoke sign in with email & pw here 
                             setState(() {
                               animationStatus = 1;
                             });

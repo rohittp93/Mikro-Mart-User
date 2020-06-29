@@ -14,12 +14,12 @@ description: Mikro mart user application
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^3.0.0+1
+  provider: ^4.1.3
   get_it: ^1.0.3+2
   rxdart: ^0.21.0
   flutter_swiper: ^1.1.6
@@ -28,8 +28,15 @@ dependencies:
   smooth_star_rating: ^1.0.3
   carousel_slider: ^1.3.0
   flare_flutter: ^1.5.5
-
+  dartz: ^0.8.8
+  basic_utils: ^1.3.0
   cupertino_icons: ^0.1.2
+  # Add the dependency for the Firebase Core Flutter SDK
+  firebase_core: ^0.4.0+9
+  firebase_auth: ^0.14.0+5
+  cloud_firestore: ^0.12.9+5
+  firebase_analytics: ^5.0.2
+
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +76,7 @@ flutter:
       - assets/food1.jpg
       - assets/food2.jpg
       - assets/food3.jpg
+      - assets/logo.png
       - assets/food4.jpg
       - assets/food5.jpg
       - assets/food6.jpg

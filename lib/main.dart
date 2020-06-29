@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/services/auth.dart';
 
 import 'core/card_list_model.dart';
 import 'core/card_model.dart';
@@ -8,20 +10,23 @@ import './ui/shared/theme.dart';
 import './ui/router.dart';
 
 void main() {
-  setupLocator() ;
-  runApp(MyApp()) ;
+  setupLocator();
+  runApp(MyApp());
 }
-class MyApp extends StatelessWidget {
 
+class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeChanger>(
-      builder: (_) => ThemeChanger(),
-      child: MaterialAppWithTheme(),
+      create: (_) => ThemeChanger(),
+      child: StreamProvider<User>.value(
+          value: AuthService().user,
+          child: MaterialAppWithTheme()),
     );
   }
 }
+
 class MaterialAppWithTheme extends StatefulWidget {
   @override
   _MaterialAppWithThemeState createState() => _MaterialAppWithThemeState();
@@ -34,8 +39,9 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
     final theme = Provider.of<ThemeChanger>(context);
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(builder: (context) => locator<CardListModelView>()),
-        ChangeNotifierProvider(builder: (context) => locator<CardModel>()),
+        ChangeNotifierProvider(
+            create: (context) => locator<CardListModelView>()),
+        ChangeNotifierProvider(create: (context) => locator<CardModel>()),
       ],
       child: MaterialApp(
         onGenerateRoute: Router.generateRoute,
@@ -46,4 +52,3 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
     );
   }
 }
-

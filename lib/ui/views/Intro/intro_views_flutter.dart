@@ -3,6 +3,7 @@ library intro_views_flutter;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:userapp/ui/views/Intro/UI/IntroPage.dart';
 import './Animation_Gesture/animated_page_dragger.dart';
 import './Animation_Gesture/page_dragger.dart';
 import './Animation_Gesture/page_reveal.dart';
@@ -12,7 +13,6 @@ import './Models/pager_indicator_view_model.dart';
 import './Models/slide_update_model.dart';
 import './UI/page_indicator_buttons.dart';
 import './UI/pager_indicator.dart';
-import './UI/page.dart';
 
 /// This is the IntroViewsFlutter widget of app which is a stateful widget as its state is dynamic and updates asynchronously.
 class IntroViewsFlutter extends StatefulWidget {
@@ -237,7 +237,7 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
       backgroundColor: widget.background,
       body: Stack(
         children: <Widget>[
-          Page(
+        /*  IntroPage(
             pageViewModel: pages[activePageIndex],
             percentVisible: 1.0,
             columnMainAxisAlignment: widget.columnMainAxisAlignment,
@@ -245,12 +245,11 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
           PageReveal(
             //next page reveal
             revealPercent: slidePercent,
-            child: Page(
+            child: IntroPage(
                 pageViewModel: pages[nextPageIndex],
                 percentVisible: slidePercent,
                 columnMainAxisAlignment: widget.columnMainAxisAlignment),
           ), //PageReveal
-
           PagerIndicator(
             //bottom page indicator
             viewModel: PagerIndicatorViewModel(
@@ -260,7 +259,6 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
               slidePercent,
             ),
           ), //PagerIndicator
-
           PageIndicatorButtons(
             //Skip and Done Buttons
             textStyle: textStyle,
@@ -315,14 +313,13 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
             skipText: widget.skipText,
             doneButtonPersist: widget.doneButtonPersist,
           ),
-
           PageDragger(
             //Used for gesture control
             fullTransitionPX: widget.fullTransition,
             canDragLeftToRight: activePageIndex > 0,
             canDragRightToLeft: activePageIndex < pages.length - 1,
             slideUpdateStream: this.slideUpdateStream,
-          ), //PageDragger
+          ), //PageDragger*/
         ], //Widget
       ), //Stack
     ); //Scaffold
