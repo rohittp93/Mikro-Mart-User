@@ -1,36 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
 class PhoneNumberRegister extends StatefulWidget {
-
-
-/*  @override
-  Widget build(BuildContext context) {
-
-  }
-*/
-
-
-
-
   @override
-  _PhoneNumberRegisterState createState()=> _PhoneNumberRegisterState();
-
-
-  /*@override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }*/
+  _PhoneNumberRegisterState createState() => _PhoneNumberRegisterState();
 }
 
-
 class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
-  final GlobalKey<ScaffoldState> _scaffoldkey =
-  new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   String phone = '';
-
+  final _codeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +24,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
           scrollDirection: Axis.vertical,
           children: <Widget>[
             SizedBox(
-              height: size.height * 0.15,
+              height: size.height * 0.10,
             ),
             Column(
                 mainAxisSize: MainAxisSize.max,
@@ -52,11 +33,13 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 16.0, top: 20.0, right: 16.0),
+                        left: 16.0, top: 0.0, right: 16.0),
                     child: Text(
                       "Verify your phone number",
-                      style: style.textTheme
-                          .copyWith(fontSize: 22, fontWeight: FontWeight.w500),
+                      style: style.textTheme.copyWith(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -67,6 +50,9 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                       height: size.height * 0.25,
                       width: size.width * 0.8,
                     ),
+                  ),
+                  SizedBox(
+                    height: 30,
                   ),
                   Row(
                     children: <Widget>[
@@ -95,7 +81,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                           textAlign: TextAlign.start,
                           autofocus: false,
                           enabled: true,
-                          keyboardType: TextInputType.number,
+                          keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.done,
                           style: TextStyle(fontSize: 20.0),
                           onChanged: (val) {
@@ -122,27 +108,26 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                         onTap: () {
                           String validationMessage = validateMobile(this.phone);
                           if (validationMessage == null) {
-                            //Navigator.pushNamed(context, '/otpPage');
+                            _auth.signInWithPhone('+91' + this.phone, context);
                           } else {
                             _scaffoldkey.currentState.showSnackBar(SnackBar(
                               content: new Text(validationMessage),
                               duration: new Duration(seconds: 3),
                             ));
                           }
+
+                          //showAlertDialog();
                         },
                         child: Container(
                           width: size.width * 0.85,
+                          height: 48,
                           decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor,
                             gradient: LinearGradient(
                                 colors: [
-                                  Theme.of(context).primaryColor,
-                                  Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.8),
-                                  Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
+                                  MikroMartColors.colorPrimary,
+                                  MikroMartColors.colorPrimary.withOpacity(0.8),
+                                  MikroMartColors.colorPrimary.withOpacity(0.5),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight),
@@ -155,14 +140,18 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                                   blurRadius: 16.0),
                             ],
                           ),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 12),
-                            child: Text(
-                              "SUBMIT",
-                              style: style.headerStyle3
-                                  .copyWith(color: Colors.white),
-                              textAlign: TextAlign.center,
+                          child: Center(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 12),
+                              child: Text(
+                                "SUBMIT",
+                                style: style.subHintTitle.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
                         ),
@@ -173,8 +162,6 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
           ],
         ));
   }
-
-
 
   String validateMobile(String value) {
     //String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
@@ -187,5 +174,4 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
     }
     return null;
   }
-
 }

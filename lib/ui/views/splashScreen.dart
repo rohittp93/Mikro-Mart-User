@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/models/user.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,19 +11,19 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   startTime(User user) async {
+    final prefs = await SharedPreferences.getInstance();
     var _duration = new Duration(seconds: 3);
     print(user);
     return new Timer(_duration, () {
-      navigationPage(user);
+      navigationPage(user, prefs.getBool('phone_authenticated'));
     });
   }
 
-  void navigationPage(User user) {
-    //Navigator.pushNamed(context, '/authWrapper');
+  void navigationPage(User user, bool isPhoneAuthenticated) {
     if (user == null) {
       Navigator.of(context).pushReplacementNamed('/');
     } else {
-      if (user.isPhoneVerified) {
+      if (isPhoneAuthenticated) {
         Navigator.of(context).pushReplacementNamed('/mainHome');
       } else {
         Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');

@@ -37,6 +37,8 @@ dependencies:
   cloud_firestore: ^0.12.9+5
   firebase_analytics: ^5.0.2
 
+  # Local cache
+  shared_preferences: ^0.5.4+5
 
 dev_dependencies:
   flutter_test:
@@ -90,6 +92,7 @@ flutter:
       - assets/food14.jpg
       - assets/profil.jpg
       - assets/profile2.jpg
+      - assets/otp1.png
       - assets/profile3.jpg
       - assets/profil4.jpg
       - assets/sun.png

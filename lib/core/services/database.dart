@@ -14,4 +14,8 @@ class DatabaseService {
       'phone_number' : phoneNumber
     });
   }
+
+  fetchUserData() {
+
+  }
 }

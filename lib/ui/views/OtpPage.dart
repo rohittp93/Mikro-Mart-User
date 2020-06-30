@@ -1,14 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:userapp/core/services/auth.dart';
 
 import 'Login_staggeredAnimation/FadeContainer.dart';
+import 'package:dartz/dartz.dart' as dartz;
 
 class OtpPage extends StatefulWidget {
+  final argument;
+
+  const OtpPage({Key key, this.argument});
+
   @override
-  OtpPageState createState() => OtpPageState();
+  OtpPageState createState() => OtpPageState(argument);
 }
 
 class OtpPageState extends State<OtpPage> {
+  final AuthService _auth = AuthService();
+  final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
+
   TextEditingController controller1 = new TextEditingController();
   TextEditingController controller2 = new TextEditingController();
   TextEditingController controller3 = new TextEditingController();
@@ -17,6 +27,10 @@ class OtpPageState extends State<OtpPage> {
   TextEditingController controller6 = new TextEditingController();
 
   TextEditingController currController = new TextEditingController();
+
+  String phone;
+
+  OtpPageState(this.phone);
 
   @override
   void dispose() {
@@ -196,6 +210,7 @@ class OtpPageState extends State<OtpPage> {
     ];
 
     return Scaffold(
+      key: _scaffoldkey,
       resizeToAvoidBottomPadding: false,
       body: SafeArea(
         child: Center(
@@ -429,8 +444,19 @@ class OtpPageState extends State<OtpPage> {
                                   textAlign: TextAlign.center),
                             ),
                             MaterialButton(
-                                onPressed: () {
-                                  matchOtp();
+                                onPressed: () async {
+                                  //matchOtp();
+                                  dynamic result = await _auth.signInWithPhone(
+                                      this.phone, context);
+                                  if (result == null) {
+                                    _scaffoldkey.currentState
+                                        .showSnackBar(SnackBar(
+                                      content: new Text(
+                                          'Something went wrong. Please try again later'),
+                                      duration: new Duration(seconds: 3),
+                                    ));
+                                  } else {
+                                  }
                                 },
                                 child: Icon(
                                   Icons.check_circle,
