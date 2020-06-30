@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/auth.dart';
 
 import 'core/card_list_model.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeChanger>(
       create: (_) => ThemeChanger(),
-      child: StreamProvider<User>.value(
+      child: StreamProvider<FirebaseUserModel>.value(
           value: AuthService().user,
           child: MaterialAppWithTheme()),
     );

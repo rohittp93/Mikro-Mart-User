@@ -106,6 +106,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                       child: InkWell(
                         splashColor: Colors.black,
                         onTap: () {
+                          FocusScope.of(context).requestFocus(FocusNode());
                           String validationMessage = validateMobile(this.phone);
                           if (validationMessage == null) {
                             _auth.signInWithPhone('+91' + this.phone, context);

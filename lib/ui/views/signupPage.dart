@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/theme.dart';
@@ -288,7 +288,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   ));
                                 } else {
                                   //routeWhenUserUpdates(result);
-                                  routeWhenUserUpdates(dartz.cast<User>(result));
+                                  routeWhenUserUpdates(dartz.cast<FirebaseUserModel>(result));
 
                                 }
                               } else {
@@ -350,7 +350,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return (!regex.hasMatch(value)) ? false : true;
   }
 
-  void routeWhenUserUpdates(User user) {
+  void routeWhenUserUpdates(FirebaseUserModel user) {
 
     if (user == null) {
 
@@ -361,9 +361,6 @@ class _SignUpPageState extends State<SignUpPage> {
         });
       } else {
           Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
-       /* SchedulerBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
-        });*/
       }
     }
   }

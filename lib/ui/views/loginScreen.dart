@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
@@ -27,10 +29,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<Null> _playAnimation() async {
-    await _loginButtonController.reset() ;
+    await _loginButtonController.reset();
     try {
-      await _loginButtonController.forward().whenComplete((){
-          animationStatus = 0 ;
+      await _loginButtonController.forward().whenComplete(() {
+        animationStatus = 0;
       });
       //await _loginButtonController.reverse();
     } on TickerCanceled {}
@@ -92,8 +94,8 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    margin:
-                        const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
+                    margin: const EdgeInsets.only(
+                        left: 40.0, right: 40.0, top: 10.0),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       border: Border(
@@ -149,8 +151,8 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    margin:
-                        const EdgeInsets.only(left: 40.0, right: 40.0, top: 10.0),
+                    margin: const EdgeInsets.only(
+                        left: 40.0, right: 40.0, top: 10.0),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       border: Border(
@@ -208,9 +210,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ],
                   ),
                   Expanded(
-                    child: Container(
-
-                    ),
+                    child: Container(),
                   ),
                   Column(
                     children: <Widget>[
@@ -224,8 +224,8 @@ class _LoginScreenState extends State<LoginScreen>
                             Expanded(
                               child: Container(
                                 margin: EdgeInsets.all(8.0),
-                                decoration:
-                                    BoxDecoration(border: Border.all(width: 0.25)),
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 0.25)),
                               ),
                             ),
                             Text(
@@ -238,8 +238,8 @@ class _LoginScreenState extends State<LoginScreen>
                             Expanded(
                               child: Container(
                                 margin: EdgeInsets.all(8.0),
-                                decoration:
-                                    BoxDecoration(border: Border.all(width: 0.25)),
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 0.25)),
                               ),
                             ),
                           ],
@@ -260,7 +260,8 @@ class _LoginScreenState extends State<LoginScreen>
                                     Expanded(
                                       child: FlatButton(
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(30.0),
+                                          borderRadius:
+                                              BorderRadius.circular(30.0),
                                         ),
                                         color: Color(0Xffdb3236),
                                         onPressed: () => {},
@@ -280,7 +281,8 @@ class _LoginScreenState extends State<LoginScreen>
                                                     children: <Widget>[
                                                       Row(
                                                         mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                            MainAxisAlignment
+                                                                .start,
                                                         children: <Widget>[
                                                           Icon(
                                                             CustomSocial.google,
@@ -292,11 +294,14 @@ class _LoginScreenState extends State<LoginScreen>
                                                       Center(
                                                         child: Text(
                                                           "GOOGLE",
-                                                          textAlign: TextAlign.center,
+                                                          textAlign:
+                                                              TextAlign.center,
                                                           style: TextStyle(
-                                                              color: Colors.white,
+                                                              color:
+                                                                  Colors.white,
                                                               fontWeight:
-                                                              FontWeight.bold),
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       ),
                                                     ],
@@ -315,16 +320,19 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.05,)
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.05,
+                      )
                     ],
                   ),
                 ],
               ),
               animationStatus == 0
                   ? Container(
-                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height *0.95 - 180),
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.95 - 180),
                       width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.only(left: 30.0, right: 30.0 ),
+                      margin: const EdgeInsets.only(left: 30.0, right: 30.0),
                       //alignment: Alignment.center,
                       child: Row(
                         children: <Widget>[
@@ -339,18 +347,31 @@ class _LoginScreenState extends State<LoginScreen>
                               // Use the auth object to invoke sign in with email & pw here
                               FocusScope.of(context).requestFocus(FocusNode());
 
-
                               if (this.email.length != 0 ||
                                   validateEmail(this.email)) {
                                 if (this.password.length != 0 &&
                                     this.password.length > 6) {
+                                  User user =
+                                      await _auth.signInWithEmailAndPassword(
+                                          this.email, this.password);
 
-                                    /*await
-                                    _auth.signInWithEmailAndPassword(
-                                        this.email, this.password);*/
-
+                                  if (user == null) {
+                                    _scaffoldkey.currentState
+                                        .showSnackBar(SnackBar(
+                                      content: new Text(
+                                          'There was a problem signing in. Please check your credentials'),
+                                      duration: new Duration(seconds: 3),
+                                    ));
+                                  } else {
+                                    if (user.phoneValidated) {
+                                        Navigator.of(context).pushReplacementNamed('/mainHome');
+                                    } else {
+                                        Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
+                                    }
+                                  }
                                 } else {
-                                  _scaffoldkey.currentState.showSnackBar(SnackBar(
+                                  _scaffoldkey.currentState
+                                      .showSnackBar(SnackBar(
                                     content: new Text(
                                         'Password must be 6+ characters long'),
                                     duration: new Duration(seconds: 3),
@@ -363,10 +384,10 @@ class _LoginScreenState extends State<LoginScreen>
                                 ));
                               }
 
-                              setState(() {
+                             /* setState(() {
                                 animationStatus = 1;
                               });
-                              _playAnimation();
+                              _playAnimation();*/
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -392,7 +413,10 @@ class _LoginScreenState extends State<LoginScreen>
                         ],
                       ),
                     )
-                  : StaggerAnimation(buttonController: _loginButtonController.view,screenSize: MediaQuery.of(context).size,)
+                  : StaggerAnimation(
+                      buttonController: _loginButtonController.view,
+                      screenSize: MediaQuery.of(context).size,
+                    )
             ],
           ),
         ),
@@ -400,7 +424,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
     ;
   }
-
 
   bool validateEmail(String value) {
     Pattern pattern =

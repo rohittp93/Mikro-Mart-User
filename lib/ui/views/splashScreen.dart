@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
+import 'package:userapp/core/services/auth.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -10,37 +12,70 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  startTime(User user) async {
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  final AuthService _auth = AuthService();
+
+  startTime() async {
     final prefs = await SharedPreferences.getInstance();
     var _duration = new Duration(seconds: 3);
-    print(user);
     return new Timer(_duration, () {
-      navigationPage(user, prefs.getBool('phone_authenticated'));
+      navigationPage(
+          prefs.getBool('signed_in'), prefs.getBool('phone_authenticated'));
     });
-  }
-
-  void navigationPage(User user, bool isPhoneAuthenticated) {
-    if (user == null) {
-      Navigator.of(context).pushReplacementNamed('/');
-    } else {
-      if (isPhoneAuthenticated) {
-        Navigator.of(context).pushReplacementNamed('/mainHome');
-      } else {
-        Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
-      }
-    }
   }
 
   @override
   void initState() {
     super.initState();
-    //startTime();
+
+    _fcm.configure(onMessage: (Map<String, dynamic> message) async {
+      print('onMessage: $message');
+      final snackBar = SnackBar(
+        content: Text(message['notification']['title']),
+        action: SnackBarAction(
+          label: 'Go',
+          onPressed: () => null,
+        ),
+      );
+
+      Scaffold.of(context).showSnackBar(snackBar);
+    }, onResume: (Map<String, dynamic> message) async {
+      print('onResume: $message');
+    }, onLaunch: (Map<String, dynamic> message) async {
+      print('onLaunch: $message');
+    });
+  }
+
+  void navigationPage(bool is_signed_in, bool isPhoneAuthenticated) {
+    if (is_signed_in != null) {
+      if(!is_signed_in) {
+        Navigator.of(context).pushReplacementNamed('/');
+      }else{
+        if (isPhoneAuthenticated != null && isPhoneAuthenticated) {
+          Navigator.of(context).pushReplacementNamed('/mainHome');
+        } else {
+          Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
+        }
+      }
+    } else {
+      Navigator.of(context).pushReplacementNamed('/');
+      //_saveDeviceToken(user.uid);
+    }
+  }
+
+  _saveDeviceToken(String userId) async {
+    String fcmToken = await _fcm.getToken();
+    final prefs = await SharedPreferences.getInstance();
+
+    prefs.setString('fcm_token', fcmToken);
+    if (fcmToken != null && _auth.user != null) {
+      _auth.updateFCMToken(userId, fcmToken);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<User>(context);
-    startTime(user);
+    startTime();
     return new Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: new Center(

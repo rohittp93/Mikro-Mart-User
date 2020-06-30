@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:userapp/core/models/otp_model.dart';
-import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/FadeContainer.dart';
@@ -10,12 +12,15 @@ import 'package:userapp/ui/views/Login_staggeredAnimation/FadeContainer.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final String PREF_PHONE_AUTHENTICATED = 'phone_authenticated';
+  final String PREF_IS_SIGNED_IN = 'signed_in';
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+  final AppDatabase appDatabase = AppDatabase();
 
   // create user object based on FirebaseUser
-  User _userFromFirebaseUser(
+  FirebaseUserModel _userFromFirebaseUser(
       FirebaseUser user, bool isSignedIn, bool isPhoneVerified) {
     return user != null
-        ? User(
+        ? FirebaseUserModel(
             uid: user.uid,
             isSignedIn: isSignedIn,
             isPhoneVerified: isPhoneVerified)
@@ -25,7 +30,7 @@ class AuthService {
   // sign in with google
 
   // auth change user stream
-  Stream<User> get user {
+  Stream<FirebaseUserModel> get user {
     return _auth.onAuthStateChanged.map((user) {
       return _userFromFirebaseUser(user, user != null, false);
     });
@@ -50,7 +55,13 @@ class AuthService {
           email: email, password: password);
       FirebaseUser user = result.user;
       // create a new document with uid & twofactorenabled as false
-      await DatabaseService(uid: user.uid).updateUserData(false, '');
+      String fcmToken = await _fcm.getToken();
+      await DatabaseService(uid: user.uid)
+          .updateUserData(false, '', user.uid, fcmToken);
+      final prefs = await SharedPreferences.getInstance();
+
+      prefs.setBool(PREF_IS_SIGNED_IN, true);
+
       return _userFromFirebaseUser(user, true, false);
     } catch (e) {
       print(e.toString());
@@ -168,7 +179,10 @@ class AuthService {
     if (user != null) {
       // successfully verified
       user.linkWithCredential(credential).then((AuthResult value) async {
-        await DatabaseService(uid: user.uid).updateUserData(true, phone);
+        String fcmToken = await _fcm.getToken();
+
+        await DatabaseService(uid: user.uid)
+            .updateUserData(true, phone, user.uid, fcmToken);
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         Navigator.pushReplacement(
           context,
@@ -185,17 +199,45 @@ class AuthService {
   }
 
   // sign in with email & pw
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
+  Future<User> signInWithEmailAndPassword(String email, String password) async {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      // Before returning the user, query the user doc from firestore to check if he is phone verified. If not, redirect
-      // to phone verification screen
-      await DatabaseService(uid: result.user.uid).fetchUserData();
-      return _userFromFirebaseUser(result.user, true, false);
+
+      FirebaseUser firebaseUser = result.user;
+      if (firebaseUser != null) {
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setBool(PREF_IS_SIGNED_IN, true);
+
+        DocumentSnapshot userDoc = await DatabaseService(uid: firebaseUser.uid)
+            .fetchUserData(result.user.uid);
+
+        User user = new User(
+            uid: firebaseUser.uid,
+            name: "dummy_name",
+            email: "dummy_email",
+            phoneValidated: userDoc.data["two_factor_enabled"],
+            phone: userDoc.data["phone_number"]);
+
+        if (user.phoneValidated) {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        } else {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        }
+
+        appDatabase.insertUser(user);
+
+        return user;
+      } else {
+        return null;
+      }
     } catch (e) {
       print(e.toString());
       return null;
     }
+  }
+
+  Future<void> updateFCMToken(String userId, String fcmToken) async {
+    await DatabaseService(uid: userId).updateFCMToken(userId, fcmToken);
   }
 }
