@@ -52,7 +52,8 @@ class AuthService {
   }
 
 // register with email & pw
-  Future registerWithEmailAndPassword(String name, String email, String password) async {
+  Future registerWithEmailAndPassword(
+      String name, String email, String password) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -94,7 +95,18 @@ class AuthService {
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
           //Navigator.of(context).pop();
-          registerPhoneWithSignedInUser(phone, credential, context);
+          //registerPhoneWithSignedInUser(phone, credential, context);
+
+          final result =
+              await registerPhoneWithSignedInUser(phone, credential, context);
+
+          if (result != null) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/mainHome', (Route<dynamic> route) => false);
+          } else {
+            // error
+          }
+
           // This only gets called when autoRetrieval is true
         },
         verificationFailed: (AuthException authException) {
@@ -106,95 +118,141 @@ class AuthService {
               context: context,
               barrierDismissible: false,
               builder: (context) {
-                return AlertDialog(
-                  title:
-                      Text("Enter the OTP sent to the registered phone number"),
-                  titleTextStyle: TextStyle(
-                      fontSize: 16.0,
-                      color: MikroMartColors.colorPrimary,
-                      fontStyle: FontStyle.normal),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextField(
-                        keyboardType: TextInputType.number,
-                        controller: _codeController,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Row(
+                String _descriptionText =
+                    'Trying to automatically read the OTP';
+                bool _isLoading = true;
+
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return AlertDialog(
+                      title: Text(
+                          "Enter the OTP sent to the registered phone number"),
+                      titleTextStyle: TextStyle(
+                          fontSize: 16.0,
+                          color: MikroMartColors.colorPrimary,
+                          fontStyle: FontStyle.normal),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Text(
-                            "Trying to automatically read the OTP",
-                            style: TextStyle(
-                                fontSize: 12.0,
-                                color: MikroMartColors.purple,
-                                fontStyle: FontStyle.normal),
+                          TextField(
+                            keyboardType: TextInputType.number,
+                            controller: _codeController,
                           ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-                            child: Container(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(
-                                backgroundColor: MikroMartColors.white,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                    MikroMartColors.purple),
-                                strokeWidth: 1,
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text(
+                                _descriptionText,
+                                style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: _isLoading
+                                        ? MikroMartColors.purple
+                                        : MikroMartColors.errorRed,
+                                    fontStyle: FontStyle.normal),
                               ),
-                            ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                                child: Container(
+                                  width: 14,
+                                  height: 14,
+                                  child: _isLoading
+                                      ? CircularProgressIndicator(
+                                          backgroundColor:
+                                              MikroMartColors.white,
+                                          valueColor:
+                                              new AlwaysStoppedAnimation<Color>(
+                                                  MikroMartColors.purple),
+                                          strokeWidth: 1,
+                                        )
+                                      : Container(),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  actions: <Widget>[
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: FlatButton(
-                          child: Text('Confirm'),
-                          textColor: MikroMartColors.colorPrimary,
-                          onPressed: () async {
-                            final code = _codeController.text.trim();
-                            AuthCredential credential =
-                                PhoneAuthProvider.getCredential(
-                                    verificationId: verificationId,
-                                    smsCode: code);
+                      actions: <Widget>[
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FlatButton(
+                              child: Text('Confirm'),
+                              textColor: MikroMartColors.colorPrimary,
+                              onPressed: () async {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                final code = _codeController.text.trim();
+                                AuthCredential credential =
+                                    PhoneAuthProvider.getCredential(
+                                        verificationId: verificationId,
+                                        smsCode: code);
 
-                            registerPhoneWithSignedInUser(
-                                phone, credential, context);
-                          },
-                        ),
-                      ),
-                    )
-                  ],
+                                final result = await registerPhoneWithSignedInUser(
+                                        phone, credential, context);
+
+                                if (result != null) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      '/mainHome',
+                                      (Route<dynamic> route) => false);
+                                } else {
+                                  setState(() {
+                                    _isLoading = false;
+                                    _descriptionText =
+                                        "OTP did not match. Please try again";
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  },
                 );
               });
         },
         codeAutoRetrievalTimeout: null);
   }
 
-  Future<void> registerPhoneWithSignedInUser(
+  Future<String> registerPhoneWithSignedInUser(
       String phone, AuthCredential credential, context) async {
     final prefs = await SharedPreferences.getInstance();
     FirebaseUser user = await _auth.currentUser();
     if (user != null) {
       // successfully verified
-      user.linkWithCredential(credential).then((AuthResult value) async {
+      AuthResult authResult =  await user.linkWithCredential(credential).catchError((error) {
+        return null;
+      });
+
+      if(authResult!=null){
         String fcmToken = await _fcm.getToken();
 
-        await DatabaseService(uid: user.uid)
-            .updateUserData(prefs.getString(PREF_USER_NAME), user.email, true, phone, user.uid, fcmToken);
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        DatabaseService(uid: user.uid).updateUserData(
+            prefs.getString(PREF_USER_NAME),
+            user.email,
+            true,
+            phone,
+            user.uid,
+            fcmToken);
+        return 'success';
+      } else{
+        return null;
+      }
+      /*user.linkWithCredential(credential).then((AuthResult value) async {
 
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/mainHome', (Route<dynamic> route) => false);
-      });
+         //return Future.value('success');
+      }).catchError((error) {
+        print('phone error $error');
+        return null;
+      });*/
     } else {
       print('Error');
+      return null;
     }
   }
 
