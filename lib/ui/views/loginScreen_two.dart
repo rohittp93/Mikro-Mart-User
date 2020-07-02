@@ -7,6 +7,8 @@ import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/progress_button.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
+import 'package:userapp/ui/views/PhonenumberRegister.dart';
+import 'package:userapp/ui/views/mainHome.dart';
 import '../shared/custom_social_icons.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
   Offset pwFieldPosition;
   FocusNode _textFocus = new FocusNode();
   bool isLoginFormValid = false;
-  bool _phoneValidated = false;
+  Widget _intentWidget = LoginScreen();
   int _buttonAnimationState = 0;
 
   @override
@@ -332,7 +334,7 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Container(
                   child: RevealProgressButton(
                     isValid: this.isLoginCredsValid,
-                    phoneValidated: _phoneValidated,
+                    intentWidget: this._intentWidget,
                     buttonAnimationState: this._buttonAnimationState,
                     onPressed: () async {
                       FocusScope.of(context).requestFocus(FocusNode());
@@ -350,12 +352,11 @@ class _LoginScreenState extends State<LoginScreen>
                           if (user != null) {
                             setState(() {
                               _buttonAnimationState = 2;
-                              _phoneValidated = user.phoneValidated;
+                              _intentWidget = user.phoneValidated ? MainHome() : PhoneNumberRegister();
                             });
                           } else {
                             setState(() {
                               _buttonAnimationState = 0;
-                              _phoneValidated = false;
                             });
 
                             showSnackBar('Email & passwords don\'t match');

@@ -8,10 +8,10 @@ class ProgressButton extends StatefulWidget {
   final Function onPressed;
   int buttonAnimationState;
   bool isValid = false;
-  bool phoneValidated = false;
+  //bool phoneValidated = false;
 
   ProgressButton(this.callback, this.isValid, this.onPressed,
-      this.buttonAnimationState, this.phoneValidated);
+      this.buttonAnimationState/*, this.phoneValidated*/);
 
   @override
   State<StatefulWidget> createState() => ProgressButtonState();
@@ -40,7 +40,7 @@ class ProgressButtonState extends State<ProgressButton>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.phoneValidated &&
+    if (/*widget.phoneValidated &&*/
         widget.buttonAnimationState != null &&
         widget.buttonAnimationState == 2) {
       taskComplete();

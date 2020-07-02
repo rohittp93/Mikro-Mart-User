@@ -1,21 +1,17 @@
-import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:userapp/ui/shared/progress_button.dart';
 import 'package:userapp/ui/shared/reveal_progress_button_painter.dart';
-import 'package:userapp/ui/views/PhonenumberRegister.dart';
-import 'package:userapp/ui/views/mainHome.dart';
-
 class RevealProgressButton extends StatefulWidget {
   final Function onPressed;
   bool isValid;
   int buttonAnimationState;
-  bool phoneValidated;
+  Widget intentWidget;
 
   RevealProgressButton(
       {@required this.isValid,
       this.onPressed,
       @required this.buttonAnimationState,
-      @required this.phoneValidated});
+      @required this.intentWidget});
 
   @override
   State<StatefulWidget> createState() => _RevealProgressButtonState();
@@ -33,7 +29,7 @@ class _RevealProgressButtonState extends State<RevealProgressButton>
       painter:
           RevealProgressButtonPainter(_fraction, MediaQuery.of(context).size),
       child: ProgressButton(reveal, widget.isValid, widget.onPressed,
-          widget.buttonAnimationState, widget.phoneValidated),
+          widget.buttonAnimationState),
     );
   }
 
@@ -63,7 +59,7 @@ class _RevealProgressButtonState extends State<RevealProgressButton>
           Navigator.of(context).pushReplacement(
               new PageRouteBuilder(
                   pageBuilder: (BuildContext context, _, __) {
-                    return !widget.phoneValidated ? PhoneNumberRegister() : MainHome(); ;
+                    return widget.intentWidget;
                   },
                   transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
                     return new FadeTransition(

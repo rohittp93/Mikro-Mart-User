@@ -8,6 +8,7 @@ import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/FadeContainer.dart';
+import 'package:userapp/ui/views/mainHome.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -188,14 +189,28 @@ class AuthService {
         await DatabaseService(uid: user.uid)
             .updateUserData(prefs.getString(PREF_USER_NAME), user.email, true, phone, user.uid, fcmToken);
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
-        Navigator.pushReplacement(
+        Navigator.of(context).pushReplacement(
+            new PageRouteBuilder(
+                pageBuilder: (BuildContext context, _, __) {
+                  return  MainHome();
+                },
+                transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                  return new FadeTransition(
+                      opacity: animation,
+                      child: child
+                  );
+                }
+            )
+        );
+
+        /*Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => FadeBox(
               primaryColor: Theme.of(context).primaryColor,
             ),
           ),
-        );
+        );*/
       });
     } else {
       print('Error');
