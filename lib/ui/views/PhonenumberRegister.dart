@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/shared/reveal_progress.dart';
 import '../shared/text_styles.dart' as style;
 
 class PhoneNumberRegister extends StatefulWidget {
@@ -12,6 +13,10 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   String phone = '';
   final _codeController = TextEditingController();
+  bool isPhoneNumberValid = false;
+  bool _isSnackbarActive = false;
+  String _intentWidget = '/mainHome';
+  int _buttonAnimationState = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +90,11 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                           textInputAction: TextInputAction.done,
                           style: TextStyle(fontSize: 20.0),
                           onChanged: (val) {
-                            setState(() => this.phone = val);
+                            setState(() {
+                              this.phone = val;
+                              this.isPhoneNumberValid =
+                                  validateMobile(this.phone) == null;
+                            });
                           },
                         ),
                         flex: 9,
@@ -99,7 +108,38 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                   SizedBox(
                     height: 50,
                   ),
-                  ClipRRect(
+                  Container(
+                    margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0),
+                    child: RevealProgressButton(
+                      keepStack: false,
+                        isValid: this.isPhoneNumberValid,
+                        intentWidgetRoute: this._intentWidget,
+                        buttonAnimationState: this._buttonAnimationState,
+                        buttonText: 'SUBMIT',
+                        onPressed: () async {
+                          FocusScope.of(context).requestFocus(FocusNode());
+
+                          setState(() {
+                            _buttonAnimationState = 1;
+                          });
+
+                          String validationMessage = validateMobile(this.phone);
+                          if (validationMessage == null) {
+                            _auth.signInWithPhone('+91' + this.phone, context);
+                          } else {
+                            setState(() {
+                              _buttonAnimationState = 0;
+                            });
+
+                            _scaffoldkey.currentState.showSnackBar(SnackBar(
+                              content: new Text(validationMessage),
+                              duration: new Duration(seconds: 3),
+                            ));
+                          }
+
+                        }),
+                  ),
+                  /*ClipRRect(
                     borderRadius: BorderRadius.circular(70),
                     child: Material(
                       borderRadius: BorderRadius.circular(20),
@@ -116,9 +156,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                               duration: new Duration(seconds: 3),
                             ));
                           }
-
-                          //showAlertDialog();
-                        },
+                          },
                         child: Container(
                           width: size.width * 0.85,
                           height: 48,
@@ -158,7 +196,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                         ),
                       ),
                     ),
-                  )
+                  )*/
                 ])
           ],
         ));

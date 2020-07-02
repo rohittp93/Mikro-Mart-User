@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/shared/reveal_progress.dart';
+import 'package:userapp/ui/views/PhonenumberRegister.dart';
+import 'package:userapp/ui/views/mainHome.dart';
 import '../shared/theme.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -21,6 +24,11 @@ class _SignUpPageState extends State<SignUpPage> {
   String email = '';
   String password = '';
   String confirmPassword = '';
+  bool isRegistrationFormValid = false;
+  bool _isSnackbarActive = false;
+  String _intentWidget = '/phoneNumberRegister';
+  int _buttonAnimationState = 0;
+
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   final AuthService _auth = AuthService();
 
@@ -90,7 +98,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             TextStyle(color: Theme.of(context).hintColor),
                       ),
                       onChanged: (val) {
-                        setState(() => name = val);
+                        setState(() {
+                          name = val;
+                          isRegistrationFormValid = validateEmail(email) &&
+                              validatePassword(password) &&
+                              validateUserName(val);
+                        });
                       },
                     ),
                   ),
@@ -144,7 +157,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             TextStyle(color: Theme.of(context).hintColor),
                       ),
                       onChanged: (val) {
-                        setState(() => email = val);
+                        setState(() {
+                          email = val;
+
+                          isRegistrationFormValid = validateEmail(val) &&
+                              validatePassword(password) &&
+                              validateUserName(name);
+                        });
                       },
                     ),
                   ),
@@ -198,7 +217,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             TextStyle(color: Theme.of(context).hintColor),
                       ),
                       onChanged: (val) {
-                        setState(() => password = val);
+                        setState(() {
+                          password = val;
+
+                          isRegistrationFormValid = validateEmail(email) &&
+                              validatePassword(val) &&
+                              validateUserName(name);
+                        });
                       },
                     ),
                   ),
@@ -283,82 +308,63 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ],
             ),
+            Divider(
+              height: MediaQuery.of(context).size.height * 0.03,
+              color: Colors.transparent,
+            ),
             Container(
-              width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.only(
-                  left: 30.0,
-                  right: 30.0,
-                  top: MediaQuery.of(context).size.height * 0.05),
-              alignment: Alignment.center,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FlatButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      color: MikroMartColors.colorPrimary,
-                      onPressed: () async {
-                        FocusScope.of(context).requestFocus(FocusNode());
+              margin: const EdgeInsets.only(
+                  left: 40.0, right: 40.0, top: 0.0, bottom: 160.0),
+              child: RevealProgressButton(
+                  keepStack: false,
+                  isValid: this.isRegistrationFormValid,
+                  intentWidgetRoute: this._intentWidget,
+                  buttonAnimationState: this._buttonAnimationState,
+                  buttonText: 'REGISTER',
+                  onPressed: () async {
+                    FocusScope.of(context).requestFocus(FocusNode());
 
-                        if (this.name.length != 0) {
-                          if (this.email.length != 0 ||
-                              validateEmail(this.email)) {
-                            if (this.password.length != 0 &&
-                                this.password.length > 6) {
-                              if (this.password == this.confirmPassword) {
-                                // Perform sign up with email & pw
-                                // On success, create firestore entry with twoFactorEnabled = false
-                                // Redirect to phone screen by uncommenting below line
+                    if (this.name.length != 0) {
+                      if (this.email.length != 0 || validateEmail(this.email)) {
+                        if (this.password.length != 0 &&
+                            this.password.length > 6) {
+                          if (this.password == this.confirmPassword) {
+                            setState(() {
+                              _buttonAnimationState = 1;
+                            });
 
-                                dynamic result =
-                                    await _auth.registerWithEmailAndPassword(
-                                        this.name, this.email, this.password);
+                            dynamic result =
+                                await _auth.registerWithEmailAndPassword(
+                                    this.name, this.email, this.password);
 
-                                if (result == null) {
-                                  showSnackBar(
-                                      'Something has gone wrong. Please try again');
-                                } else {
-                                  //routeWhenUserUpdates(result);
-                                  routeWhenUserUpdates(
-                                      dartz.cast<FirebaseUserModel>(result));
-                                }
-                              } else {
-                                showSnackBar('Passwords don\'t match');
-                              }
-                            } else {
+                            if (result == null) {
                               showSnackBar(
-                                  'Password must be 6+ characters long');
+                                  'Something has gone wrong. Please try again');
+                              setState(() {
+                                _buttonAnimationState = 0;
+                              });
+                            } else {
+                              //routeWhenUserUpdates(result);
+                              setState(() {
+                                _buttonAnimationState = 2;
+                                _intentWidget = routeWhenUserUpdates(
+                                    dartz.cast<FirebaseUserModel>(result));
+                              });
                             }
                           } else {
-                            showSnackBar('Email ID is invalid');
+                            showSnackBar('Passwords don\'t match');
                           }
                         } else {
-                          showSnackBar('Enter a valid name');
+                          showSnackBar('Password must be 6+ characters long');
                         }
-                      },
-                      child: Container(
-                        height: 48,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "SIGN UP",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                      } else {
+                        showSnackBar('Email ID is invalid');
+                      }
+                    } else {
+                      showSnackBar('Enter a valid name');
+                    }
+                  }),
+            )
           ],
         )),
       ),
@@ -366,10 +372,16 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void showSnackBar(String message) {
-    _scaffoldkey.currentState.showSnackBar(SnackBar(
-      content: new Text(message),
-      duration: new Duration(seconds: 3),
-    ));
+    if (!_isSnackbarActive) {
+      _isSnackbarActive = true;
+      _scaffoldkey.currentState
+          .showSnackBar(SnackBar(
+            content: new Text(message),
+            duration: new Duration(seconds: 3),
+          ))
+          .closed
+          .then((value) => _isSnackbarActive = false);
+    }
   }
 
   bool validateEmail(String value) {
@@ -379,15 +391,30 @@ class _SignUpPageState extends State<SignUpPage> {
     return (!regex.hasMatch(value)) ? false : true;
   }
 
-  void routeWhenUserUpdates(FirebaseUserModel user) {
+  bool validatePassword(String text) {
+    if (password.length != 0 && password.length > 6) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool validateUserName(String text) {
+    if (name.length != 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  String routeWhenUserUpdates(FirebaseUserModel user) {
     if (user == null) {
+      return null;
     } else {
       if (user.isPhoneVerified) {
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushReplacementNamed('/mainHome');
-        });
+        return '/mainHome';
       } else {
-        Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
+        return '/phoneNumberRegister';
       }
     }
   }

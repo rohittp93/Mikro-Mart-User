@@ -12,9 +12,9 @@ import 'package:userapp/ui/views/mainHome.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final String PREF_PHONE_AUTHENTICATED = 'phone_authenticated';
-  final String PREF_IS_SIGNED_IN = 'signed_in ';
-  final String PREF_USER_NAME = 'user_name';
+  final String PREF_PHONE_AUTHENTICATED = "phone_authenticated";
+  final String PREF_IS_SIGNED_IN = "signed_in";
+  final String PREF_USER_NAME = "user_name";
 
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final AppDatabase appDatabase = AppDatabase();
@@ -189,28 +189,9 @@ class AuthService {
         await DatabaseService(uid: user.uid)
             .updateUserData(prefs.getString(PREF_USER_NAME), user.email, true, phone, user.uid, fcmToken);
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
-        Navigator.of(context).pushReplacement(
-            new PageRouteBuilder(
-                pageBuilder: (BuildContext context, _, __) {
-                  return  MainHome();
-                },
-                transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                  return new FadeTransition(
-                      opacity: animation,
-                      child: child
-                  );
-                }
-            )
-        );
 
-        /*Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FadeBox(
-              primaryColor: Theme.of(context).primaryColor,
-            ),
-          ),
-        );*/
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/mainHome', (Route<dynamic> route) => false);
       });
     } else {
       print('Error');
@@ -241,7 +222,7 @@ class AuthService {
         if (user.phoneValidated) {
           prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         } else {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
         }
 
         appDatabase.insertUser(user);

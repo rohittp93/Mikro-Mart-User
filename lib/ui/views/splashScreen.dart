@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     var _duration = new Duration(seconds: 3);
     return new Timer(_duration, () {
       navigationPage(
-          prefs.getBool('signed_in'), prefs.getBool('phone_authenticated'));
+          prefs.getBool("signed_in") ?? false , prefs.getBool("phone_authenticated") ?? false);
     });
   }
 
@@ -47,20 +47,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPage(bool is_signed_in, bool isPhoneAuthenticated) {
-    if (is_signed_in != null) {
       if(!is_signed_in) {
         Navigator.of(context).pushReplacementNamed('/');
       }else{
-        if (isPhoneAuthenticated != null && isPhoneAuthenticated) {
+        if (isPhoneAuthenticated) {
           Navigator.of(context).pushReplacementNamed('/mainHome');
         } else {
           Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
         }
       }
-    } else {
-      Navigator.of(context).pushReplacementNamed('/');
-      //_saveDeviceToken(user.uid);
-    }
   }
 
   _saveDeviceToken(String userId) async {

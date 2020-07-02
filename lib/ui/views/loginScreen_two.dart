@@ -30,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen>
   Offset pwFieldPosition;
   FocusNode _textFocus = new FocusNode();
   bool isLoginFormValid = false;
-  Widget _intentWidget = LoginScreen();
+  String _intentWidget = '/phoneNumberRegister';
+  bool _isSnackbarActive = false;
   int _buttonAnimationState = 0;
 
   @override
@@ -334,8 +335,10 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Container(
                   child: RevealProgressButton(
                     isValid: this.isLoginCredsValid,
-                    intentWidget: this._intentWidget,
+                    keepStack: false,
+                    intentWidgetRoute: this._intentWidget,
                     buttonAnimationState: this._buttonAnimationState,
+                    buttonText: 'LOGIN',
                     onPressed: () async {
                       FocusScope.of(context).requestFocus(FocusNode());
 
@@ -352,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen>
                           if (user != null) {
                             setState(() {
                               _buttonAnimationState = 2;
-                              _intentWidget = user.phoneValidated ? MainHome() : PhoneNumberRegister();
+                              _intentWidget = user.phoneValidated ? '/mainHome' : '/phoneNumberRegister';
                             });
                           } else {
                             setState(() {
@@ -397,11 +400,18 @@ class _LoginScreenState extends State<LoginScreen>
     return (!regex.hasMatch(value)) ? false : true;
   }
 
+
   void showSnackBar(String message) {
-    _scaffoldkey.currentState.showSnackBar(SnackBar(
-      content: new Text(message),
-      duration: new Duration(seconds: 3),
-    ));
+    if (!_isSnackbarActive) {
+      _isSnackbarActive = true;
+      _scaffoldkey.currentState
+          .showSnackBar(SnackBar(
+        content: new Text(message),
+        duration: new Duration(seconds: 3),
+      ))
+          .closed
+          .then((value) => _isSnackbarActive = false);
+    }
   }
 
   bool validatePassword(String text) {

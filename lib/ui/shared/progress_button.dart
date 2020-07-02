@@ -8,10 +8,10 @@ class ProgressButton extends StatefulWidget {
   final Function onPressed;
   int buttonAnimationState;
   bool isValid = false;
-  //bool phoneValidated = false;
+  String buttonText;
 
   ProgressButton(this.callback, this.isValid, this.onPressed,
-      this.buttonAnimationState/*, this.phoneValidated*/);
+      this.buttonAnimationState, this.buttonText);
 
   @override
   State<StatefulWidget> createState() => ProgressButtonState();
@@ -107,6 +107,7 @@ class ProgressButtonState extends State<ProgressButton>
     Timer(Duration(milliseconds: 500), () {
       _animatingReveal = true;
       widget.callback();
+      _controller.dispose();
     });
   }
 
@@ -117,7 +118,7 @@ class ProgressButtonState extends State<ProgressButton>
   Widget buildButtonChild() {
     if (widget.buttonAnimationState == 0) {
       return Text(
-        'LOGIN',
+        widget.buttonText,
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       );
     } else if (widget.buttonAnimationState == 1) {
