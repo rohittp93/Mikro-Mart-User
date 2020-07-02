@@ -12,7 +12,9 @@ import 'package:userapp/ui/views/Login_staggeredAnimation/FadeContainer.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final String PREF_PHONE_AUTHENTICATED = 'phone_authenticated';
-  final String PREF_IS_SIGNED_IN = 'signed_in';
+  final String PREF_IS_SIGNED_IN = 'signed_in ';
+  final String PREF_USER_NAME = 'user_name';
+
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final AppDatabase appDatabase = AppDatabase();
 
@@ -49,17 +51,19 @@ class AuthService {
   }
 
 // register with email & pw
-  Future registerWithEmailAndPassword(String email, String password) async {
+  Future registerWithEmailAndPassword(String name, String email, String password) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      final prefs = await SharedPreferences.getInstance();
+
+      prefs.setString(PREF_USER_NAME, name);
+
       FirebaseUser user = result.user;
       // create a new document with uid & twofactorenabled as false
       String fcmToken = await _fcm.getToken();
       await DatabaseService(uid: user.uid)
-          .updateUserData(false, '', user.uid, fcmToken);
-      final prefs = await SharedPreferences.getInstance();
-
+          .updateUserData(name, email, false, '', user.uid, fcmToken);
       prefs.setBool(PREF_IS_SIGNED_IN, true);
 
       return _userFromFirebaseUser(user, true, false);
@@ -182,7 +186,7 @@ class AuthService {
         String fcmToken = await _fcm.getToken();
 
         await DatabaseService(uid: user.uid)
-            .updateUserData(true, phone, user.uid, fcmToken);
+            .updateUserData(prefs.getString(PREF_USER_NAME), user.email, true, phone, user.uid, fcmToken);
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         Navigator.pushReplacement(
           context,
@@ -214,7 +218,7 @@ class AuthService {
 
         User user = new User(
             uid: firebaseUser.uid,
-            name: "dummy_name",
+            name: "name",
             email: "dummy_email",
             phoneValidated: userDoc.data["two_factor_enabled"],
             phone: userDoc.data["phone_number"]);

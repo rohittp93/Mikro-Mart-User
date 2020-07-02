@@ -34,7 +34,8 @@ class _FadeBoxState extends State<FadeBox> with TickerProviderStateMixin {
       body: AnimatedBuilder(
         animation: _screenController,
         builder: (context, child) {
-          return MainHome();
+          //return MainHome();
+          return Container();
         },
       ),
     );

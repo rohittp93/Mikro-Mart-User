@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/shared/progress_button.dart';
+import 'package:userapp/ui/shared/reveal_progress.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
 import '../shared/custom_social_icons.dart';
 
@@ -16,16 +19,38 @@ class _LoginScreenState extends State<LoginScreen>
   AnimationController _loginButtonController;
   var animationStatus = 0;
   String email = '';
+  bool isLoginCredsValid = false;
   String password = '';
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   final AuthService _auth = AuthService();
+  final GlobalKey _passwordInputKey = GlobalKey();
+  Size pwFieldSize;
+  Offset pwFieldPosition;
+  FocusNode _textFocus = new FocusNode();
+  bool isLoginFormValid = false;
+  bool _phoneValidated = false;
+  int _buttonAnimationState = 0;
 
   @override
   void initState() {
     _loginButtonController = AnimationController(
         duration: Duration(milliseconds: 3000), vsync: this);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getSizeAndPosition();
+    });
+
     super.initState();
+  }
+
+  getSizeAndPosition() {
+    RenderBox _textFieldBox =
+        _passwordInputKey.currentContext.findRenderObject();
+    pwFieldSize = _textFieldBox.size;
+    pwFieldPosition = _textFieldBox.localToGlobal(Offset.zero);
+    print(pwFieldSize);
+    print(pwFieldPosition);
+    setState(() {});
   }
 
   Future<Null> _playAnimation() async {
@@ -48,20 +73,14 @@ class _LoginScreenState extends State<LoginScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldkey,
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            image: DecorationImage(
-              colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.05), BlendMode.dstATop),
-              image: AssetImage('assets/home_background.jpeg'),
-              fit: BoxFit.cover,
-            ),
-          ),
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        color: Colors.transparent,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
           child: Stack(
-            alignment: AlignmentDirectional.topCenter,
             children: <Widget>[
               Column(
                 children: <Widget>[
@@ -71,20 +90,20 @@ class _LoginScreenState extends State<LoginScreen>
                   Container(
                     child: Image.asset(
                       "assets/logo.png",
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: MediaQuery.of(context).size.width * 0.7,
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      height: MediaQuery.of(context).size.width * 0.6,
                     ),
                   ),
                   Row(
                     children: <Widget>[
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 40.0),
+                          padding: const EdgeInsets.only(left: 40.0, top: 20),
                           child: Text(
                             "EMAIL",
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
                               color: MikroMartColors.colorPrimary,
+                              fontWeight: FontWeight.w400,
                               fontSize: 15.0,
                             ),
                           ),
@@ -121,7 +140,11 @@ class _LoginScreenState extends State<LoginScreen>
                                   TextStyle(color: Theme.of(context).hintColor),
                             ),
                             onChanged: (val) {
-                              setState(() => email = val);
+                              setState(() {
+                                email = val;
+                                isLoginCredsValid = validateEmail(val) &&
+                                    validatePassword(password);
+                              });
                             },
                           ),
                         ),
@@ -140,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen>
                           child: Text(
                             "PASSWORD",
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w400,
                               color: MikroMartColors.colorPrimary,
                               fontSize: 15.0,
                             ),
@@ -169,6 +192,7 @@ class _LoginScreenState extends State<LoginScreen>
                       children: <Widget>[
                         Expanded(
                           child: TextField(
+                            key: _passwordInputKey,
                             obscureText: true,
                             textAlign: TextAlign.left,
                             decoration: InputDecoration(
@@ -178,46 +202,23 @@ class _LoginScreenState extends State<LoginScreen>
                                   TextStyle(color: Theme.of(context).hintColor),
                             ),
                             onChanged: (val) {
-                              setState(() => password = val);
+                              setState(() {
+                                password = val;
+                                isLoginCredsValid = validateEmail(email) &&
+                                    validatePassword(val);
+                              });
                             },
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Divider(
-                    height: MediaQuery.of(context).size.height * 0.03,
-                    color: Colors.transparent,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: FlatButton(
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: MikroMartColors.colorPrimary,
-                              fontSize: 15.0,
-                            ),
-                            textAlign: TextAlign.end,
-                          ),
-                          onPressed: () => {},
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Container(),
-                  ),
                   Column(
                     children: <Widget>[
                       Container(
                         width: MediaQuery.of(context).size.width,
                         margin: const EdgeInsets.only(
-                            left: 30.0, right: 30.0, top: 20.0),
+                            left: 30.0, right: 30.0, top: 108.0),
                         alignment: Alignment.center,
                         child: Row(
                           children: <Widget>[
@@ -253,7 +254,6 @@ class _LoginScreenState extends State<LoginScreen>
                           children: <Widget>[
                             Expanded(
                               child: Container(
-                                margin: EdgeInsets.only(left: 8.0),
                                 alignment: Alignment.center,
                                 child: Row(
                                   children: <Widget>[
@@ -322,102 +322,65 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.05,
+                        height: 50,
                       )
                     ],
                   ),
                 ],
               ),
-              animationStatus == 0
-                  ? Container(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.95 - 180),
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.only(left: 30.0, right: 30.0),
-                      //alignment: Alignment.center,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: FlatButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            color: MikroMartColors.colorPrimary,
-                            onPressed: () async {
-                              // TODO : Validate if Email & PW are entered & then proceed if valid.
-                              // Use the auth object to invoke sign in with email & pw here
-                              FocusScope.of(context).requestFocus(FocusNode());
+              Center(
+                child: Container(
+                  child: RevealProgressButton(
+                    isValid: this.isLoginCredsValid,
+                    phoneValidated: _phoneValidated,
+                    buttonAnimationState: this._buttonAnimationState,
+                    onPressed: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
 
-                              if (this.email.length != 0 ||
-                                  validateEmail(this.email)) {
-                                if (this.password.length != 0 &&
-                                    this.password.length > 6) {
-                                  User user =
-                                      await _auth.signInWithEmailAndPassword(
-                                          this.email, this.password);
+                      if (this.email.length != 0 || validateEmail(this.email)) {
+                        if (this.password.length != 0 &&
+                            this.password.length > 6) {
+                          setState(() {
+                            _buttonAnimationState = 1;
+                          });
 
-                                  if (user == null) {
-                                    _scaffoldkey.currentState
-                                        .showSnackBar(SnackBar(
-                                      content: new Text(
-                                          'There was a problem signing in. Please check your credentials'),
-                                      duration: new Duration(seconds: 3),
-                                    ));
-                                  } else {
-                                    if (user.phoneValidated) {
-                                      Navigator.of(context)
-                                          .pushReplacementNamed('/mainHome');
-                                    } else {
-                                      Navigator.of(context)
-                                          .pushReplacementNamed(
-                                              '/phoneNumberRegister');
-                                    }
-                                  }
-                                } else {
-                                  _scaffoldkey.currentState
-                                      .showSnackBar(SnackBar(
-                                    content: new Text(
-                                        'Password must be 6+ characters long'),
-                                    duration: new Duration(seconds: 3),
-                                  ));
-                                }
-                              } else {
-                                _scaffoldkey.currentState.showSnackBar(SnackBar(
-                                  content: new Text('Email ID is invalid'),
-                                  duration: new Duration(seconds: 3),
-                                ));
-                              }
+                          User user = await   _auth.signInWithEmailAndPassword(
+                              this.email, this.password);
 
-                              /* setState(() {
-                                animationStatus = 1;
-                              });
-                              _playAnimation();*/
-                            },
-                            child: Container(
-                              height: 48,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                      "LOGIN",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )),
-                        ],
-                      ),
-                    )
-                  : StaggerAnimation(
-                      buttonController: _loginButtonController.view,
-                      //screenSize: MediaQuery.of(context).size,
-                    )
+                          if (user != null) {
+                            setState(() {
+                              _buttonAnimationState = 2;
+                              _phoneValidated = user.phoneValidated;
+                            });
+                          } else {
+                            setState(() {
+                              _buttonAnimationState = 0;
+                              _phoneValidated = false;
+                            });
+
+                            showSnackBar('Email & passwords don\'t match');
+                          }
+                        } else {
+                          showSnackBar('Password must be 6+ characters long');
+                        }
+                      } else {
+                        showSnackBar('Email ID is invalid');
+                      }
+
+                    },
+                  ),
+                  padding: EdgeInsets.only(
+                      top: ((pwFieldPosition != null
+                                  ? pwFieldPosition.dy
+                                  : 0.0) +
+                              (pwFieldSize != null
+                                  ? pwFieldSize.height
+                                  : 0.0)) +
+                          40),
+                  //width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.only(left: 30.0, right: 30.0),
+                ),
+              ),
             ],
           ),
         ),
@@ -431,5 +394,20 @@ class _LoginScreenState extends State<LoginScreen>
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
     return (!regex.hasMatch(value)) ? false : true;
+  }
+
+  void showSnackBar(String message) {
+    _scaffoldkey.currentState.showSnackBar(SnackBar(
+      content: new Text(message),
+      duration: new Duration(seconds: 3),
+    ));
+  }
+
+  bool validatePassword(String text) {
+    if (password.length != 0 && password.length > 6) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

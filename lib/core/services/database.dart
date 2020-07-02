@@ -8,14 +8,15 @@ class DatabaseService {
 
   final CollectionReference userCollection = Firestore.instance.collection('users');
 
-  Future updateUserData(bool twoFactorEnabled, String phoneNumber, String uid, String fcmToken) async{
+  Future updateUserData(String name,String email, bool twoFactorEnabled, String phoneNumber, String uid, String fcmToken) async{
     return await userCollection.document(uid).setData({
       'two_factor_enabled': twoFactorEnabled,
       'phone_number' : phoneNumber,
       'is_admin' : false,
       'registration_date' : FieldValue.serverTimestamp(),
       'user_id' : uid,
-      'device_token': fcmToken
+      'device_token': fcmToken,
+      'name': name
     });
   }
 

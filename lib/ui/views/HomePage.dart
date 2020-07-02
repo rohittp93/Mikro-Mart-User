@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import './signupPage.dart';
-import './loginScreen.dart';
+import './loginScreen_two.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -76,10 +76,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                     onPressed: () => gotoSignup(),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 20.0,
-                        horizontal: 20.0,
-                      ),
+                      height: 48,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -119,10 +116,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     highlightColor: MikroMartColors.colorPrimary,
                     onPressed: () => gotoLogin(),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 20.0,
-                        horizontal: 20.0,
-                      ),
+                     height: 48,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
