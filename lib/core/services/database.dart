@@ -16,6 +16,7 @@ class DatabaseService {
       'registration_date' : FieldValue.serverTimestamp(),
       'user_id' : uid,
       'device_token': fcmToken,
+      'email': email,
       'name': name
     });
   }

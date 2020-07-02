@@ -1,15 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
-import 'package:userapp/ui/shared/progress_button.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
-import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
-import 'package:userapp/ui/views/PhonenumberRegister.dart';
-import 'package:userapp/ui/views/mainHome.dart';
-import '../shared/custom_social_icons.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -26,9 +20,9 @@ class _LoginScreenState extends State<LoginScreen>
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   final AuthService _auth = AuthService();
   final GlobalKey _passwordInputKey = GlobalKey();
-  Size pwFieldSize;
-  Offset pwFieldPosition;
-  FocusNode _textFocus = new FocusNode();
+ /* Size pwFieldSize;
+  Offset pwFieldPosition;*/
+  //FocusNode _textFocus = new FocusNode();
   bool isLoginFormValid = false;
   String _intentWidget = '/phoneNumberRegister';
   bool _isSnackbarActive = false;
@@ -38,32 +32,7 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     _loginButtonController = AnimationController(
         duration: Duration(milliseconds: 3000), vsync: this);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getSizeAndPosition();
-    });
-
     super.initState();
-  }
-
-  getSizeAndPosition() {
-    RenderBox _textFieldBox =
-        _passwordInputKey.currentContext.findRenderObject();
-    pwFieldSize = _textFieldBox.size;
-    pwFieldPosition = _textFieldBox.localToGlobal(Offset.zero);
-    print(pwFieldSize);
-    print(pwFieldPosition);
-    setState(() {});
-  }
-
-  Future<Null> _playAnimation() async {
-    await _loginButtonController.reset();
-    try {
-      await _loginButtonController.forward().whenComplete(() {
-        animationStatus = 0;
-      });
-      //await _loginButtonController.reverse();
-    } on TickerCanceled {}
   }
 
   @override
@@ -219,9 +188,52 @@ class _LoginScreenState extends State<LoginScreen>
                   Column(
                     children: <Widget>[
                       Container(
+                        child: RevealProgressButton(
+                          isValid: this.isLoginCredsValid,
+                          keepStack: false,
+                          intentWidgetRoute: this._intentWidget,
+                          buttonAnimationState: this._buttonAnimationState,
+                          buttonText: 'LOGIN',
+                          onPressed: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+
+                            if (this.email.length != 0 || validateEmail(this.email)) {
+                              if (this.password.length != 0 &&
+                                  this.password.length > 6) {
+                                setState(() {
+                                  _buttonAnimationState = 1;
+                                });
+
+                                User user = await   _auth.signInWithEmailAndPassword(
+                                    this.email, this.password);
+
+                                if (user != null) {
+                                  setState(() {
+                                    _buttonAnimationState = 2;
+                                    _intentWidget = user.phoneValidated ? '/mainHome' : '/phoneNumberRegister';
+                                  });
+                                } else {
+                                  setState(() {
+                                    _buttonAnimationState = 0;
+                                  });
+
+                                  showSnackBar('Email & passwords don\'t match');
+                                }
+                              } else {
+                                showSnackBar('Password must be 6+ characters long');
+                              }
+                            } else {
+                              showSnackBar('Email ID is invalid');
+                            }
+
+                          },
+                        ),
+                        margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 80.0),
+                      ),
+                      Container(
                         width: MediaQuery.of(context).size.width,
                         margin: const EdgeInsets.only(
-                            left: 30.0, right: 30.0, top: 108.0),
+                            left: 30.0, right: 30.0, top: 20.0),
                         alignment: Alignment.center,
                         child: Row(
                           children: <Widget>[
@@ -233,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             Text(
-                              "OR CONNECT WITH",
+                              "OR",
                               style: TextStyle(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.bold,
@@ -249,79 +261,54 @@ class _LoginScreenState extends State<LoginScreen>
                           ],
                         ),
                       ),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.only(
-                            left: 30.0, right: 30.0, top: 20.0),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: FlatButton(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                        ),
-                                        color: Color(0Xffdb3236),
-                                        onPressed: () => {},
-                                        child: Container(
-                                          height: 48,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: FlatButton(
-                                                  onPressed: () => {},
-                                                  child: Stack(
-                                                    children: <Widget>[
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: <Widget>[
-                                                          Center(
-                                                            child: Icon(
-                                                              CustomSocial
-                                                                  .google,
-                                                              color:
-                                                                  Colors.white,
-                                                              size: 15.0,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Center(
-                                                        child: Text(
-                                                          "GOOGLE",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(30.0,20.0,30.0,0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 48,
+                            color: MikroMartColors.colorPrimary,
+                            child: InkWell(
+                              onTap: () async {
+                                FirebaseUserModel user =
+                                    await _auth.signInWithGoogle();
+
+                                if (user == null) {
+                                  _scaffoldkey.currentState
+                                      .showSnackBar(SnackBar(
+                                    content: new Text(
+                                        'There was a problem signing in. Please check your credentials'),
+                                    duration: new Duration(seconds: 3),
+                                  ));
+                                } else {
+                                  if (user.isPhoneVerified) {
+                                    Navigator.of(context)
+                                        .pushReplacementNamed('/mainHome');
+                                  } else {
+                                    Navigator.of(context)
+                                        .pushReplacementNamed(
+                                        '/phoneNumberRegister');
+                                  }
+                                }
+                              },
+                              child: Center(
+                                child: Container(
+                                  child: Text(
+                                    "SIGN IN WITH GOOGLE",
+                                    textAlign:
+                                    TextAlign.center,
+                                    style: TextStyle(
+                                        color:
+                                        Colors.white,
+                                        fontWeight:
+                                        FontWeight
+                                            .bold),
+                                  ),
                                 ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -330,60 +317,6 @@ class _LoginScreenState extends State<LoginScreen>
                     ],
                   ),
                 ],
-              ),
-              Center(
-                child: Container(
-                  child: RevealProgressButton(
-                    isValid: this.isLoginCredsValid,
-                    keepStack: false,
-                    intentWidgetRoute: this._intentWidget,
-                    buttonAnimationState: this._buttonAnimationState,
-                    buttonText: 'LOGIN',
-                    onPressed: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-
-                      if (this.email.length != 0 || validateEmail(this.email)) {
-                        if (this.password.length != 0 &&
-                            this.password.length > 6) {
-                          setState(() {
-                            _buttonAnimationState = 1;
-                          });
-
-                          User user = await   _auth.signInWithEmailAndPassword(
-                              this.email, this.password);
-
-                          if (user != null) {
-                            setState(() {
-                              _buttonAnimationState = 2;
-                              _intentWidget = user.phoneValidated ? '/mainHome' : '/phoneNumberRegister';
-                            });
-                          } else {
-                            setState(() {
-                              _buttonAnimationState = 0;
-                            });
-
-                            showSnackBar('Email & passwords don\'t match');
-                          }
-                        } else {
-                          showSnackBar('Password must be 6+ characters long');
-                        }
-                      } else {
-                        showSnackBar('Email ID is invalid');
-                      }
-
-                    },
-                  ),
-                  padding: EdgeInsets.only(
-                      top: ((pwFieldPosition != null
-                                  ? pwFieldPosition.dy
-                                  : 0.0) +
-                              (pwFieldSize != null
-                                  ? pwFieldSize.height
-                                  : 0.0)) +
-                          40),
-                  //width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.only(left: 30.0, right: 30.0),
-                ),
               ),
             ],
           ),

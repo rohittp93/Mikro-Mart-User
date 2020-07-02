@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
@@ -15,6 +16,7 @@ class AuthService {
   final String PREF_PHONE_AUTHENTICATED = "phone_authenticated";
   final String PREF_IS_SIGNED_IN = "signed_in";
   final String PREF_USER_NAME = "user_name";
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final FirebaseMessaging _fcm = FirebaseMessaging();
   final AppDatabase appDatabase = AppDatabase();
@@ -29,8 +31,6 @@ class AuthService {
             isPhoneVerified: isPhoneVerified)
         : null;
   }
-
-  // sign in with google
 
   // auth change user stream
   Stream<FirebaseUserModel> get user {
@@ -191,7 +191,8 @@ class AuthService {
                                         verificationId: verificationId,
                                         smsCode: code);
 
-                                final result = await registerPhoneWithSignedInUser(
+                                final result =
+                                    await registerPhoneWithSignedInUser(
                                         phone, credential, context);
 
                                 if (result != null) {
@@ -224,11 +225,12 @@ class AuthService {
     FirebaseUser user = await _auth.currentUser();
     if (user != null) {
       // successfully verified
-      AuthResult authResult =  await user.linkWithCredential(credential).catchError((error) {
+      AuthResult authResult =
+          await user.linkWithCredential(credential).catchError((error) {
         return null;
       });
 
-      if(authResult!=null){
+      if (authResult != null) {
         String fcmToken = await _fcm.getToken();
 
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
@@ -240,7 +242,7 @@ class AuthService {
             user.uid,
             fcmToken);
         return 'success';
-      } else{
+      } else {
         return null;
       }
       /*user.linkWithCredential(credential).then((AuthResult value) async {
@@ -259,6 +261,93 @@ class AuthService {
   // sign in with email & pw
   Future<User> signInWithEmailAndPassword(String email, String password) async {
     try {
+      AuthResult result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+
+      FirebaseUser firebaseUser = result.user;
+      if (firebaseUser != null) {
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setBool(PREF_IS_SIGNED_IN, true);
+
+        DocumentSnapshot userDoc = await DatabaseService(uid: firebaseUser.uid)
+            .fetchUserData(result.user.uid);
+
+        User user = new User(
+            uid: firebaseUser.uid,
+            name: userDoc.data["name"],
+            email: userDoc.data["email"],
+            phoneValidated: userDoc.data["two_factor_enabled"],
+            phone: userDoc.data["phone_number"]);
+
+        if (user.phoneValidated) {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        } else {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
+        }
+
+        appDatabase.insertUser(user);
+
+        return user;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  // sign in with google
+  Future<FirebaseUserModel> signInWithGoogle() async {
+    try {
+      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final AuthResult authResult =
+          await _auth.signInWithCredential(credential);
+      final FirebaseUser user = authResult.user;
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setBool(PREF_IS_SIGNED_IN, true);
+
+      DocumentSnapshot userDoc =
+          await DatabaseService(uid: user.uid).fetchUserData(user.uid);
+
+      if (userDoc.exists) {
+        User userModel = new User(
+            uid: user.uid,
+            name: userDoc.data["name"],
+            email: userDoc.data["email"],
+            phoneValidated: userDoc.data["two_factor_enabled"],
+            phone: userDoc.data["phone_number"]);
+
+        if (userModel.phoneValidated) {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        } else {
+          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
+        }
+
+        appDatabase.insertUser(userModel);
+
+        return _userFromFirebaseUser(user, true, userModel.phoneValidated);
+      } else {
+        String fcmToken = await _fcm.getToken();
+        await DatabaseService(uid: user.uid)
+            .updateUserData(user.email, user.email, false, '', user.uid, fcmToken);
+        prefs.setBool(PREF_IS_SIGNED_IN, true);
+
+        return _userFromFirebaseUser(user, true, false);
+      }
+    } catch (e) {
+      return null;
+    }
+
+    /*try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
 
@@ -292,7 +381,7 @@ class AuthService {
     } catch (e) {
       print(e.toString());
       return null;
-    }
+    }*/
   }
 
   Future<void> updateFCMToken(String userId, String fcmToken) async {

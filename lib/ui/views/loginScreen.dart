@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/auth.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/Login_staggeredAnimation/staggeredAnimation.dart';
@@ -264,7 +265,29 @@ class _LoginScreenState extends State<LoginScreen>
                                               BorderRadius.circular(30.0),
                                         ),
                                         color: Color(0Xffdb3236),
-                                        onPressed: () => {},
+                                        onPressed: () async {
+                                          //adjsgh
+                                          FirebaseUserModel user =
+                                              await _auth.signInWithGoogle();
+
+                                          if (user == null) {
+                                            _scaffoldkey.currentState
+                                                .showSnackBar(SnackBar(
+                                              content: new Text(
+                                                  'There was a problem signing in. Please check your credentials'),
+                                              duration: new Duration(seconds: 3),
+                                            ));
+                                          } else {
+                                            if (user.isPhoneVerified) {
+                                              Navigator.of(context)
+                                                  .pushReplacementNamed('/mainHome');
+                                            } else {
+                                              Navigator.of(context)
+                                                  .pushReplacementNamed(
+                                                  '/phoneNumberRegister');
+                                            }
+                                          }
+                                        },
                                         child: Container(
                                           height: 48,
                                           child: Row(
