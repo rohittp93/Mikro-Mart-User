@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import './signupPage.dart';
-import './loginScreen_two.dart';
+import './loginScreen.dart';
 
 class HomePage extends StatefulWidget {
   @override

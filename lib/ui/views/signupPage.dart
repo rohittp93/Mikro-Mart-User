@@ -31,6 +31,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   final AuthService _auth = AuthService();
+  final emailFocus = FocusNode();
+  final passwordFocus = FocusNode();
+  final confirmForcus = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +94,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: TextField(
                       obscureText: false,
                       textAlign: TextAlign.left,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (v){
+                        FocusScope.of(context).requestFocus(emailFocus);
+                      },
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Name',
@@ -149,6 +156,11 @@ class _SignUpPageState extends State<SignUpPage> {
                   Expanded(
                     child: TextField(
                       obscureText: false,
+                      textInputAction: TextInputAction.next,
+                      focusNode: emailFocus,
+                      onSubmitted: (v) {
+                        FocusScope.of(context).requestFocus(passwordFocus);
+                      },
                       textAlign: TextAlign.left,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -209,7 +221,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   Expanded(
                     child: TextField(
                       obscureText: true,
+                      focusNode: passwordFocus,
                       textAlign: TextAlign.left,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (v) {
+                        FocusScope.of(context).requestFocus(confirmForcus);
+                      },
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: '*********',
@@ -270,6 +287,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: TextField(
                       obscureText: true,
                       textAlign: TextAlign.left,
+                      focusNode: confirmForcus,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: '*********',

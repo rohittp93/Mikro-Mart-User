@@ -182,6 +182,7 @@ class AuthService {
                               child: Text('Confirm'),
                               textColor: MikroMartColors.colorPrimary,
                               onPressed: () async {
+                                FocusScope.of(context).requestFocus(FocusNode());
                                 setState(() {
                                   _isLoading = true;
                                 });

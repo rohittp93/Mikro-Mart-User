@@ -5,7 +5,6 @@ import 'package:userapp/ui/views/PhonenumberRegister.dart';
 import 'package:userapp/ui/views/card_type.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
 import 'package:userapp/ui/views/onBording.dart';
-import './views/loginScreen.dart';
 import './views/HomePage.dart';
 import './views/mainHome.dart';
 import './views/shoppingCart.dart';
