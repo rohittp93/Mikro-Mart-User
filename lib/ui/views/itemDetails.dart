@@ -2,37 +2,39 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:userapp/core/models/item.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
 final stateBloc = StateBloc();
 
 class ItemDetails extends StatelessWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  ItemDetails({this.dish});
+  ItemDetails({this.data});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutStarts(
-        dish: dish,
+        data: data,
       ),
     );
   }
 }
 
 class LayoutStarts extends StatelessWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  LayoutStarts({this.dish});
+  LayoutStarts({this.data});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        CarDetailsAnimation(dish: dish),
-        CustomBottomSheet(context: context, dish: dish),
+        CarDetailsAnimation(data: data),
+        CustomBottomSheet(context: context, data: data),
         RentButton(),
       ],
     );
@@ -45,7 +47,6 @@ class RentButton extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomRight,
       child: SizedBox(
-        width: 200,
         child: FlatButton(
           onPressed: () {},
           child: Text(
@@ -53,10 +54,10 @@ class RentButton extends StatelessWidget {
             style: style.arialTheme,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(35)),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
           ),
-          color: Theme.of(context).primaryColor,
-          padding: EdgeInsets.all(25),
+          color:  MikroMartColors.colorPrimary,
+          padding: EdgeInsets.all(20),
         ),
       ),
     );
@@ -64,9 +65,9 @@ class RentButton extends StatelessWidget {
 }
 
 class CarDetailsAnimation extends StatefulWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  CarDetailsAnimation({this.dish});
+  CarDetailsAnimation({this.data});
 
   @override
   _CarDetailsAnimationState createState() => _CarDetailsAnimationState();
@@ -120,7 +121,7 @@ class _CarDetailsAnimationState extends State<CarDetailsAnimation>
           scale: scaleAnimation,
           child: FadeTransition(
             opacity: fadeAnimation,
-            child: DishDetails(dish: widget.dish),
+            child: DishDetails(data: widget.data),
           ),
         );
       },
@@ -129,21 +130,20 @@ class _CarDetailsAnimationState extends State<CarDetailsAnimation>
 }
 
 class DishDetails extends StatelessWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  DishDetails({this.dish});
+  DishDetails({this.data});
 
   @override
   Widget build(BuildContext context) {
     return Container(
         child: Stack(
-      //crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Positioned(
           child: Container(
             height: double.infinity,
             width: double.infinity,
-            child: CarCarousel(dish: dish),
+            child: CarCarousel(data: data),
           ),
         ),
         SafeArea(
@@ -163,30 +163,9 @@ class DishDetails extends StatelessWidget {
                       size: 42,
                     ),
                   )),
-              Container(
-                margin: EdgeInsets.only(right: 25),
-                child: dish['liked'] ?   Icon(
-                  Icons.favorite,
-                  color: Colors.red,
-                  size: 42,
-                ):Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 42,
-                ),
-              )
             ],
           ),
         ),
-/*        Positioned(
-          top: 80,
-          child: SafeArea(
-            child: Container(
-              padding: EdgeInsets.only(left: 30),
-              child: _carTitle(context),
-            ),
-          ),
-        )*/
       ],
     ));
   }
@@ -201,24 +180,24 @@ class DishDetails extends StatelessWidget {
                 fontSize: 62,
               ),
               children: [
-                TextSpan(text: dish['type']),
+                TextSpan(text: data.item_name),
                 TextSpan(text: "\n"),
-                TextSpan(text: dish['cuisine'], style: style.subcardTitleStyle),
+                //TextSpan(text: data['cuisine'], style: style.subcardTitleStyle),
               ]),
         ),
         SizedBox(height: 10),
         RichText(
           text: TextSpan(style: TextStyle(fontSize: 16), children: [
             TextSpan(
-                text: dish['price'].toString(),
+                text: data.item_price.toString(),
                 style: TextStyle(
-                    color: Theme.of(context).primaryColor,
+                    color: MikroMartColors.colorPrimary,
                     fontSize: 48,
                     fontWeight: FontWeight.w900)),
             TextSpan(
-              text: " \$",
+              text: " \₹",
               style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color:  MikroMartColors.colorPrimary,
                   fontSize: 48,
                   fontWeight: FontWeight.w900),
             )
@@ -230,19 +209,19 @@ class DishDetails extends StatelessWidget {
 }
 
 class CarCarousel extends StatefulWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  CarCarousel({this.dish});
+  CarCarousel({this.data});
 
   @override
   _CarCarouselState createState() => _CarCarouselState();
 }
 
 class _CarCarouselState extends State<CarCarousel> {
-  List<String> imgList;
+  //List<String> imgList;
 
   List<Widget> child() {}
-  List<Widget> childe;
+  //List<Widget> childe;
 
   List<T> _map<T>(List list, Function handler) {
     List<T> result = [];
@@ -256,8 +235,8 @@ class _CarCarouselState extends State<CarCarousel> {
 
   @override
   void initState() {
-    imgList = widget.dish["imgList"];
-    childe = _map<Widget>(imgList, (index, String assetName) {
+    //imgList = widget.data["imgList"];
+    /*childe = _map<Widget>(imgList, (index, String assetName) {
       return Container(
           decoration: BoxDecoration(),
           child: Hero(
@@ -269,7 +248,7 @@ class _CarCarouselState extends State<CarCarousel> {
               colorBlendMode: BlendMode.hardLight,
             ),
           ));
-    }).toList();
+    }).toList();*/
     super.initState();
   }
 
@@ -278,37 +257,15 @@ class _CarCarouselState extends State<CarCarousel> {
     return Container(
       child: Stack(
         children: <Widget>[
-          CarouselSlider(
-            autoPlay: true,
-            height: MediaQuery.of(context).size.height * 0.9,
-            viewportFraction: 1.0,
-            items: childe,
-            onPageChanged: (index) {
-              setState(() {
-                _current = index;
-              });
-            },
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.7,
-            left: MediaQuery.of(context).size.width * 0.32,
-            child: Container(
-              //margin: EdgeInsets.only(left: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: _map<Widget>(imgList, (index, assetName) {
-                  return Container(
-                    width: 50,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: _current == index
-                            ? Colors.grey[100]
-                            : Colors.grey[600]),
-                  );
-                }),
+          Container(
+            height: MediaQuery.of(context).size.height/2,
+            child: Center(
+              child: Image(
+                image: NetworkImage(widget.data.item_image_path),
+                fit: BoxFit.cover,
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -318,9 +275,9 @@ class _CarCarouselState extends State<CarCarousel> {
 ///////////////////
 class CustomBottomSheet extends StatefulWidget {
   BuildContext context;
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  CustomBottomSheet({this.context, this.dish});
+  CustomBottomSheet({this.context, this.data});
 
   @override
   _CustomBottomSheetState createState() => _CustomBottomSheetState();
@@ -338,14 +295,14 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
   @override
   void initState() {
     super.initState();
-    double sheetTop = MediaQuery.of(widget.context).size.height * 0.8;
-    double minSheetTop = 30;
+    double sheetTop = MediaQuery.of(widget.context).size.height * 0.5;
+    double minSheetTop = 100;
     controller = AnimationController(
-        duration: const Duration(milliseconds: 200), vsync: this);
+        duration: const Duration(milliseconds: 400), vsync: this);
     animation = Tween<double>(begin: sheetTop, end: minSheetTop)
         .animate(CurvedAnimation(
       parent: controller,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInCubic,
       reverseCurve: Curves.easeInOut,
     ))
           ..addListener(() {
@@ -376,34 +333,34 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
         },
         onVerticalDragEnd: (DragEndDetails dragEndDetails) {
           //upward drag
-          if (dragEndDetails.primaryVelocity < 0.0) {
+          if (dragEndDetails.primaryVelocity < 0.0 && !controller.isCompleted) {
             forwardAnimation();
             controller.forward();
-          } else if (dragEndDetails.primaryVelocity > 0.0) {
+          } else if (dragEndDetails.primaryVelocity > 0.0 && controller.isCompleted) {
             reverseAnimation();
           } else {
             return;
           }
         },
-        child: SheetContainer(dish: widget.dish),
+        child: SheetContainer(data: widget.data),
       ),
     );
   }
 }
 
 class SheetContainer extends StatelessWidget {
-  final Map<String, dynamic> dish;
+  final Item data;
 
-  SheetContainer({this.dish});
+  SheetContainer({this.data});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 25),
+      padding: EdgeInsets.only(top: 20),
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           color: Theme.of(context).cardColor),
       child: Column(
         children: <Widget>[
@@ -416,19 +373,19 @@ class SheetContainer extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      dish['type'],
+                      data.item_name,
                       style: style.headerStyle2,
                     ),
-                    Text(
+                    /*Text(
                       '  ${dish['cuisine']}',
                       style: style.subHintTitle,
-                    )
+                    )*/
                   ],
                 ),
                 SizedBox(
                   height: 5,
                 ),
-                Row(
+               /* Row(
                   children: <Widget>[
                     SmoothStarRating(
                         allowHalfRating: false,
@@ -443,10 +400,10 @@ class SheetContainer extends StatelessWidget {
                       style: style.subHintTitle,
                     )
                   ],
-                ),
-                SizedBox(
+                ),*/
+                /*SizedBox(
                   height: MediaQuery.of(context).size.height * 0.005,
-                ),
+                ),*/
                 Row(
                   children: <Widget>[
                     Text(
@@ -454,14 +411,14 @@ class SheetContainer extends StatelessWidget {
                       style: style.cardTitleStyle,
                     ),
                     Text(
-                      '${dish['price']} \$',
+                      '${data.item_price.toString()} \₹',
                       style: style.headerStyle3
-                          .copyWith(color: Theme.of(context).primaryColor),
+                          .copyWith(color:  MikroMartColors.colorPrimary),
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
+                  height: 40,
                 ),
                 Text(
                   'Product Description',
@@ -477,7 +434,7 @@ class SheetContainer extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.05,
                 ),
-                Text(
+                /*Text(
                   'Reviews',
                   style: style.headerStyle2,
                 ),
@@ -496,7 +453,7 @@ class SheetContainer extends StatelessWidget {
                     drawReviewTile(context, 'Pewdiepie', 'assets/profil4.jpg'),
                     SizedBox(height: 100,)
                   ],
-                )
+                )*/
               ],
             ),
           )
@@ -572,7 +529,7 @@ class SheetContainer extends StatelessWidget {
       height: 3,
       width: 65,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15), color: Color(0xffd9dbdb)),
+          borderRadius: BorderRadius.circular(20), color: Color(0xffd9dbdb)),
     );
   }
 }

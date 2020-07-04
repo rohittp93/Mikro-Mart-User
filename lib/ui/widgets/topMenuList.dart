@@ -1,11 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:userapp/core/card_model.dart';
+import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/notifiers/item_notifier.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 import '../../locator.dart';
 import 'package:provider/provider.dart';
 import '../../core/Dish_list.dart';
 import '../views/itemDetails.dart';
+import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
 class TopMenuList extends StatefulWidget {
   @override
@@ -17,67 +22,87 @@ class _TopMenuListState extends State<TopMenuList> {
 
   int currentPage = 0;
 
+  //Provider.of<CardModel>(context);
 
-
-  _buildStoryPage(Map data, bool active,context) {
+  _buildStoryPage(Item data, bool active, context) {
     // Animated Properties
-    final double blur = active ? 7 : 0;
-    final double offset = active ? 10 : 0;
+    final double blur = active ? 18 : 0;
+    final double offset = active ? 12 : 0;
     final double top = active ? 10 : 50;
-
 
     return Column(
       children: <Widget>[
         GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (_)=> ItemDetails(dish: data,))) ;
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => ItemDetails(
+                          data: data,
+                        )));
           },
           child: Hero(
             transitionOnUserGestures: true,
-            tag:data['id'] ,
+            tag: data.item_name,
             child: AnimatedContainer(
-              width: MediaQuery.of(context).size.width *0.7,
-              height: MediaQuery.of(context).size.height *0.45 - top - 7 - 8,
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: MediaQuery.of(context).size.height * 0.45 - top - 7 - 8,
               duration: Duration(milliseconds: 700),
               curve: Curves.easeOutQuint,
-              margin: EdgeInsets.only(top: top, bottom: 15, right: MediaQuery.of(context).size.width *0.1),
+              margin: EdgeInsets.only(
+                  top: top,
+                  bottom: 15,
+                  right: MediaQuery.of(context).size.width * 0.1),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage(data['img']),
-                  ),
-
-                  boxShadow: [BoxShadow(color: Colors.black38, blurRadius: blur, offset: Offset(offset, offset))]
-              ),
-
+                      image: NetworkImage(data.item_image_path),
+                      fit: BoxFit.cover),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: blur,
+                        offset: Offset(offset, offset))
+                  ]),
             ),
           ),
         ),
         Container(
-          padding: EdgeInsets.only(right: MediaQuery.of(context).size.width *0.1),
-          height: MediaQuery.of(context).size.height *0.07,
+          padding:
+              EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.1),
           child: Row(
-            mainAxisSize: MainAxisSize.max ,
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text('${data["type"]}',style: style.cardTitleStyle.copyWith(color: Theme.of(context).primaryColor),),
-                  SizedBox(height: 5,),
-                  Text('${data["cuisine"]}',style: style.subcardTitleStyle,)
-                ],
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(10)
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Text(
+                  '${data.item_name}',
+                  style: style.cardTitleStyle
+                      .copyWith(color: MikroMartColors.colorPrimary),
+
                 ),
-                
-                padding: EdgeInsets.symmetric(vertical: 12,horizontal: 7),
-                  child: Text('\$30',style: style.cardTitleStyle.copyWith(color: Colors.white),),
+              ),
+              /*SizedBox(
+                    height: 5,
+                  ),*/
+              /*Text(
+                    '${data["cuisine"]}',
+                    style: style.subcardTitleStyle,
+                  )*/
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: MikroMartColors.colorPrimary,
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 7),
+                  child: Text(
+                    '\₹ ' + data.item_price.toString(),
+                    style: style.cardPriceStyle.copyWith(color: Colors.white),
+                  ),
+                ),
               )
             ],
           ),
@@ -85,21 +110,31 @@ class _TopMenuListState extends State<TopMenuList> {
       ],
     );
   }
+
   @override
   void initState() {
     ctrl.addListener(() {
       int next = ctrl.page.round();
 
-      if(currentPage != next) {
+      if (currentPage != next) {
         setState(() {
           currentPage = next;
         });
       }
-    });    super.initState();
+    });
+
+    ItemNotifier itemNotifier =
+        Provider.of<ItemNotifier>(context, listen: false);
+
+    firebase.getItemOffers(itemNotifier);
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    ItemNotifier itemNotifier = Provider.of<ItemNotifier>(context);
+
     return Column(
       children: <Widget>[
         Padding(
@@ -109,7 +144,7 @@ class _TopMenuListState extends State<TopMenuList> {
             children: <Widget>[
               Expanded(
                 child: Text(
-                  "Top Menu",
+                  "Top Offers",
                   style: style.headerStyle2,
                 ),
               ),
@@ -118,13 +153,25 @@ class _TopMenuListState extends State<TopMenuList> {
                 child: Text(
                   "View More",
                   style: style.subHeaderStyle
-                      .copyWith(color: Theme.of(context).primaryColor),
+                      .copyWith(color: MikroMartColors.colorPrimary),
                 ),
               )
             ],
           ),
         ),
-        Consumer<FoodList>(
+        Container(
+          height: MediaQuery.of(context).size.height * 0.52,
+          child: PageView.builder(
+            controller: ctrl,
+            itemCount: itemNotifier.offerItemList.length,
+            itemBuilder: (context, index) {
+              bool active = index == currentPage;
+              return _buildStoryPage(
+                  itemNotifier.offerItemList[index], active, context);
+            },
+          ),
+        )
+        /*Consumer<FoodList>(
           builder: (context,model,child){
             return Container(
               height: MediaQuery.of(context).size.height* 0.52,
@@ -138,7 +185,7 @@ class _TopMenuListState extends State<TopMenuList> {
               ),
             );
           },
-        )
+        )*/
       ],
     );
   }

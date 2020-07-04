@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/notifiers/item_notifier.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 
 import 'core/card_list_model.dart';
 import 'core/card_model.dart';
@@ -42,6 +43,8 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
         ChangeNotifierProvider(
             create: (context) => locator<CardListModelView>()),
         ChangeNotifierProvider(create: (context) => locator<CardModel>()),
+        ChangeNotifierProvider(
+            create: (context) => ItemNotifier()),
       ],
       child: MaterialApp(
         onGenerateRoute: Router.generateRoute,

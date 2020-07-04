@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 

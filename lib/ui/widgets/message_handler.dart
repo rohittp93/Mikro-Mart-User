@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 
 class MessageHandler extends StatefulWidget {
   @override

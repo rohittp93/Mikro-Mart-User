@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 import 'package:userapp/ui/views/PhonenumberRegister.dart';

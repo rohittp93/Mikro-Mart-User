@@ -55,7 +55,7 @@ class LikedProduct extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 22),
       child: GestureDetector(
         onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (_)=> ItemDetails(dish: productDetails,))) ;
+          Navigator.push(context, MaterialPageRoute(builder: (_)=> ItemDetails(data: productDetails,))) ;
         },
         child: Container(
           height: size.height * 0.15,

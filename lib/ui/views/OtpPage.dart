@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 
 import 'Login_staggeredAnimation/FadeContainer.dart';
 import 'package:dartz/dartz.dart' as dartz;

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:userapp/core/models/item.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:provider/provider.dart';
 import '../../core/Dish_list.dart';
 class PopularItem extends StatelessWidget{
-  final Map<String,dynamic> item ;
+  final Item item ;
   PopularItem({this.item}) ;
 
   @override
@@ -15,7 +16,7 @@ class PopularItem extends StatelessWidget{
       children: <Widget>[
         GestureDetector(
           onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (_)=> ItemDetails(dish: item,))) ;
+            Navigator.push(context, MaterialPageRoute(builder: (_)=> ItemDetails(data: item,))) ;
           },
           child: Card(
             elevation: 10,
@@ -25,10 +26,8 @@ class PopularItem extends StatelessWidget{
               width: MediaQuery.of(context).size.width * 0.43,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: AssetImage(item['img']),
-                ),
+                  image: DecorationImage(image: NetworkImage(item.item_image_path),
+                      fit: BoxFit.cover)
               ),
               child: Padding(
                 padding: EdgeInsets.all(10),
@@ -40,7 +39,7 @@ class PopularItem extends StatelessWidget{
                       boxShadow: [BoxShadow(color: Colors.black54, blurRadius: 15, offset: Offset(1, 0),spreadRadius: 4)]
 
                   ),
-                  child: GestureDetector(
+                 /* child: GestureDetector(
                     onTap: (){
                       itemDetails.likeAndUnlike(item['id']);
                     },
@@ -49,7 +48,7 @@ class PopularItem extends StatelessWidget{
                       color: Colors.red,
                       size: MediaQuery.of(context).size.height * 0.04,
                     ),
-                  ),
+                  ),*/
                 ),
               ), //just for testing, will fill with image later
             ),
@@ -60,7 +59,7 @@ class PopularItem extends StatelessWidget{
           child: Column(
             children: <Widget>[
               Text(
-                item['type'],
+                item.item_name,
                 style: style.subcardTitleStyle,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
@@ -69,23 +68,23 @@ class PopularItem extends StatelessWidget{
             ],
           ),
         ),
-        Row(
+       /* Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SmoothStarRating(
+           *//* SmoothStarRating(
                 allowHalfRating: false,
                 starCount: 5,
                 rating: item['rating'],
                 size: 20.0,
                 color: Color(0xFFFEBF00),
                 borderColor: Color(0xFFFEBF00),
-                spacing: 0.0),
+                spacing: 0.0),*//*
             Text(
               "(${item['rating']})",
               style: style.subHeaderStyle,
             )
           ],
-        ),
+        ),*/
       ],
     );
   }

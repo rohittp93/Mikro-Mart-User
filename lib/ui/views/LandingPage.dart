@@ -18,8 +18,8 @@ class LandingPage extends StatelessWidget {
 
           children: <Widget>[
             TopMenuList(),
-            DishCategories(),
-            PopularItems()
+           // DishCategories(),
+            //PopularItems()
 
           ],
         ),

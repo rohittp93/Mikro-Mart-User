@@ -6,10 +6,10 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
+import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
-import 'package:userapp/ui/views/Login_staggeredAnimation/FadeContainer.dart';
-import 'package:userapp/ui/views/mainHome.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -246,13 +246,6 @@ class AuthService {
       } else {
         return null;
       }
-      /*user.linkWithCredential(credential).then((AuthResult value) async {
-
-         //return Future.value('success');
-      }).catchError((error) {
-        print('phone error $error');
-        return null;
-      });*/
     } else {
       print('Error');
       return null;
@@ -347,45 +340,26 @@ class AuthService {
     } catch (e) {
       return null;
     }
-
-    /*try {
-      AuthResult result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-
-      FirebaseUser firebaseUser = result.user;
-      if (firebaseUser != null) {
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setBool(PREF_IS_SIGNED_IN, true);
-
-        DocumentSnapshot userDoc = await DatabaseService(uid: firebaseUser.uid)
-            .fetchUserData(result.user.uid);
-
-        User user = new User(
-            uid: firebaseUser.uid,
-            name: "name",
-            email: "dummy_email",
-            phoneValidated: userDoc.data["two_factor_enabled"],
-            phone: userDoc.data["phone_number"]);
-
-        if (user.phoneValidated) {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
-        } else {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
-        }
-
-        appDatabase.insertUser(user);
-
-        return user;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }*/
   }
 
   Future<void> updateFCMToken(String userId, String fcmToken) async {
     await DatabaseService(uid: userId).updateFCMToken(userId, fcmToken);
   }
+
+
+
+
+}
+
+getItemOffers(ItemNotifier notifier) async {
+  QuerySnapshot snapshot = await Firestore.instance.collection('items').where('category_id', isEqualTo: 'KtAXEw9SFk1jtMUtNRON').getDocuments();
+
+  List<Item> _itemList = [];
+
+  snapshot.documents.forEach((document) {
+    Item item  = Item.fromMap(document.data);
+    _itemList.add(item);
+  });
+
+  notifier.offerList = _itemList;
 }

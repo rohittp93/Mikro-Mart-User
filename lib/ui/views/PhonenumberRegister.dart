@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:userapp/core/services/auth.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 import '../shared/text_styles.dart' as style;

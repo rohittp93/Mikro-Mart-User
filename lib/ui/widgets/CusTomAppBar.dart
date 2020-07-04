@@ -22,7 +22,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                   child: Icon(Icons.shopping_cart, size: 32)),
               Expanded(
                 child: Text(
-                  "Restaurant App ui",
+                  "Mikro Mart",
                   style: style.appBarTextTheme,
                   textAlign: TextAlign.center,
                 ),
