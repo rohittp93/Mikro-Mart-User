@@ -1,9 +1,12 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:userapp/core/notifiers/categories_notifier.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
-
-
+import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
 class SearchPanel extends StatefulWidget {
   @override
@@ -11,9 +14,20 @@ class SearchPanel extends StatefulWidget {
 }
 
 class _SearchPanelState extends State<SearchPanel> {
+  @override
+  void initState() {
+    CategoriesNotifier _categoriesNotifier =
+        Provider.of<CategoriesNotifier>(context, listen: false);
+
+    //firebase.getCategories(_categoriesNotifier);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    CategoriesNotifier _categoriesNotifier =
+        Provider.of<CategoriesNotifier>(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -21,8 +35,8 @@ class _SearchPanelState extends State<SearchPanel> {
             Stack(
               children: <Widget>[
                 Container(
-                  height: 250.0,
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                  height: 100.0,
+                  color: MikroMartColors.colorPrimary.withOpacity(0.1),
                 ),
                 Column(
                   children: <Widget>[
@@ -30,19 +44,58 @@ class _SearchPanelState extends State<SearchPanel> {
                       padding: EdgeInsets.fromLTRB(15.0, 25.0, 15.0, 10.0),
                       child: Material(
                         elevation: 10.0,
-                        borderRadius: BorderRadius.circular(25.0),
+                        borderRadius: BorderRadius.circular(8.0),
                         child: TextFormField(
+                          textInputAction: TextInputAction.search,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.search),
-                              contentPadding:
-                              EdgeInsets.only(left: 15.0, top: 15.0),
-                              hintText: 'Search for recipes and Food',
-                              hintStyle: TextStyle(color: Theme.of(context).hintColor)),
+                              contentPadding: EdgeInsets.only(
+                                  left: 16.0, top: 16.0, bottom: 16.0),
+                              hintText: 'Search a specific item',
+                              hintStyle: TextStyle(
+                                  color: Theme.of(context).hintColor)),
                         ),
                       ),
                     ),
-                    SizedBox(height: 15.0),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          "or navigate by category",
+                          style: style.subHeaderStyle
+                              .copyWith(color: MikroMartColors.colorPrimary),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Divider(color: MikroMartColors.transparentGray),
+                    ListView.separated(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(_categoriesNotifier
+                              .categoriesList[index].category_name),
+                          trailing: Icon(Icons.keyboard_arrow_right),
+                          onTap: () {
+                            print('Clicked');
+                          },
+                        );
+                      },
+                      itemCount: _categoriesNotifier.categoriesList.length,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Divider(color: MikroMartColors.transparentGray);
+                      },
+                    )
+
+                    /* SizedBox(height: 15.0),
                     Padding(
                       padding: EdgeInsets.only(left: 15.0),
                       child: Container(
@@ -87,12 +140,12 @@ class _SearchPanelState extends State<SearchPanel> {
                           SizedBox(width: 10.0),
                         ],
                       ),
-                    )
+                    )*/
                   ],
                 )
               ],
             ),
-            SizedBox(height: 15.0),
+            /*SizedBox(height: 15.0),
             Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.only(left: 15.0),
@@ -158,7 +211,7 @@ class _SearchPanelState extends State<SearchPanel> {
                     )
                 )
               ],
-            )
+            )*/
           ],
         ),
       ),
@@ -178,14 +231,13 @@ class _SearchPanelState extends State<SearchPanel> {
           Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                image:
-                DecorationImage(image: AssetImage('assets/food8.jpg'),fit: BoxFit.fill)),
+                image: DecorationImage(
+                    image: AssetImage('assets/food8.jpg'), fit: BoxFit.fill)),
             height: 125.0,
             width: 100.0,
           ),
           SizedBox(width: 20.0),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
                 'Grilled Chicken',
@@ -222,6 +274,7 @@ class _SearchPanelState extends State<SearchPanel> {
           )
         ],
       ),
-    );;
+    );
+    ;
   }
 }

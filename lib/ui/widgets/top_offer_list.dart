@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:userapp/core/card_model.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
@@ -12,12 +13,12 @@ import '../../core/Dish_list.dart';
 import '../views/itemDetails.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
-class TopMenuList extends StatefulWidget {
+class TopOfferList extends StatefulWidget {
   @override
-  _TopMenuListState createState() => _TopMenuListState();
+  _TopOfferListState createState() => _TopOfferListState();
 }
 
-class _TopMenuListState extends State<TopMenuList> {
+class _TopOfferListState extends State<TopOfferList> {
   final PageController ctrl = PageController(viewportFraction: 0.8);
 
   int currentPage = 0;
@@ -125,6 +126,12 @@ class _TopMenuListState extends State<TopMenuList> {
 
     ItemNotifier itemNotifier =
         Provider.of<ItemNotifier>(context, listen: false);
+
+
+   /* CategoriesNotifier _categoriesNotifier =
+    Provider.of<CategoriesNotifier>(context);*/
+
+    //firebase.getCategories(_categoriesNotifier);
 
     firebase.getItemOffers(itemNotifier);
 

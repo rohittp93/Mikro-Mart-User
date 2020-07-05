@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
@@ -182,7 +184,8 @@ class AuthService {
                               child: Text('Confirm'),
                               textColor: MikroMartColors.colorPrimary,
                               onPressed: () async {
-                                FocusScope.of(context).requestFocus(FocusNode());
+                                FocusScope.of(context)
+                                    .requestFocus(FocusNode());
                                 setState(() {
                                   _isLoading = true;
                                 });
@@ -331,8 +334,8 @@ class AuthService {
         return _userFromFirebaseUser(user, true, userModel.phoneValidated);
       } else {
         String fcmToken = await _fcm.getToken();
-        await DatabaseService(uid: user.uid)
-            .updateUserData(user.email, user.email, false, '', user.uid, fcmToken);
+        await DatabaseService(uid: user.uid).updateUserData(
+            user.email, user.email, false, '', user.uid, fcmToken);
         prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         return _userFromFirebaseUser(user, true, false);
@@ -345,21 +348,35 @@ class AuthService {
   Future<void> updateFCMToken(String userId, String fcmToken) async {
     await DatabaseService(uid: userId).updateFCMToken(userId, fcmToken);
   }
-
-
-
-
 }
 
 getItemOffers(ItemNotifier notifier) async {
-  QuerySnapshot snapshot = await Firestore.instance.collection('items').where('category_id', isEqualTo: 'KtAXEw9SFk1jtMUtNRON').getDocuments();
+  QuerySnapshot snapshot = await Firestore.instance
+      .collection('items')
+      .where('category_id', isEqualTo: 'KtAXEw9SFk1jtMUtNRON')
+      .getDocuments();
 
   List<Item> _itemList = [];
 
   snapshot.documents.forEach((document) {
-    Item item  = Item.fromMap(document.data);
+    Item item = Item.fromMap(document.data);
     _itemList.add(item);
   });
 
   notifier.offerList = _itemList;
+}
+
+getCategories(CategoriesNotifier notifier) async {
+  QuerySnapshot snapshot = await Firestore.instance
+      .collection('categories')
+      .getDocuments();
+
+  List<Category> _categories = [];
+
+  snapshot.documents.forEach((document) {
+    Category category = Category.fromMap(document.data);
+    _categories.add(category);
+  });
+
+  notifier.categoryList = _categories;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
@@ -25,28 +26,26 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
   }
 
   Widget current_page(position) {
-    if (position == 0){
+    if (position == 0) {
       return LandingPage();
     }
-    if( position == 1) {
-      return Center(
-          child: SearchPanel()
-      );
+    if (position == 1) {
+      return Center(child: SearchPanel());
     }
-    if (position == 2){
-      return FavoriteList() ;
+    if (position == 2) {
+      return FavoriteList();
     }
-    if(position == 3 ){
-      return ProfilePage() ;
+    if (position == 3) {
+      return ProfilePage();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    primaryColor = Theme.of(context).primaryColor;
+    primaryColor = MikroMartColors.colorPrimary;
     return Scaffold(
       bottomNavigationBar: FancyBottomNavigation(
-        textColor: Theme.of(context).hintColor,
+        textColor: MikroMartColors.colorPrimaryDark,
         activeIconColor: Colors.white,
         circleColor: primaryColor,
         inactiveIconColor: primaryColor,

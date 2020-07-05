@@ -18,4 +18,5 @@ class MikroMartColors {
   static const transparentGray = Color(0xDD000000);
   static const textGray = Color(0xFF363636);
   static const white = Color(0xFFFFFFFF);
+  static const appbarcolor = Color(0xFFE7E7E7);
 }

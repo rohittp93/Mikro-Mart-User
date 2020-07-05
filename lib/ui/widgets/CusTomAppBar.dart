@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
 
@@ -8,26 +9,27 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    return PreferredSize(
-      child: Container(
+    return  Container(
+        height: 100,
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
         child: SafeArea(
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
+          child: Stack(
             children: <Widget>[
-              GestureDetector(
+            /*  GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, '/shoppingCart');
                   },
-                  child: Icon(Icons.shopping_cart, size: 32)),
+                  child: Icon(Icons.shopping_cart, size: 32)),*/
               Expanded(
-                child: Text(
-                  "Mikro Mart",
-                  style: style.appBarTextTheme,
-                  textAlign: TextAlign.center,
+                child: Center(
+                  child: Text(
+                    "Mikro Mart",
+                    style: style.appBarTextTheme,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-              GestureDetector(
+              /*GestureDetector(
                 onTap: (){
                   Navigator.pushNamed(context, '/notification') ;
                 },
@@ -35,10 +37,9 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                   Icons.notifications_none,
                   size: 32,
                 ),
-              ),
+              ),*/
             ],
           ),
-        ),
       ),
     );
   }
