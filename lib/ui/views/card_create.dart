@@ -193,7 +193,6 @@ class _CardCreate extends State<CardCreate> {
     );
 
     return new Scaffold(
-        appBar: TitleAppBar(title: "Create card"),
         //backgroundColor: Colors.grey[100],
         body: ListView(
           itemExtent: 750.0,

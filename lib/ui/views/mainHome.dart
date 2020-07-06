@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/views/shoppingCart.dart';
 import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
@@ -33,7 +34,7 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
       return Center(child: SearchPanel());
     }
     if (position == 2) {
-      return FavoriteList();
+      return ShoppingCart();
     }
     if (position == 3) {
       return ProfilePage();
@@ -53,7 +54,7 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
         tabs: [
           TabData(iconData: Icons.home, title: "Home"),
           TabData(iconData: Icons.search, title: "Search"),
-          TabData(iconData: Icons.favorite, title: "Favorite"),
+          TabData(iconData: Icons.shopping_cart, title: "Cart"),
           TabData(iconData: Icons.person, title: "Profile"),
         ],
         onTabChangedListener: (position) {

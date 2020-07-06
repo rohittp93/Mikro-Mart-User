@@ -13,7 +13,6 @@ class PaymentPage extends StatelessWidget {
     CardListModelView cardlistProvided =
         Provider.of<CardListModelView>(context);
     return Scaffold(
-      appBar: TitleAppBar(title: "Checkout"),
       body: Column(
         children: <Widget>[
           StreamBuilder<CardResults>(

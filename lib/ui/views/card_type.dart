@@ -30,7 +30,6 @@ class CardType extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: TitleAppBar(title: "Select type"),
       body: Container(
         padding: EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 0.0),
         child: Column(

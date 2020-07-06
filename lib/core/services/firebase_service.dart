@@ -374,9 +374,27 @@ getCategories(CategoriesNotifier notifier) async {
   List<Category> _categories = [];
 
   snapshot.documents.forEach((document) {
-    Category category = Category.fromMap(document.data);
+    Category category = Category.fromMap(document.data, document.documentID);
     _categories.add(category);
   });
 
   notifier.categoryList = _categories;
+}
+
+
+
+Future<List<Item>> getItems(String categoryId) async {
+  QuerySnapshot snapshot = await Firestore.instance
+      .collection('items')
+      .where('category_id', isEqualTo: categoryId)
+      .getDocuments();
+
+  List<Item> _itemList = [];
+
+  snapshot.documents.forEach((document) {
+    Item item = Item.fromMap(document.data);
+    _itemList.add(item);
+  });
+
+  return _itemList;
 }

@@ -85,7 +85,7 @@ class _SearchPanelState extends State<SearchPanel> {
                               .categoriesList[index].category_name),
                           trailing: Icon(Icons.keyboard_arrow_right),
                           onTap: () {
-                            print('Clicked');
+                            Navigator.pushNamed(context, '/itemList', arguments: _categoriesNotifier.categoriesList[index]) ;
                           },
                         );
                       },

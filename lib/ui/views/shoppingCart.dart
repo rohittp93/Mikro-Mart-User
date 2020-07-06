@@ -25,7 +25,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
           color: Theme.of(context).cardColor,
           child: Column(
             children: <Widget>[
-              Expanded(
+         /*     Expanded(
                 child: Container(
                   height: 50,
                   child: TextField(
@@ -62,7 +62,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                     ),
                   ),
                 ),
-              ),
+              ),*/
               SizedBox(
                 height: 6,
               ),
@@ -109,7 +109,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: Container()
+      /*SingleChildScrollView(
         //physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +191,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
             )
           ],
         ),
-      ),
+      ),*/
     );
   }
 }

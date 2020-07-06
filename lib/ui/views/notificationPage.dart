@@ -10,7 +10,6 @@ class NotificationPage extends StatelessWidget {
     size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: TitleAppBar(title: "Notification"),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(12),

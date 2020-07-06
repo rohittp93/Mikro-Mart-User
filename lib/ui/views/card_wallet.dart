@@ -60,7 +60,6 @@ class _CardWallet extends State<CardWallet> with TickerProviderStateMixin {
     cardModel = Provider.of<CardModel>(context);
     cardModel.saveCard();
     return Scaffold(
-        appBar: TitleAppBar(title: "Wallet"),
         body: Center(
           child: Column(
             children: <Widget>[
