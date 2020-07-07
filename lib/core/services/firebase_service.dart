@@ -359,7 +359,7 @@ getItemOffers(ItemNotifier notifier) async {
   List<Item> _itemList = [];
 
   snapshot.documents.forEach((document) {
-    Item item = Item.fromMap(document.data);
+    Item item = Item.fromMap(document.data, document.documentID);
     _itemList.add(item);
   });
 
@@ -367,9 +367,8 @@ getItemOffers(ItemNotifier notifier) async {
 }
 
 getCategories(CategoriesNotifier notifier) async {
-  QuerySnapshot snapshot = await Firestore.instance
-      .collection('categories')
-      .getDocuments();
+  QuerySnapshot snapshot =
+      await Firestore.instance.collection('categories').getDocuments();
 
   List<Category> _categories = [];
 
@@ -381,20 +380,36 @@ getCategories(CategoriesNotifier notifier) async {
   notifier.categoryList = _categories;
 }
 
+Future<List<DocumentSnapshot>> getItems(String categoryId, int _per_page) async {
+  QuerySnapshot snapshot;
+  try {
+    snapshot = await Firestore.instance
+        .collection('items')
+        .orderBy('item_name')
+        .limit(_per_page)
+        .where('category_id', isEqualTo: categoryId)
+        .getDocuments();
+  } catch (e) {
+    return null;
+  }
+
+  return snapshot.documents;
+}
+
+Future<List<DocumentSnapshot>> getMoreItems(String categoryId, int _per_page, DocumentSnapshot lastDocument) async {
+  QuerySnapshot snapshot;
+  try {
+    snapshot = await Firestore.instance
+        .collection('items')
+        .orderBy('item_name')
+        .startAfterDocument(lastDocument)
+        .limit(_per_page)
+        .where('category_id', isEqualTo: categoryId)
+        .getDocuments();
+  } catch (e) {
+    return null;
+  }
 
 
-Future<List<Item>> getItems(String categoryId) async {
-  QuerySnapshot snapshot = await Firestore.instance
-      .collection('items')
-      .where('category_id', isEqualTo: categoryId)
-      .getDocuments();
-
-  List<Item> _itemList = [];
-
-  snapshot.documents.forEach((document) {
-    Item item = Item.fromMap(document.data);
-    _itemList.add(item);
-  });
-
-  return _itemList;
+  return snapshot.documents;
 }

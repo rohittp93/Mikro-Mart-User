@@ -77,7 +77,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         style: style.cardTitleStyle,
                       ),
                       Text(
-                        '\$ 212',
+                        '\₹  212',
                         style: style.cardTitleStyle
                             .copyWith(color: Theme.of(context).primaryColor),
                       ),

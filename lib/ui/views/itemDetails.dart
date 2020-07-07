@@ -56,7 +56,7 @@ class RentButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
           ),
-          color:  MikroMartColors.colorPrimary,
+          color: MikroMartColors.colorPrimary,
           padding: EdgeInsets.all(20),
         ),
       ),
@@ -197,7 +197,7 @@ class DishDetails extends StatelessWidget {
             TextSpan(
               text: " \₹",
               style: TextStyle(
-                  color:  MikroMartColors.colorPrimary,
+                  color: MikroMartColors.colorPrimary,
                   fontSize: 48,
                   fontWeight: FontWeight.w900),
             )
@@ -221,6 +221,7 @@ class _CarCarouselState extends State<CarCarousel> {
   //List<String> imgList;
 
   List<Widget> child() {}
+
   //List<Widget> childe;
 
   List<T> _map<T>(List list, Function handler) {
@@ -258,7 +259,7 @@ class _CarCarouselState extends State<CarCarousel> {
       child: Stack(
         children: <Widget>[
           Container(
-            height: MediaQuery.of(context).size.height/2,
+            height: MediaQuery.of(context).size.height / 2,
             child: Center(
               child: Image(
                 image: NetworkImage(widget.data.item_image_path),
@@ -336,7 +337,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
           if (dragEndDetails.primaryVelocity < 0.0 && !controller.isCompleted) {
             forwardAnimation();
             controller.forward();
-          } else if (dragEndDetails.primaryVelocity > 0.0 && controller.isCompleted) {
+          } else if (dragEndDetails.primaryVelocity > 0.0 &&
+              controller.isCompleted) {
             reverseAnimation();
           } else {
             return;
@@ -385,7 +387,7 @@ class SheetContainer extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-               /* Row(
+                /* Row(
                   children: <Widget>[
                     SmoothStarRating(
                         allowHalfRating: false,
@@ -407,13 +409,13 @@ class SheetContainer extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      '20 Pieces     ',
+                      data.item_quantity,
                       style: style.cardTitleStyle,
                     ),
                     Text(
-                      '${data.item_price.toString()} \₹',
+                      '${data.item_price.toString()} + ₹',
                       style: style.headerStyle3
-                          .copyWith(color:  MikroMartColors.colorPrimary),
+                          .copyWith(color: MikroMartColors.colorPrimary),
                     ),
                   ],
                 ),
@@ -428,7 +430,7 @@ class SheetContainer extends StatelessWidget {
                   height: 15,
                 ),
                 Text(
-                  'Pyongyang Matsutake and Spinach Sauce alongside Natural Shitaki Juice,Psychotropic Cheese in a mélange of Pan-fried Veal Pizza Craft Tuna and Black Truffle Blobs atop Home-grown Spam Cake Tepid Frankfurter with a side of Housemade Sea Urchin and Truffle Oil Confit Tepid Frankfurter with a side of Housemade Sea Urchin and Truffle Oil Confit',
+                  data.item_description,
                   style: style.textTheme,
                 ),
                 SizedBox(

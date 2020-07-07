@@ -22,11 +22,7 @@ class _TopOfferListState extends State<TopOfferList> {
   final PageController ctrl = PageController(viewportFraction: 0.8);
 
   int currentPage = 0;
-
-  //Provider.of<CardModel>(context);
-
   _buildStoryPage(Item data, bool active, context) {
-    // Animated Properties
     final double blur = active ? 18 : 0;
     final double offset = active ? 12 : 0;
     final double top = active ? 10 : 50;
@@ -85,13 +81,6 @@ class _TopOfferListState extends State<TopOfferList> {
 
                 ),
               ),
-              /*SizedBox(
-                    height: 5,
-                  ),*/
-              /*Text(
-                    '${data["cuisine"]}',
-                    style: style.subcardTitleStyle,
-                  )*/
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: Container(
@@ -126,12 +115,6 @@ class _TopOfferListState extends State<TopOfferList> {
 
     ItemNotifier itemNotifier =
         Provider.of<ItemNotifier>(context, listen: false);
-
-
-   /* CategoriesNotifier _categoriesNotifier =
-    Provider.of<CategoriesNotifier>(context);*/
-
-    //firebase.getCategories(_categoriesNotifier);
 
     firebase.getItemOffers(itemNotifier);
 
@@ -178,21 +161,6 @@ class _TopOfferListState extends State<TopOfferList> {
             },
           ),
         )
-        /*Consumer<FoodList>(
-          builder: (context,model,child){
-            return Container(
-              height: MediaQuery.of(context).size.height* 0.52,
-              child: PageView.builder(
-                controller: ctrl,
-                itemCount: model.categories.length,
-                itemBuilder: (context,index){
-                  bool active = index == currentPage;
-                  return _buildStoryPage(model.categories[index],active,context) ;
-                },
-              ),
-            );
-          },
-        )*/
       ],
     );
   }

@@ -16,6 +16,11 @@ const subHintTitle = TextStyle(
     fontSize: 14.0
 );
 
+
+const mediumTextTitle = TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500);
+const mediumTextSubtitle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500, color: MikroMartColors.subtitleGray);
+
+
 const arialTheme = TextStyle(
     color: Colors.white,
     fontSize: 18,

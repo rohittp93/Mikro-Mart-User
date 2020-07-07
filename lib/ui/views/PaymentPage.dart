@@ -114,7 +114,7 @@ class PaymentPage extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.w500),
                   ),
-                  Text('\$212.00',
+                  Text('\$ 212.00',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

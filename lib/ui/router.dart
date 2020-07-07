@@ -4,7 +4,7 @@ import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/ui/views/OtpPage.dart';
 import 'package:userapp/ui/views/PhonenumberRegister.dart';
 import 'package:userapp/ui/views/card_type.dart';
-import 'package:userapp/ui/views/items_list.dart';
+import 'package:userapp/ui/views/items_list_two.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
 import 'package:userapp/ui/views/onBording.dart';
 import './views/HomePage.dart';

@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.of(context).pushReplacementNamed('/');
       }else{
         if (isPhoneAuthenticated) {
-          Navigator.of(context).pushReplacementNamed('/mainHome');
+          Navigator.of(context).pushNamedAndRemoveUntil('/mainHome', (Route<dynamic> route) => false);
         } else {
           Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
         }

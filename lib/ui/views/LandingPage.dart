@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/ui/widgets/CusTomAppBar.dart';
 import '../widgets/top_offer_list.dart';
 import 'package:provider/provider.dart';
 import '../../locator.dart';
@@ -14,6 +15,7 @@ class LandingPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: <Widget>[
+            CustomAppBar(),
             TopOfferList(),
             HomeCategories(),
             //DishCategories(),
@@ -24,4 +26,8 @@ class LandingPage extends StatelessWidget {
       ),
     );
   }
+
+
+  @override
+  bool get wantKeepAlive => true;
 }
