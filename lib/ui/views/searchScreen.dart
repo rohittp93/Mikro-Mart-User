@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
-import 'package:userapp/ui/views/items_list_two.dart';
+import 'package:userapp/ui/views/items_list.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
@@ -45,7 +45,7 @@ class _SearchPanelState extends State<SearchPanel> {
                       Container(
                         padding: EdgeInsets.fromLTRB(15.0, 25.0, 15.0, 10.0),
                         child: Material(
-                          elevation: 10.0,
+                          elevation: 2.0,
                           borderRadius: BorderRadius.circular(8.0),
                           child: TextFormField(
                             textInputAction: TextInputAction.search,

@@ -38,6 +38,7 @@ dependencies:
   firebase_analytics: ^5.0.2
   firebase_messaging: ^6.0.16
   google_sign_in: 4.5.1
+  algolia: 0.1.7
 
   # Moor
   moor_flutter:
