@@ -2,13 +2,12 @@ import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
-import 'package:userapp/ui/views/PhonenumberRegister.dart';
-import 'package:userapp/ui/views/mainHome.dart';
-import '../shared/theme.dart';
+import 'package:userapp/ui/views/address_screen.dart';
 
 class SignUpPage extends StatefulWidget {
   final VoidCallback onLoginClicked;
@@ -22,6 +21,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   String name = '';
   String email = '';
+  AddressModel _userAddress;
   String password = '';
   String confirmPassword = '';
   bool isRegistrationFormValid = false;
@@ -95,7 +95,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       obscureText: false,
                       textAlign: TextAlign.left,
                       textInputAction: TextInputAction.next,
-                      onSubmitted: (v){
+                      onSubmitted: (v) {
                         FocusScope.of(context).requestFocus(emailFocus);
                       },
                       decoration: InputDecoration(
@@ -307,6 +307,70 @@ class _SignUpPageState extends State<SignUpPage> {
               color: Colors.transparent,
             ),
             Row(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 40.0),
+                  child: Text(
+                    "Address",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: MikroMartColors.colorPrimary,
+                      fontSize: 15.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                      color: MikroMartColors.colorPrimary,
+                      width: 0.5,
+                      style: BorderStyle.solid),
+                ),
+              ),
+              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                      child: GestureDetector(
+                    onTap: () async {
+                      //AddressModel result = await Navigator.pushNamed(context,'/addressScreen');
+
+                      var result = await Navigator.push(
+                          context,
+                          new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                new AddressScreen(),
+                            fullscreenDialog: true,
+                          ));
+
+                      setState(() {
+                        _userAddress = result;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 18.0, 0.0, 18.0),
+                      child: Text(
+                        _userAddress!=null ?_userAddress.appartmentName : 'Address',
+                        style: _userAddress == null
+                            ? TextStyle(
+                                color: MikroMartColors.subtitleGray,
+                                fontSize: 16.0)
+                            : TextStyle(color: Colors.black, fontSize: 16.0),
+                      ),
+                    ),
+                  )),
+                ],
+              ),
+            ),
+            Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
                 Padding(
@@ -347,27 +411,31 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (this.password.length != 0 &&
                             this.password.length > 6) {
                           if (this.password == this.confirmPassword) {
-                            setState(() {
-                              _buttonAnimationState = 1;
-                            });
-
-                            dynamic result =
-                                await _auth.registerWithEmailAndPassword(
-                                    this.name, this.email, this.password);
-
-                            if (result == null) {
-                              showSnackBar(
-                                  'Something has gone wrong. Please try again');
+                            if(_userAddress!=null) {
                               setState(() {
-                                _buttonAnimationState = 0;
+                                _buttonAnimationState = 1;
                               });
-                            } else {
-                              //routeWhenUserUpdates(result);
-                              setState(() {
-                                _buttonAnimationState = 2;
-                                _intentWidget = routeWhenUserUpdates(
-                                    dartz.cast<FirebaseUserModel>(result));
-                              });
+
+                              dynamic result =
+                              await _auth.registerWithEmailAndPassword(
+                                  this.name, this.email, this.password, this._userAddress);
+
+                              if (result == null) {
+                                showSnackBar(
+                                    'Something has gone wrong. Please try again');
+                                setState(() {
+                                  _buttonAnimationState = 0;
+                                });
+                              } else {
+                                //routeWhenUserUpdates(result);
+                                setState(() {
+                                  _buttonAnimationState = 2;
+                                  _intentWidget = routeWhenUserUpdates(
+                                      dartz.cast<FirebaseUserModel>(result));
+                                });
+                              }
+                            }else{
+                              showSnackBar('Select addreess');
                             }
                           } else {
                             showSnackBar('Passwords don\'t match');

@@ -15,7 +15,7 @@ class LandingPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: <Widget>[
-            CustomAppBar(),
+            CustomAppBar(title: 'Mikro Mart',),
             TopOfferList(),
             HomeCategories(),
             //DishCategories(),

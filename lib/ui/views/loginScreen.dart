@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/firebase_service.dart';
@@ -41,6 +42,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     return Scaffold(
       key: _scaffoldkey,
       resizeToAvoidBottomPadding: false,
@@ -208,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 });
 
                                 User user = await   _auth.signInWithEmailAndPassword(
-                                    this.email, this.password);
+                                    this.email, this.password, db);
 
                                 if (user != null) {
                                   setState(() {
@@ -275,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen>
                             child: InkWell(
                               onTap: () async {
                                 FirebaseUserModel user =
-                                    await _auth.signInWithGoogle();
+                                    await _auth.signInWithGoogle(db);
 
                                 if (user == null) {
                                   _scaffoldkey.currentState

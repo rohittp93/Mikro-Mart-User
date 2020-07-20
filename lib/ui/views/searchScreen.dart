@@ -30,7 +30,6 @@ class _SearchPanelState extends State<SearchPanel> {
   Timer _debounce;
   StreamSubscription<List<AlgoliaObjectSnapshot>> _searchSnapShotsStream;
 
-
   @override
   void initState() {
     CategoriesNotifier _categoriesNotifier =
@@ -53,7 +52,7 @@ class _SearchPanelState extends State<SearchPanel> {
   void dispose() {
     _controller.removeListener(_onSearchChanged);
     _controller.dispose();
-    _debounce.cancel();
+    if (_debounce != null) _debounce.cancel();
     super.dispose();
   }
 
@@ -155,9 +154,12 @@ class _SearchPanelState extends State<SearchPanel> {
                                   flex: 1,
                                   child: Center(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: SizedBox(height: 30, width: 30,child: CircularProgressIndicator()),
-                                      )))
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: SizedBox(
+                                        height: 30,
+                                        width: 30,
+                                        child: CircularProgressIndicator()),
+                                  )))
                               : _isSearching
                                   ? GridView.count(
                                       controller: _scrollController,
@@ -313,7 +315,6 @@ class _SearchPanelState extends State<SearchPanel> {
         }
       });
     });
-
 
     /*for (var i = 0; i < snapShots.length; i++) {
       AlgoliaObjectSnapshot snap = snapShots[i];

@@ -6,6 +6,7 @@ import 'package:userapp/core/services/firebase_service.dart';
 
 import 'core/card_list_model.dart';
 import 'core/card_model.dart';
+import 'core/data/moor_database.dart';
 import 'locator.dart';
 import 'package:provider/provider.dart';
 import './ui/shared/theme.dart';
@@ -48,6 +49,8 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
             create: (context) => ItemNotifier()),
         ChangeNotifierProvider(
             create: (context) => CategoriesNotifier()),
+        Provider(
+            create: (context) => AppDatabase(), dispose: (context, db) => db.close(),),
       ],
       child: MaterialApp(
         onGenerateRoute: Router.generateRoute,

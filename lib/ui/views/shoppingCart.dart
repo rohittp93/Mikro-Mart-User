@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/widgets/CusTomAppBar.dart';
 import '../widgets/cartItemCard.dart';
 import '../../locator.dart';
 import '../shared/text_styles.dart' as style;
@@ -16,16 +18,16 @@ class _ShoppingCartState extends State<ShoppingCart> {
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      bottomNavigationBar: Card(
-        elevation: 10,
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-          height: 140,
-          width: MediaQuery.of(context).size.width * 0.85,
-          color: Theme.of(context).cardColor,
-          child: Column(
-            children: <Widget>[
-         /*     Expanded(
+        bottomNavigationBar: Card(
+          elevation: 10,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            height: 130,
+            width: MediaQuery.of(context).size.width * 0.85,
+            color: Theme.of(context).cardColor,
+            child: Column(
+              children: <Widget>[
+                /*Expanded(
                 child: Container(
                   height: 50,
                   child: TextField(
@@ -63,54 +65,63 @@ class _ShoppingCartState extends State<ShoppingCart> {
                   ),
                 ),
               ),*/
-              SizedBox(
-                height: 6,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Total: ',
-                        style: style.cardTitleStyle,
-                      ),
-                      Text(
-                        '\₹  212',
-                        style: style.cardTitleStyle
-                            .copyWith(color: Theme.of(context).primaryColor),
-                      ),
-                      Text('Delivery charges included')
-                    ],
-                  ),
-                  SizedBox(width: 10.0),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    height: 65,
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/paymentPage') ;
-                      },
-                      elevation: 0.5,
-                      color: Theme.of(context).primaryColor,
-                      child: Center(
-                        child: Text(
-                          'PLACE ORDER',
+                SizedBox(
+                  height: 6,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Total: ',
+                          style: style.cardTitleStyle,
                         ),
-                      ),
-                      textColor: Colors.white,
+                        Text(
+                          '\₹  212',
+                          style: style.cardTitleStyle
+                              .copyWith(color: MikroMartColors.colorPrimary),
+                        ),
+                        Text('Delivery charges included')
+                      ],
                     ),
-                  )
-                ],
+                    SizedBox(width: 10.0),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: 65,
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          //Navigator.pushNamed(context, '/paymentPage') ;
+                        },
+                        elevation: 0.5,
+                        color: MikroMartColors.colorPrimary,
+                        child: Center(
+                          child: Text(
+                            'PLACE ORDER',
+                          ),
+                        ),
+                        textColor: Colors.white,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: Container(
+          color: Colors.white,
+          child: Column(
+            children: <Widget>[
+              CustomAppBar(
+                title: 'Shopping Cart',
               ),
             ],
           ),
-        ),
-      ),
-      body: Container()
-      /*SingleChildScrollView(
+        )
+        /*SingleChildScrollView(
         //physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,6 +203,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
           ],
         ),
       ),*/
-    );
+        );
   }
 }

@@ -15,8 +15,18 @@ class Users extends Table {
   Set<Column> get primaryKey => {uid};
 }
 
+class CartItems extends Table {
+ TextColumn get itemId => text()();
+  TextColumn get itemName => text()();
+  TextColumn get itemImage => text()();
+  IntColumn get itemQuantity => integer()();
 
-@UseMoor(tables: [Users])
+  @override
+  Set<Column> get primaryKey => {itemId};
+}
+
+
+@UseMoor(tables: [Users, CartItems])
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
@@ -30,4 +40,11 @@ class AppDatabase extends _$AppDatabase {
   Future insertUser(User user) => into(users).insert(user);
   Future updateUser(User user) => update(users).replace(user);
   Future deleteUser(User user) => delete(users).delete(user);
+
+
+  Future<List<CartItem>> getCartItems() => select(cartItems).get();
+  Stream<List<CartItem>> watchAllCartItems() => select(cartItems).watch();
+  Future insertCartItem(CartItem cartItem) => into(cartItems).insert(cartItem);
+  Future updateCartItem(CartItem cartItem) => update(cartItems).replace(cartItem);
+  Future deleteCartItem(CartItem cartItem) => delete(cartItems).delete(cartItem);
 }

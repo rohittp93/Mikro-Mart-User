@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/ui/views/OtpPage.dart';
 import 'package:userapp/ui/views/PhonenumberRegister.dart';
+import 'package:userapp/ui/views/address_screen.dart';
 import 'package:userapp/ui/views/card_type.dart';
 import 'package:userapp/ui/views/items_list.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
@@ -54,9 +55,12 @@ class Router {
         return MaterialPageRoute(builder: (context) => ShoppingCart());
       case '/itemList':
         Category data = settings.arguments;
-        return MaterialPageRoute(builder: (context) => ItemsList(argument: data));
+        return MaterialPageRoute(
+            builder: (context) => ItemsList(argument: data));
       case '/onBoarding':
         return MaterialPageRoute(builder: (context) => OnBoarding());
+      case '/addressScreen':
+        return MaterialPageRoute(builder: (context) => AddressScreen());
 
       default:
         return MaterialPageRoute(

@@ -4,11 +4,13 @@ import '../shared/text_styles.dart' as style;
 
 
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
-  Size size;
+  final String title;
+
+  CustomAppBar({Key key, @required this.title}) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
     return  Container(
         height: 100,
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
@@ -23,21 +25,12 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
               Expanded(
                 child: Center(
                   child: Text(
-                    "Mikro Mart",
+                    title,
                     style: style.appBarTextTheme,
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
-              /*GestureDetector(
-                onTap: (){
-                  Navigator.pushNamed(context, '/notification') ;
-                },
-                child: Icon(
-                  Icons.notifications_none,
-                  size: 32,
-                ),
-              ),*/
             ],
           ),
       ),

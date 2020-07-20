@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:provider/provider.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
@@ -18,46 +21,183 @@ class ItemDetails extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutStarts(
-        data: data,
+        item: data,
       ),
     );
   }
 }
 
-class LayoutStarts extends StatelessWidget {
-  final Item data;
+class LayoutStarts extends StatefulWidget {
+  final Item item;
 
-  LayoutStarts({this.data});
+  LayoutStarts({this.item});
+
+  @override
+  _LayoutStartsState createState() => _LayoutStartsState();
+}
+
+class _LayoutStartsState extends State<LayoutStarts> {
+  bool itemAdded = false;
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     return Stack(
       children: <Widget>[
-        CarDetailsAnimation(data: data),
-        CustomBottomSheet(context: context, data: data),
-        RentButton(),
+        CarDetailsAnimation(data: widget.item),
+        CustomBottomSheet(context: context, data: widget.item),
+        itemAdded
+            ? ItemQuantityWidget(
+                itemQuantityChanged: (itemQuantity) {
+                  if (itemQuantity == 0) {
+                    setState(() {
+                      itemAdded = false;
+                    });
+                  }
+                },
+              )
+            : AddToCartButton(
+                itemAdded: () {
+                  CartItem cartItem = new CartItem(
+                    itemId: widget.item.id,
+                    itemImage: widget.item.item_image_path,
+                    itemQuantity: 1,
+                    itemName: widget.item.item_name,
+                  );
+
+                  _auth.addCartItem(cartItem, db);
+
+                  setState(() {
+                    itemAdded = true;
+                  });
+                },
+              ),
       ],
     );
   }
 }
 
-class RentButton extends StatelessWidget {
+class AddToCartButton extends StatelessWidget {
+  final Function itemAdded;
+
+  AddToCartButton({@required this.itemAdded});
+
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.bottomRight,
       child: SizedBox(
-        child: FlatButton(
-          onPressed: () {},
-          child: Text(
-            "Add To Cart ",
-            style: style.arialTheme,
+        child: Container(
+          width: 200,
+          child: FlatButton(
+            onPressed: () {
+              itemAdded();
+            },
+            child: Text(
+              "Add To Cart ",
+              style: style.arialTheme,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+            ),
+            color: MikroMartColors.colorPrimary,
+            padding: EdgeInsets.fromLTRB(0, 25, 0, 25),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+        ),
+      ),
+    );
+  }
+}
+
+class ItemQuantityWidget extends StatefulWidget {
+  final Function(int) itemQuantityChanged;
+
+  const ItemQuantityWidget({Key key, @required this.itemQuantityChanged})
+      : super(key: key);
+
+  @override
+  _ItemQuantityWidgetState createState() => _ItemQuantityWidgetState();
+}
+
+class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
+  int _itemQuantity = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: SizedBox(
+        child: Container(
+          decoration: BoxDecoration(
+              color: MikroMartColors.purple,
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+              border: Border.all(
+                  width: 3,
+                  color: MikroMartColors.purple,
+                  style: BorderStyle.solid)),
+          width: 200,
+          padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              ButtonTheme(
+                minWidth: 40,
+                height: 40,
+                child: OutlineButton(
+                  child: new Icon(
+                    Icons.remove,
+                    color: Colors.white,
+                  ),
+                  borderSide: BorderSide(
+                    color: Colors.white, //Color of the border
+                    style: BorderStyle.solid, //Style of the border
+                    width: 0.8, //width of the border
+                  ),
+                  onPressed: () {
+                    if (_itemQuantity != 0) {
+                      int quantity = _itemQuantity - 1;
+                      widget.itemQuantityChanged(quantity);
+
+                      setState(() {
+                        _itemQuantity = quantity;
+                      });
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                child: Text(
+                  _itemQuantity.toString(),
+                  style: style.arialTheme,
+                ),
+              ),
+              ButtonTheme(
+                minWidth: 40,
+                height: 40,
+                child: OutlineButton(
+                  child: new Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  borderSide: BorderSide(
+                    color: Colors.white, //Color of the border
+                    style: BorderStyle.solid, //Style of the border
+                    width: 0.8, //width of the border
+                  ),
+                  onPressed: () {
+                    int quantity = _itemQuantity + 1;
+                    widget.itemQuantityChanged(quantity);
+                    setState(() {
+                      _itemQuantity = quantity;
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
-          color: MikroMartColors.colorPrimary,
-          padding: EdgeInsets.all(20),
         ),
       ),
     );
@@ -376,7 +516,7 @@ class SheetContainer extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       data.item_name,
-                      style: style.headerStyle2,
+                      style: style.itemDetailHeader,
                     ),
                     /*Text(
                       '  ${dish['cuisine']}',
@@ -387,35 +527,20 @@ class SheetContainer extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-                /* Row(
-                  children: <Widget>[
-                    SmoothStarRating(
-                        allowHalfRating: false,
-                        starCount: 5,
-                        rating: dish['rating'],
-                        size: 20.0,
-                        color: Color(0xFFFEBF00),
-                        borderColor: Color(0xFFFEBF00),
-                        spacing: 0.0),
-                    Text(
-                      '  (${dish['rating']})',
-                      style: style.subHintTitle,
-                    )
-                  ],
-                ),*/
-                /*SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.005,
-                ),*/
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
                       data.item_quantity,
-                      style: style.cardTitleStyle,
+                      style: style.textTheme,
                     ),
-                    Text(
-                      '${data.item_price.toString()} + ₹',
-                      style: style.headerStyle3
-                          .copyWith(color: MikroMartColors.colorPrimary),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                      child: Text(
+                        '${'₹ ' + data.item_price.toString()}',
+                        style: style.itemDetailHeader
+                            .copyWith(color: MikroMartColors.colorPrimary),
+                      ),
                     ),
                   ],
                 ),
@@ -424,7 +549,7 @@ class SheetContainer extends StatelessWidget {
                 ),
                 Text(
                   'Product Description',
-                  style: style.headerStyle2,
+                  style: style.itemDetailHeader,
                 ),
                 SizedBox(
                   height: 15,
@@ -436,90 +561,9 @@ class SheetContainer extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.05,
                 ),
-                /*Text(
-                  'Reviews',
-                  style: style.headerStyle2,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    drawReviewTile(context, 'Joe Hattab', 'assets/profil.jpg'),
-                    drawReviewTile(context, 'Sophie', 'assets/profile2.jpg'),
-                    drawReviewTile(
-                        context, 'Lionel Messi', 'assets/profile3.jpg'),
-                    drawReviewTile(context, 'Pewdiepie', 'assets/profil4.jpg'),
-                    SizedBox(height: 100,)
-                  ],
-                )*/
               ],
             ),
           )
-        ],
-      ),
-    );
-  }
-
-  drawReviewTile(context, name, asset) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: MediaQuery.of(context).size.height * 0.1,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(image: AssetImage(asset))),
-          ),
-          SizedBox(
-            width: 15,
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Text(
-                  name,
-                  style: style.headerStyle3,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: <Widget>[
-                    SmoothStarRating(
-                        allowHalfRating: false,
-                        starCount: 5,
-                        rating: 5,
-                        size: 20.0,
-                        color: Color(0xFFFEBF00),
-                        borderColor: Color(0xFFFEBF00),
-                        spacing: 0.0),
-                    Text(
-                      ' June 7, 2020',
-                      style: style.subHintTitle,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  'This is the best food you can ever try Delicious and Have a nice plating and the service and delivery was really quickly',
-                  softWrap: true,
-                  maxLines: 3,
-                  style: style.textTheme.copyWith(fontSize: 14),
-                )
-              ],
-            ),
-          ),
         ],
       ),
     );
