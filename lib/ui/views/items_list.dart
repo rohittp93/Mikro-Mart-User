@@ -264,48 +264,45 @@ class _ItemsListState extends State<ItemsList> {
                                                   fit: BoxFit.contain,
                                                 ),
                                               ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 8, bottom: 0, top: 4),
-                                                child: Flexible(
-                                                  child: Container(
-                                                    child: Column(
-                                                      children: <Widget>[
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: Text(
-                                                            item.item_name,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 2,
-                                                            style: style
-                                                                .lightTextTitle,
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 4,
-                                                        ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerLeft,
-                                                          child: Text(
-                                                            '₹ ' +
-                                                                item.item_price
-                                                                    .toString(),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: style
-                                                                .lightTextSubtitle,
-                                                          ),
-                                                        ),
-                                                      ],
+                                          Flexible(
+                                            child: Container(
+                                              padding: EdgeInsets.fromLTRB(8.0, 8.0, 0, 4.0),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Align(
+                                                    alignment: Alignment
+                                                        .centerLeft,
+                                                    child: Text(
+                                                      item.item_name,
+                                                      overflow:
+                                                      TextOverflow
+                                                          .ellipsis,
+                                                      maxLines: 2,
+                                                      style: style
+                                                          .lightTextTitle,
                                                     ),
                                                   ),
-                                                ),
+                                                  SizedBox(
+                                                    height: 4,
+                                                  ),
+                                                  Align(
+                                                    alignment: Alignment
+                                                        .centerLeft,
+                                                    child: Text(
+                                                      '₹ ' +
+                                                          item.item_price
+                                                              .toString(),
+                                                      overflow:
+                                                      TextOverflow
+                                                          .ellipsis,
+                                                      style: style
+                                                          .lightTextSubtitle,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
+                                            ),
+                                          ),
                                             ],
                                           ),
                                         ),

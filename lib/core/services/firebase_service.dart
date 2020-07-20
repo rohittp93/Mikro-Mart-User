@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
@@ -22,6 +23,7 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final FirebaseMessaging _fcm = FirebaseMessaging();
+
   //final AppDatabase appDatabase = AppDatabase();
 
   // create user object based on FirebaseUser
@@ -42,10 +44,17 @@ class AuthService {
     });
   }
 
-  addCartItem(CartItem cartItem, AppDatabase db){
+  addCartItem(CartItem cartItem, AppDatabase db) {
     db.insertCartItem(cartItem);
   }
 
+  updateCartItem(CartItem cartItem, AppDatabase db) {
+    db.updateCartItem(cartItem);
+  }
+
+  deleteCartItem(CartItem cartItem, AppDatabase db) {
+    db.deleteCartItem(cartItem);
+  }
 
   // sign in anonymously
   Future signInAnon() async {
@@ -60,8 +69,8 @@ class AuthService {
   }
 
 // register with email & pw
-  Future registerWithEmailAndPassword(
-      String name, String email, String password, AddressModel userAddress) async {
+  Future registerWithEmailAndPassword(String name, String email,
+      String password, AddressModel userAddress) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -72,10 +81,19 @@ class AuthService {
       FirebaseUser user = result.user;
       // create a new document with uid & twofactorenabled as false
       String fcmToken = await _fcm.getToken();
-      GeoPoint addressLocation = new GeoPoint(userAddress.location.latitude, userAddress.location.longitude);
+      GeoPoint addressLocation = new GeoPoint(
+          userAddress.location.latitude, userAddress.location.longitude);
 
-      await DatabaseService(uid: user.uid)
-          .updateUserData(name, email, false, '', user.uid, fcmToken, addressLocation, userAddress.appartmentName, false);
+      await DatabaseService(uid: user.uid).updateUserData(
+          name,
+          email,
+          false,
+          '',
+          user.uid,
+          fcmToken,
+          addressLocation,
+          userAddress.appartmentName,
+          false);
       prefs.setBool(PREF_IS_SIGNED_IN, true);
 
       return _userFromFirebaseUser(user, true, false);
@@ -252,7 +270,10 @@ class AuthService {
             true,
             phone,
             user.uid,
-            fcmToken, null, null, false);
+            fcmToken,
+            null,
+            null,
+            false);
         return 'success';
       } else {
         return null;
@@ -264,7 +285,8 @@ class AuthService {
   }
 
   // sign in with email & pw
-  Future<User> signInWithEmailAndPassword(String email, String password, AppDatabase db) async {
+  Future<User> signInWithEmailAndPassword(
+      String email, String password, AppDatabase db) async {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -302,8 +324,6 @@ class AuthService {
     }
   }
 
-
-
   // sign in with google
   Future<FirebaseUserModel> signInWithGoogle(AppDatabase db) async {
     try {
@@ -328,7 +348,9 @@ class AuthService {
       if (userDoc.exists) {
         User userModel = new User(
             uid: user.uid,
-            name: userDoc.data["name"]==null? userDoc.data["email"] : userDoc.data["name"],
+            name: userDoc.data["name"] == null
+                ? userDoc.data["email"]
+                : userDoc.data["name"],
             email: userDoc.data["email"],
             phoneValidated: userDoc.data["two_factor_enabled"],
             phone: userDoc.data["phone_number"]);
@@ -344,8 +366,8 @@ class AuthService {
         return _userFromFirebaseUser(user, true, userModel.phoneValidated);
       } else {
         String fcmToken = await _fcm.getToken();
-        await DatabaseService(uid: user.uid).updateUserData(
-            user.email, user.email, false, '', user.uid, fcmToken, null, null, true);
+        await DatabaseService(uid: user.uid).updateUserData(user.email,
+            user.email, false, '', user.uid, fcmToken, null, null, true);
         prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         return _userFromFirebaseUser(user, true, false);
@@ -390,8 +412,8 @@ getCategories(CategoriesNotifier notifier) async {
   notifier.categoryList = _categories;
 }
 
-
-Future<List<DocumentSnapshot>> getItems(String categoryId, int _per_page) async {
+Future<List<DocumentSnapshot>> getItems(
+    String categoryId, int _per_page) async {
   QuerySnapshot snapshot;
   try {
     snapshot = await Firestore.instance
@@ -407,7 +429,8 @@ Future<List<DocumentSnapshot>> getItems(String categoryId, int _per_page) async 
   return snapshot.documents;
 }
 
-Future<List<DocumentSnapshot>> getMoreItems(String categoryId, int _per_page, DocumentSnapshot lastDocument) async {
+Future<List<DocumentSnapshot>> getMoreItems(
+    String categoryId, int _per_page, DocumentSnapshot lastDocument) async {
   QuerySnapshot snapshot;
   try {
     snapshot = await Firestore.instance
@@ -420,7 +443,6 @@ Future<List<DocumentSnapshot>> getMoreItems(String categoryId, int _per_page, Do
   } catch (e) {
     return null;
   }
-
 
   return snapshot.documents;
 }

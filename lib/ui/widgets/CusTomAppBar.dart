@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
         height: 100,
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 18.0),
         child: SafeArea(
-          child: Stack(
+          child: Row(
             children: <Widget>[
             /*  GestureDetector(
                   onTap: () {

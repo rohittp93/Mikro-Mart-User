@@ -18,14 +18,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ThemeChanger>(
       create: (_) => ThemeChanger(),
-      child: StreamProvider<FirebaseUserModel>.value(
-          value: AuthService().user,
-          child: MaterialAppWithTheme()),
+      child: Provider(
+        create: (context) => AppDatabase(),
+        dispose: (context, db) => db.close(),
+        child: StreamProvider<FirebaseUserModel>.value(
+            value: AuthService().user, child: MaterialAppWithTheme()),
+      ),
     );
   }
 }
@@ -36,21 +38,19 @@ class MaterialAppWithTheme extends StatefulWidget {
 }
 
 class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
-
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeChanger>(context);
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
             create: (context) => locator<CardListModelView>()),
         ChangeNotifierProvider(create: (context) => locator<CardModel>()),
-        ChangeNotifierProvider(
-            create: (context) => ItemNotifier()),
-        ChangeNotifierProvider(
-            create: (context) => CategoriesNotifier()),
-        Provider(
-            create: (context) => AppDatabase(), dispose: (context, db) => db.close(),),
+        ChangeNotifierProvider(create: (context) => ItemNotifier()),
+        ChangeNotifierProvider(create: (context) => CategoriesNotifier()),
+        StreamProvider<List<CartItem>>.value(value: db.watchAllCartItems()),
       ],
       child: MaterialApp(
         onGenerateRoute: Router.generateRoute,

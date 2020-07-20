@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/services/firebase_service.dart';
@@ -39,10 +37,37 @@ class LayoutStarts extends StatefulWidget {
 class _LayoutStartsState extends State<LayoutStarts> {
   bool itemAdded = false;
   final AuthService _auth = AuthService();
+  List<CartItem> _cartItems;
+  int _itemQuantity = 0;
+  CartItem _cartItem;
 
   @override
   Widget build(BuildContext context) {
     AppDatabase db = Provider.of<AppDatabase>(context);
+    _cartItems = Provider.of<List<CartItem>>(context);
+
+    if (_cartItems!=null && _cartItems.length > 0) {
+     int position = _cartItems
+          .indexWhere((cartItem) => cartItem.itemId == widget.item.id);
+
+     if(position>=0){
+       setState(() {
+         _cartItem = _cartItems[position];
+         itemAdded = true;
+         _itemQuantity = _cartItem.itemQuantity;
+       });
+     }else{
+       setState(() {
+         itemAdded = false;
+         _itemQuantity = 0;
+       });
+     }
+    } else {
+      setState(() {
+        itemAdded = false;
+        _itemQuantity = 0;
+      });
+    }
 
     return Stack(
       children: <Widget>[
@@ -50,6 +75,9 @@ class _LayoutStartsState extends State<LayoutStarts> {
         CustomBottomSheet(context: context, data: widget.item),
         itemAdded
             ? ItemQuantityWidget(
+                item: widget.item,
+                cartItem: _cartItem,
+                itemQuantity: _itemQuantity,
                 itemQuantityChanged: (itemQuantity) {
                   if (itemQuantity == 0) {
                     setState(() {
@@ -69,9 +97,9 @@ class _LayoutStartsState extends State<LayoutStarts> {
 
                   _auth.addCartItem(cartItem, db);
 
-                  setState(() {
+                /*  setState(() {
                     itemAdded = true;
-                  });
+                  });*/
                 },
               ),
       ],
@@ -113,8 +141,16 @@ class AddToCartButton extends StatelessWidget {
 
 class ItemQuantityWidget extends StatefulWidget {
   final Function(int) itemQuantityChanged;
+  final Item item;
+  final int itemQuantity;
 
-  const ItemQuantityWidget({Key key, @required this.itemQuantityChanged})
+  final CartItem cartItem;
+
+  const ItemQuantityWidget(
+      {Key key,
+      @required this.itemQuantityChanged,
+      @required this.item,
+      @required this.itemQuantity, this.cartItem})
       : super(key: key);
 
   @override
@@ -122,10 +158,13 @@ class ItemQuantityWidget extends StatefulWidget {
 }
 
 class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
-  int _itemQuantity = 1;
+  //int _itemQuantity = 1;
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     return Align(
       alignment: Alignment.bottomRight,
       child: SizedBox(
@@ -156,21 +195,23 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                     width: 0.8, //width of the border
                   ),
                   onPressed: () {
-                    if (_itemQuantity != 0) {
-                      int quantity = _itemQuantity - 1;
+                    if (widget.itemQuantity != 0) {
+                      int quantity = widget.itemQuantity - 1;
                       widget.itemQuantityChanged(quantity);
 
-                      setState(() {
-                        _itemQuantity = quantity;
-                      });
-                    }
+                      if (quantity == 0) {
+                        deleteCartItem(widget.cartItem, db);
+                      } else {
+                        updateCartItemQuantity(widget.cartItem, quantity, db);
+                      }
+                    } else {}
                   },
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
                 child: Text(
-                  _itemQuantity.toString(),
+                  widget.itemQuantity.toString(),
                   style: style.arialTheme,
                 ),
               ),
@@ -188,11 +229,14 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                     width: 0.8, //width of the border
                   ),
                   onPressed: () {
-                    int quantity = _itemQuantity + 1;
+                    int quantity = widget.itemQuantity + 1;
+                    updateCartItemQuantity(widget.cartItem, quantity, db);
+
                     widget.itemQuantityChanged(quantity);
-                    setState(() {
+
+                    /*setState(() {
                       _itemQuantity = quantity;
-                    });
+                    });*/
                   },
                 ),
               ),
@@ -201,6 +245,16 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
         ),
       ),
     );
+  }
+
+  void updateCartItemQuantity(CartItem cartItem, int quantity, AppDatabase db) {
+    final item = cartItem.copyWith(itemQuantity: quantity);
+    _auth.updateCartItem(item, db);
+
+  }
+
+  void deleteCartItem(CartItem cartItem, AppDatabase db) {
+    _auth.deleteCartItem(cartItem, db);
   }
 }
 
