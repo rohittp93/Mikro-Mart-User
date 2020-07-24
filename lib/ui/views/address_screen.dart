@@ -110,8 +110,6 @@ class _AddressScreenState extends State<AddressScreen> {
 
   showFlatNameBottomSheet() {
     _addressNameFlushBar = Flushbar<List<String>>(
-      title: 'Hello Rohit',
-      message: 'How are you',
       flushbarPosition: FlushbarPosition.BOTTOM,
       flushbarStyle: FlushbarStyle.GROUNDED,
       reverseAnimationCurve: Curves.decelerate,
@@ -165,15 +163,7 @@ class _AddressScreenState extends State<AddressScreen> {
         Icons.check,
         color: Colors.white,
       ),
-      /*mainButton: FlatButton(
-        onPressed: () {
-          _addressNameFlushBar.dismiss();
-        },
-        child: Text(
-          'Done',
-          style: TextStyle(color: MikroMartColors.white),
-        ),
-      ),*/
+
     )..show(context).then((result) {
         if (result != null) {
           String address = result[0];

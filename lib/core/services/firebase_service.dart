@@ -23,6 +23,7 @@ class AuthService {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   final FirebaseMessaging _fcm = FirebaseMessaging();
+  final String CART_VALID = "cart_valid";
 
   //final AppDatabase appDatabase = AppDatabase();
 
@@ -248,6 +249,40 @@ class AuthService {
         },
         codeAutoRetrievalTimeout: null);
   }
+
+  validateCartItems(List<CartItem> cartItems) async {
+    String cartMessage = CART_VALID;
+
+    for (CartItem cartItem in cartItems) {
+      DocumentReference snapshot = await Firestore.instance
+          .collection('items')
+          .document(cartItem.itemId);
+
+      DocumentSnapshot datasnapshot = await snapshot.get();
+
+      if (datasnapshot.exists) {
+        Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
+
+        if (item.item_stock_quantity == 0){
+          cartMessage = '${item.item_name} is out of stock';
+          break;
+        } else  if (cartItem.cartQuantity<=item.item_stock_quantity ) {
+          cartMessage = CART_VALID;
+        } else {
+          cartMessage = 'There are currently on ${item.item_stock_quantity}  ${item.item_name}s in stock';
+          break;
+        }
+      } else {
+        cartMessage = '${cartItem.itemName} is no longer available';
+        break;
+      }
+    }
+
+    return cartMessage;
+  }
+
+
+
 
   Future<String> registerPhoneWithSignedInUser(
       String phone, AuthCredential credential, context) async {

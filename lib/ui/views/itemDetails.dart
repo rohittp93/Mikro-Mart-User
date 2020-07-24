@@ -1,3 +1,4 @@
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
@@ -46,22 +47,22 @@ class _LayoutStartsState extends State<LayoutStarts> {
     AppDatabase db = Provider.of<AppDatabase>(context);
     _cartItems = Provider.of<List<CartItem>>(context);
 
-    if (_cartItems!=null && _cartItems.length > 0) {
-     int position = _cartItems
+    if (_cartItems != null && _cartItems.length > 0) {
+      int position = _cartItems
           .indexWhere((cartItem) => cartItem.itemId == widget.item.id);
 
-     if(position>=0){
-       setState(() {
-         _cartItem = _cartItems[position];
-         itemAdded = true;
-         _itemQuantity = _cartItem.itemQuantity;
-       });
-     }else{
-       setState(() {
-         itemAdded = false;
-         _itemQuantity = 0;
-       });
-     }
+      if (position >= 0) {
+        setState(() {
+          _cartItem = _cartItems[position];
+          itemAdded = true;
+          _itemQuantity = _cartItem.cartQuantity;
+        });
+      } else {
+        setState(() {
+          itemAdded = false;
+          _itemQuantity = 0;
+        });
+      }
     } else {
       setState(() {
         itemAdded = false;
@@ -89,15 +90,19 @@ class _LayoutStartsState extends State<LayoutStarts> {
             : AddToCartButton(
                 itemAdded: () {
                   CartItem cartItem = new CartItem(
-                    itemId: widget.item.id,
-                    itemImage: widget.item.item_image_path,
-                    itemQuantity: 1,
-                    itemName: widget.item.item_name,
-                  );
+                      itemId: widget.item.id,
+                      itemImage: widget.item.item_image_path,
+                      itemQuantity: widget.item.item_quantity,
+                      cartQuantity: 1,
+                      itemName: widget.item.item_name,
+                      itemPrice: widget.item.item_price,
+                      maxQuantity: widget.item.max_cart_threshold,
+                      quantityInStock: widget.item.item_stock_quantity,
+                      cartPrice: widget.item.item_price);
 
                   _auth.addCartItem(cartItem, db);
 
-                /*  setState(() {
+                  /*  setState(() {
                     itemAdded = true;
                   });*/
                 },
@@ -150,7 +155,8 @@ class ItemQuantityWidget extends StatefulWidget {
       {Key key,
       @required this.itemQuantityChanged,
       @required this.item,
-      @required this.itemQuantity, this.cartItem})
+      @required this.itemQuantity,
+      this.cartItem})
       : super(key: key);
 
   @override
@@ -160,6 +166,8 @@ class ItemQuantityWidget extends StatefulWidget {
 class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
   //int _itemQuantity = 1;
   final AuthService _auth = AuthService();
+
+  Flushbar<List<String>> _addressNameFlushBar;
 
   @override
   Widget build(BuildContext context) {
@@ -229,11 +237,14 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                     width: 0.8, //width of the border
                   ),
                   onPressed: () {
-                    int quantity = widget.itemQuantity + 1;
-                    updateCartItemQuantity(widget.cartItem, quantity, db);
+                    if (validateCartCount(widget.item, widget.itemQuantity)) {
+                      int quantity = widget.itemQuantity + 1;
+                      updateCartItemQuantity(widget.cartItem, quantity, db);
 
-                    widget.itemQuantityChanged(quantity);
-
+                      widget.itemQuantityChanged(quantity);
+                    } else {
+                      showErrorBottomSheet(widget.item, widget.itemQuantity);
+                    }
                     /*setState(() {
                       _itemQuantity = quantity;
                     });*/
@@ -247,14 +258,85 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
     );
   }
 
-  void updateCartItemQuantity(CartItem cartItem, int quantity, AppDatabase db) {
-    final item = cartItem.copyWith(itemQuantity: quantity);
-    _auth.updateCartItem(item, db);
+  showErrorBottomSheet(Item item, int itemQuantity) {
+    _addressNameFlushBar = Flushbar<List<String>>(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.easeOutCubic,
+      animationDuration: Duration(milliseconds: 600),
+      duration: Duration(seconds: 4),
+      backgroundColor: MikroMartColors.purpleStart,
+      userInputForm: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child: ((itemQuantity + 1) <= item.item_stock_quantity)
+                  ? Text(
+                      'You can add only upto ${item.max_cart_threshold} ${item.item_name} in a single order',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    )
+                  : Text(
+                      'There are only ${item.item_stock_quantity} ${item.item_name}s in stock. Please add within this limit',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: FlatButton(
+                  child: Text('OK'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  color: Colors.white,
+                  textColor: MikroMartColors.purpleEnd,
+                  padding: EdgeInsets.all(6),
+                  onPressed: () {
+                    _addressNameFlushBar.dismiss();
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      boxShadows: [
+        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
+      ],
+      backgroundGradient: LinearGradient(colors: [
+        MikroMartColors.colorPrimaryDark,
+        MikroMartColors.colorPrimary
+      ]),
+      isDismissible: true,
+      icon: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
+    )..show(context).then((result) {
+        if (result != null) {
+          String address = result[0];
+          print('ADDRESS TYPED IS $address');
+        } else {}
+      });
+  }
 
+  void updateCartItemQuantity(CartItem cartItem, int quantity, AppDatabase db) {
+    final item = cartItem.copyWith(
+        cartQuantity: quantity, cartPrice: ((cartItem.itemPrice) * quantity));
+    _auth.updateCartItem(item, db);
   }
 
   void deleteCartItem(CartItem cartItem, AppDatabase db) {
     _auth.deleteCartItem(cartItem, db);
+  }
+
+  bool validateCartCount(Item item, int itemQuantity) {
+    return (itemQuantity + 1) <= item.max_cart_threshold &&
+        (itemQuantity + 1) <= item.item_stock_quantity;
   }
 }
 

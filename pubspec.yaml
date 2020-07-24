@@ -113,6 +113,7 @@ flutter:
       - assets/sun.png
       - assets/moon.png
       - assets/switcher.flr
+      - assets/empty.flr
       - assets/Walkthrough/Best_Chef_day.png
       - assets/Walkthrough/Best_Chef_night.png
       - assets/Walkthrough/Perfect_Price_day.png

@@ -1,4 +1,5 @@
-class FirebaseUserModel {
+class
+FirebaseUserModel {
   final String uid;
   final bool isSignedIn;
   final bool isPhoneVerified;

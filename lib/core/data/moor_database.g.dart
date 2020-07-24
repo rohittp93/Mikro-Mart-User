@@ -358,16 +358,27 @@ class CartItem extends DataClass implements Insertable<CartItem> {
   final String itemId;
   final String itemName;
   final String itemImage;
-  final int itemQuantity;
+  final String itemQuantity;
+  final double itemPrice;
+  final double cartPrice;
+  final int cartQuantity;
+  final int quantityInStock;
+  final int maxQuantity;
   CartItem(
       {@required this.itemId,
       @required this.itemName,
       @required this.itemImage,
-      @required this.itemQuantity});
+      @required this.itemQuantity,
+      @required this.itemPrice,
+      @required this.cartPrice,
+      @required this.cartQuantity,
+      @required this.quantityInStock,
+      @required this.maxQuantity});
   factory CartItem.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
+    final doubleType = db.typeSystem.forDartType<double>();
     final intType = db.typeSystem.forDartType<int>();
     return CartItem(
       itemId:
@@ -376,8 +387,18 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           .mapFromDatabaseResponse(data['${effectivePrefix}item_name']),
       itemImage: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}item_image']),
-      itemQuantity: intType
+      itemQuantity: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}item_quantity']),
+      itemPrice: doubleType
+          .mapFromDatabaseResponse(data['${effectivePrefix}item_price']),
+      cartPrice: doubleType
+          .mapFromDatabaseResponse(data['${effectivePrefix}cart_price']),
+      cartQuantity: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}cart_quantity']),
+      quantityInStock: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}quantity_in_stock']),
+      maxQuantity: intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}max_quantity']),
     );
   }
   @override
@@ -393,7 +414,22 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       map['item_image'] = Variable<String>(itemImage);
     }
     if (!nullToAbsent || itemQuantity != null) {
-      map['item_quantity'] = Variable<int>(itemQuantity);
+      map['item_quantity'] = Variable<String>(itemQuantity);
+    }
+    if (!nullToAbsent || itemPrice != null) {
+      map['item_price'] = Variable<double>(itemPrice);
+    }
+    if (!nullToAbsent || cartPrice != null) {
+      map['cart_price'] = Variable<double>(cartPrice);
+    }
+    if (!nullToAbsent || cartQuantity != null) {
+      map['cart_quantity'] = Variable<int>(cartQuantity);
+    }
+    if (!nullToAbsent || quantityInStock != null) {
+      map['quantity_in_stock'] = Variable<int>(quantityInStock);
+    }
+    if (!nullToAbsent || maxQuantity != null) {
+      map['max_quantity'] = Variable<int>(maxQuantity);
     }
     return map;
   }
@@ -411,6 +447,21 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       itemQuantity: itemQuantity == null && nullToAbsent
           ? const Value.absent()
           : Value(itemQuantity),
+      itemPrice: itemPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(itemPrice),
+      cartPrice: cartPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cartPrice),
+      cartQuantity: cartQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cartQuantity),
+      quantityInStock: quantityInStock == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quantityInStock),
+      maxQuantity: maxQuantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxQuantity),
     );
   }
 
@@ -421,7 +472,12 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       itemId: serializer.fromJson<String>(json['itemId']),
       itemName: serializer.fromJson<String>(json['itemName']),
       itemImage: serializer.fromJson<String>(json['itemImage']),
-      itemQuantity: serializer.fromJson<int>(json['itemQuantity']),
+      itemQuantity: serializer.fromJson<String>(json['itemQuantity']),
+      itemPrice: serializer.fromJson<double>(json['itemPrice']),
+      cartPrice: serializer.fromJson<double>(json['cartPrice']),
+      cartQuantity: serializer.fromJson<int>(json['cartQuantity']),
+      quantityInStock: serializer.fromJson<int>(json['quantityInStock']),
+      maxQuantity: serializer.fromJson<int>(json['maxQuantity']),
     );
   }
   @override
@@ -431,7 +487,12 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       'itemId': serializer.toJson<String>(itemId),
       'itemName': serializer.toJson<String>(itemName),
       'itemImage': serializer.toJson<String>(itemImage),
-      'itemQuantity': serializer.toJson<int>(itemQuantity),
+      'itemQuantity': serializer.toJson<String>(itemQuantity),
+      'itemPrice': serializer.toJson<double>(itemPrice),
+      'cartPrice': serializer.toJson<double>(cartPrice),
+      'cartQuantity': serializer.toJson<int>(cartQuantity),
+      'quantityInStock': serializer.toJson<int>(quantityInStock),
+      'maxQuantity': serializer.toJson<int>(maxQuantity),
     };
   }
 
@@ -439,12 +500,22 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           {String itemId,
           String itemName,
           String itemImage,
-          int itemQuantity}) =>
+          String itemQuantity,
+          double itemPrice,
+          double cartPrice,
+          int cartQuantity,
+          int quantityInStock,
+          int maxQuantity}) =>
       CartItem(
         itemId: itemId ?? this.itemId,
         itemName: itemName ?? this.itemName,
         itemImage: itemImage ?? this.itemImage,
         itemQuantity: itemQuantity ?? this.itemQuantity,
+        itemPrice: itemPrice ?? this.itemPrice,
+        cartPrice: cartPrice ?? this.cartPrice,
+        cartQuantity: cartQuantity ?? this.cartQuantity,
+        quantityInStock: quantityInStock ?? this.quantityInStock,
+        maxQuantity: maxQuantity ?? this.maxQuantity,
       );
   @override
   String toString() {
@@ -452,7 +523,12 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           ..write('itemId: $itemId, ')
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
-          ..write('itemQuantity: $itemQuantity')
+          ..write('itemQuantity: $itemQuantity, ')
+          ..write('itemPrice: $itemPrice, ')
+          ..write('cartPrice: $cartPrice, ')
+          ..write('cartQuantity: $cartQuantity, ')
+          ..write('quantityInStock: $quantityInStock, ')
+          ..write('maxQuantity: $maxQuantity')
           ..write(')'))
         .toString();
   }
@@ -460,8 +536,20 @@ class CartItem extends DataClass implements Insertable<CartItem> {
   @override
   int get hashCode => $mrjf($mrjc(
       itemId.hashCode,
-      $mrjc(itemName.hashCode,
-          $mrjc(itemImage.hashCode, itemQuantity.hashCode))));
+      $mrjc(
+          itemName.hashCode,
+          $mrjc(
+              itemImage.hashCode,
+              $mrjc(
+                  itemQuantity.hashCode,
+                  $mrjc(
+                      itemPrice.hashCode,
+                      $mrjc(
+                          cartPrice.hashCode,
+                          $mrjc(
+                              cartQuantity.hashCode,
+                              $mrjc(quantityInStock.hashCode,
+                                  maxQuantity.hashCode)))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -469,40 +557,75 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           other.itemId == this.itemId &&
           other.itemName == this.itemName &&
           other.itemImage == this.itemImage &&
-          other.itemQuantity == this.itemQuantity);
+          other.itemQuantity == this.itemQuantity &&
+          other.itemPrice == this.itemPrice &&
+          other.cartPrice == this.cartPrice &&
+          other.cartQuantity == this.cartQuantity &&
+          other.quantityInStock == this.quantityInStock &&
+          other.maxQuantity == this.maxQuantity);
 }
 
 class CartItemsCompanion extends UpdateCompanion<CartItem> {
   final Value<String> itemId;
   final Value<String> itemName;
   final Value<String> itemImage;
-  final Value<int> itemQuantity;
+  final Value<String> itemQuantity;
+  final Value<double> itemPrice;
+  final Value<double> cartPrice;
+  final Value<int> cartQuantity;
+  final Value<int> quantityInStock;
+  final Value<int> maxQuantity;
   const CartItemsCompanion({
     this.itemId = const Value.absent(),
     this.itemName = const Value.absent(),
     this.itemImage = const Value.absent(),
     this.itemQuantity = const Value.absent(),
+    this.itemPrice = const Value.absent(),
+    this.cartPrice = const Value.absent(),
+    this.cartQuantity = const Value.absent(),
+    this.quantityInStock = const Value.absent(),
+    this.maxQuantity = const Value.absent(),
   });
   CartItemsCompanion.insert({
     @required String itemId,
     @required String itemName,
     @required String itemImage,
-    @required int itemQuantity,
+    @required String itemQuantity,
+    @required double itemPrice,
+    @required double cartPrice,
+    @required int cartQuantity,
+    @required int quantityInStock,
+    @required int maxQuantity,
   })  : itemId = Value(itemId),
         itemName = Value(itemName),
         itemImage = Value(itemImage),
-        itemQuantity = Value(itemQuantity);
+        itemQuantity = Value(itemQuantity),
+        itemPrice = Value(itemPrice),
+        cartPrice = Value(cartPrice),
+        cartQuantity = Value(cartQuantity),
+        quantityInStock = Value(quantityInStock),
+        maxQuantity = Value(maxQuantity);
   static Insertable<CartItem> custom({
     Expression<String> itemId,
     Expression<String> itemName,
     Expression<String> itemImage,
-    Expression<int> itemQuantity,
+    Expression<String> itemQuantity,
+    Expression<double> itemPrice,
+    Expression<double> cartPrice,
+    Expression<int> cartQuantity,
+    Expression<int> quantityInStock,
+    Expression<int> maxQuantity,
   }) {
     return RawValuesInsertable({
       if (itemId != null) 'item_id': itemId,
       if (itemName != null) 'item_name': itemName,
       if (itemImage != null) 'item_image': itemImage,
       if (itemQuantity != null) 'item_quantity': itemQuantity,
+      if (itemPrice != null) 'item_price': itemPrice,
+      if (cartPrice != null) 'cart_price': cartPrice,
+      if (cartQuantity != null) 'cart_quantity': cartQuantity,
+      if (quantityInStock != null) 'quantity_in_stock': quantityInStock,
+      if (maxQuantity != null) 'max_quantity': maxQuantity,
     });
   }
 
@@ -510,12 +633,22 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       {Value<String> itemId,
       Value<String> itemName,
       Value<String> itemImage,
-      Value<int> itemQuantity}) {
+      Value<String> itemQuantity,
+      Value<double> itemPrice,
+      Value<double> cartPrice,
+      Value<int> cartQuantity,
+      Value<int> quantityInStock,
+      Value<int> maxQuantity}) {
     return CartItemsCompanion(
       itemId: itemId ?? this.itemId,
       itemName: itemName ?? this.itemName,
       itemImage: itemImage ?? this.itemImage,
       itemQuantity: itemQuantity ?? this.itemQuantity,
+      itemPrice: itemPrice ?? this.itemPrice,
+      cartPrice: cartPrice ?? this.cartPrice,
+      cartQuantity: cartQuantity ?? this.cartQuantity,
+      quantityInStock: quantityInStock ?? this.quantityInStock,
+      maxQuantity: maxQuantity ?? this.maxQuantity,
     );
   }
 
@@ -532,7 +665,22 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       map['item_image'] = Variable<String>(itemImage.value);
     }
     if (itemQuantity.present) {
-      map['item_quantity'] = Variable<int>(itemQuantity.value);
+      map['item_quantity'] = Variable<String>(itemQuantity.value);
+    }
+    if (itemPrice.present) {
+      map['item_price'] = Variable<double>(itemPrice.value);
+    }
+    if (cartPrice.present) {
+      map['cart_price'] = Variable<double>(cartPrice.value);
+    }
+    if (cartQuantity.present) {
+      map['cart_quantity'] = Variable<int>(cartQuantity.value);
+    }
+    if (quantityInStock.present) {
+      map['quantity_in_stock'] = Variable<int>(quantityInStock.value);
+    }
+    if (maxQuantity.present) {
+      map['max_quantity'] = Variable<int>(maxQuantity.value);
     }
     return map;
   }
@@ -543,7 +691,12 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
           ..write('itemId: $itemId, ')
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
-          ..write('itemQuantity: $itemQuantity')
+          ..write('itemQuantity: $itemQuantity, ')
+          ..write('itemPrice: $itemPrice, ')
+          ..write('cartPrice: $cartPrice, ')
+          ..write('cartQuantity: $cartQuantity, ')
+          ..write('quantityInStock: $quantityInStock, ')
+          ..write('maxQuantity: $maxQuantity')
           ..write(')'))
         .toString();
   }
@@ -592,21 +745,96 @@ class $CartItemsTable extends CartItems
 
   final VerificationMeta _itemQuantityMeta =
       const VerificationMeta('itemQuantity');
-  GeneratedIntColumn _itemQuantity;
+  GeneratedTextColumn _itemQuantity;
   @override
-  GeneratedIntColumn get itemQuantity =>
+  GeneratedTextColumn get itemQuantity =>
       _itemQuantity ??= _constructItemQuantity();
-  GeneratedIntColumn _constructItemQuantity() {
-    return GeneratedIntColumn(
+  GeneratedTextColumn _constructItemQuantity() {
+    return GeneratedTextColumn(
       'item_quantity',
       $tableName,
       false,
     );
   }
 
+  final VerificationMeta _itemPriceMeta = const VerificationMeta('itemPrice');
+  GeneratedRealColumn _itemPrice;
   @override
-  List<GeneratedColumn> get $columns =>
-      [itemId, itemName, itemImage, itemQuantity];
+  GeneratedRealColumn get itemPrice => _itemPrice ??= _constructItemPrice();
+  GeneratedRealColumn _constructItemPrice() {
+    return GeneratedRealColumn(
+      'item_price',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cartPriceMeta = const VerificationMeta('cartPrice');
+  GeneratedRealColumn _cartPrice;
+  @override
+  GeneratedRealColumn get cartPrice => _cartPrice ??= _constructCartPrice();
+  GeneratedRealColumn _constructCartPrice() {
+    return GeneratedRealColumn(
+      'cart_price',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cartQuantityMeta =
+      const VerificationMeta('cartQuantity');
+  GeneratedIntColumn _cartQuantity;
+  @override
+  GeneratedIntColumn get cartQuantity =>
+      _cartQuantity ??= _constructCartQuantity();
+  GeneratedIntColumn _constructCartQuantity() {
+    return GeneratedIntColumn(
+      'cart_quantity',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _quantityInStockMeta =
+      const VerificationMeta('quantityInStock');
+  GeneratedIntColumn _quantityInStock;
+  @override
+  GeneratedIntColumn get quantityInStock =>
+      _quantityInStock ??= _constructQuantityInStock();
+  GeneratedIntColumn _constructQuantityInStock() {
+    return GeneratedIntColumn(
+      'quantity_in_stock',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _maxQuantityMeta =
+      const VerificationMeta('maxQuantity');
+  GeneratedIntColumn _maxQuantity;
+  @override
+  GeneratedIntColumn get maxQuantity =>
+      _maxQuantity ??= _constructMaxQuantity();
+  GeneratedIntColumn _constructMaxQuantity() {
+    return GeneratedIntColumn(
+      'max_quantity',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [
+        itemId,
+        itemName,
+        itemImage,
+        itemQuantity,
+        itemPrice,
+        cartPrice,
+        cartQuantity,
+        quantityInStock,
+        maxQuantity
+      ];
   @override
   $CartItemsTable get asDslTable => this;
   @override
@@ -643,6 +871,42 @@ class $CartItemsTable extends CartItems
               data['item_quantity'], _itemQuantityMeta));
     } else if (isInserting) {
       context.missing(_itemQuantityMeta);
+    }
+    if (data.containsKey('item_price')) {
+      context.handle(_itemPriceMeta,
+          itemPrice.isAcceptableOrUnknown(data['item_price'], _itemPriceMeta));
+    } else if (isInserting) {
+      context.missing(_itemPriceMeta);
+    }
+    if (data.containsKey('cart_price')) {
+      context.handle(_cartPriceMeta,
+          cartPrice.isAcceptableOrUnknown(data['cart_price'], _cartPriceMeta));
+    } else if (isInserting) {
+      context.missing(_cartPriceMeta);
+    }
+    if (data.containsKey('cart_quantity')) {
+      context.handle(
+          _cartQuantityMeta,
+          cartQuantity.isAcceptableOrUnknown(
+              data['cart_quantity'], _cartQuantityMeta));
+    } else if (isInserting) {
+      context.missing(_cartQuantityMeta);
+    }
+    if (data.containsKey('quantity_in_stock')) {
+      context.handle(
+          _quantityInStockMeta,
+          quantityInStock.isAcceptableOrUnknown(
+              data['quantity_in_stock'], _quantityInStockMeta));
+    } else if (isInserting) {
+      context.missing(_quantityInStockMeta);
+    }
+    if (data.containsKey('max_quantity')) {
+      context.handle(
+          _maxQuantityMeta,
+          maxQuantity.isAcceptableOrUnknown(
+              data['max_quantity'], _maxQuantityMeta));
+    } else if (isInserting) {
+      context.missing(_maxQuantityMeta);
     }
     return context;
   }
