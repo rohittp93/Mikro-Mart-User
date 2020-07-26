@@ -743,10 +743,6 @@ class SheetContainer extends StatelessWidget {
                       data.item_name,
                       style: style.itemDetailHeader,
                     ),
-                    /*Text(
-                      '  ${dish['cuisine']}',
-                      style: style.subHintTitle,
-                    )*/
                   ],
                 ),
                 SizedBox(
@@ -755,16 +751,22 @@ class SheetContainer extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      data.item_quantity,
-                      style: style.textTheme,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                    Flexible(
+                      flex: 2,
                       child: Text(
-                        '${'₹ ' + data.item_price.toString()}',
-                        style: style.itemDetailHeader
-                            .copyWith(color: MikroMartColors.colorPrimary),
+                        data.item_quantity,
+                        style: style.textTheme,
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                        child: Text(
+                          '${'₹ ' + data.item_price.toString()}',
+                          style: style.itemDetailHeader
+                              .copyWith(color: MikroMartColors.colorPrimary),
+                        ),
                       ),
                     ),
                   ],
@@ -779,8 +781,24 @@ class SheetContainer extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,16,0),
+                  child: Text(
+                    data.item_description,
+                    style: style.textTheme,
+                  ),
+                ),  SizedBox(
+                  height: 40,
+                ),
                 Text(
-                  data.item_description,
+                  'Outlet',
+                  style: style.itemDetailHeader,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  data.outlet_id,
                   style: style.textTheme,
                 ),
                 SizedBox(

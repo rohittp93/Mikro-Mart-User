@@ -333,6 +333,7 @@ class AuthService {
         order_status: ORDER_PLACED,
         cart_items: orderItems,
         total_amount: totalAmount,
+        outlet_name: cartItems[0].outletId,
         user_name: prefs.getString(PREF_USER_NAME),
         user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
         user_location: new GeoPoint(

@@ -93,6 +93,7 @@ class DatabaseService {
       'user_name': order.user_name,
       'user_house_name': order.user_house_name,
       'user_location': order.user_location,
+      'outlet_name': order.outlet_name,
       'order_items': FieldValue.arrayUnion(order.cart_items),
       'created_time': FieldValue.serverTimestamp(),
     });

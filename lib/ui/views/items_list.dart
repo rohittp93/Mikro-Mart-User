@@ -268,19 +268,20 @@ class _ItemsListState extends State<ItemsList> {
                                             child: Container(
                                               padding: EdgeInsets.fromLTRB(8.0, 8.0, 0, 4.0),
                                               child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: <Widget>[
-                                                  Align(
-                                                    alignment: Alignment
-                                                        .centerLeft,
-                                                    child: Text(
-                                                      item.item_name,
-                                                      overflow:
-                                                      TextOverflow
-                                                          .ellipsis,
-                                                      maxLines: 2,
-                                                      style: style
-                                                          .lightTextTitle,
-                                                    ),
+                                                   Align(
+                                                      alignment: Alignment
+                                                          .topLeft,
+                                                      child: Text(
+                                                        item.item_name,
+                                                        overflow:
+                                                        TextOverflow
+                                                            .ellipsis,
+                                                        maxLines: 2,
+                                                        style: style
+                                                            .itemnNameText,
+                                                      ),
                                                   ),
                                                   SizedBox(
                                                     height: 4,
@@ -296,7 +297,7 @@ class _ItemsListState extends State<ItemsList> {
                                                       TextOverflow
                                                           .ellipsis,
                                                       style: style
-                                                          .lightTextSubtitle,
+                                                          .itemPriceText,
                                                     ),
                                                   ),
                                                 ],

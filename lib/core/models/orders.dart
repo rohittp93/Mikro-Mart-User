@@ -9,6 +9,7 @@ class OrderModel {
   String user_name;
   String user_house_name;
   GeoPoint user_location;
+  String outlet_name;
 
   OrderModel({
     @required this.order_status,
@@ -17,6 +18,7 @@ class OrderModel {
     @required this.user_name,
     @required this.user_house_name,
     @required this.user_location,
+    @required this.outlet_name,
   });
 
   OrderModel.fromMap(Map<String, dynamic> data) {
@@ -28,6 +30,7 @@ class OrderModel {
     created_time = data['created_time'];
     user_location = data['user_location'];
     cart_items = data['cart_items'];
+    outlet_name = data['outlet_name'];
   }
 }
 
