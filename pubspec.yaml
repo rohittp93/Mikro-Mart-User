@@ -39,6 +39,7 @@ dependencies:
   firebase_messaging: ^6.0.16
   google_sign_in: 4.5.1
   algolia: 0.1.7
+  flutter_spinkit:
 
   flushbar: 1.10.4
 
@@ -112,6 +113,7 @@ flutter:
       - assets/profil4.jpg
       - assets/sun.png
       - assets/moon.png
+      - assets/tick.png
       - assets/switcher.flr
       - assets/empty.flr
       - assets/Walkthrough/Best_Chef_day.png

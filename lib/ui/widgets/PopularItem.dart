@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import '../shared/text_styles.dart' as style;
-import 'package:provider/provider.dart';
-import '../../core/Dish_list.dart';
 class PopularItem extends StatelessWidget{
   final Item item ;
   PopularItem({this.item}) ;
 
   @override
   Widget build(BuildContext context) {
-    var itemDetails = Provider.of<FoodList>(context) ;
     return Column(
       children: <Widget>[
         GestureDetector(

@@ -1,6 +1,9 @@
+/*
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 
 import 'Login_staggeredAnimation/FadeContainer.dart';
@@ -51,6 +54,8 @@ class OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     List<Widget> widgetList = [
       Padding(
         padding: EdgeInsets.only(left: 0.0, right: 2.0),
@@ -447,7 +452,7 @@ class OtpPageState extends State<OtpPage> {
                                 onPressed: () async {
                                   //matchOtp();
                                   dynamic result = await _auth.signInWithPhone(
-                                      this.phone, context);
+                                      this.phone, context, db);
                                   if (result == null) {
                                     _scaffoldkey.currentState
                                         .showSnackBar(SnackBar(
@@ -475,7 +480,7 @@ class OtpPageState extends State<OtpPage> {
         ),
       ),
     );
-  }
+  }void
 
   void inputTextToField(String str) {
     //Edit first textField
@@ -568,3 +573,4 @@ class OtpPageState extends State<OtpPage> {
         });
   }
 }
+*/

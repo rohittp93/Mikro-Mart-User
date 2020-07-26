@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
@@ -22,6 +24,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final AuthService _auth = AuthService();
+    AppDatabase db = Provider.of<AppDatabase>(context);
 
     return Scaffold(
         key: _scaffoldkey,
@@ -125,7 +128,7 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
 
                           String validationMessage = validateMobile(this.phone);
                           if (validationMessage == null) {
-                            _auth.signInWithPhone('+91' + this.phone, context);
+                            _auth.signInWithPhone('+91' + this.phone, context, db);
                           } else {
                             setState(() {
                               _buttonAnimationState = 0;

@@ -1,8 +1,6 @@
 import '../../core/card_list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/card_list.dart';
-import './card_type.dart';
 
 class WalletPage extends StatelessWidget {
   @override
@@ -35,6 +33,6 @@ class WalletPage extends StatelessWidget {
             )
           ],
         ),
-        body: CardList());
+        body: Container());
   }
 }

@@ -7,9 +7,6 @@ import './PopularItem.dart' ;
 class PopularItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final double itemHeight =
-        (MediaQuery.of(context).size.height - kToolbarHeight - 24) / 2;
-    final double itemWidth = MediaQuery.of(context).size.width / 2;
     return Column(
       children: <Widget>[
         Padding(
@@ -36,9 +33,7 @@ class PopularItems extends StatelessWidget {
         ),
         Consumer<FoodList>(
           builder: (context, model, child) {
-            final double itemHeight =
-                (MediaQuery.of(context).size.height - kToolbarHeight - 24) / 2;
-            final double itemWidth = MediaQuery.of(context).size.width / 1.7;
+
             return GridView.builder(
               padding: EdgeInsets.only(bottom:32),
               physics: ScrollPhysics(),

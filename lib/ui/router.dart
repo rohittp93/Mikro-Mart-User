@@ -28,9 +28,9 @@ class Router {
         return MaterialPageRoute(builder: (_) => HomePage());
       case '/phoneNumberRegister':
         return MaterialPageRoute(builder: (_) => PhoneNumberRegister());
-      case '/otpPage':
+ /*     case '/otpPage':
         var argument = settings.arguments;
-        return MaterialPageRoute(builder: (_) => OtpPage(argument: argument));
+        return MaterialPageRoute(builder: (_) => OtpPage(argument: argument));*/
       case '/cardList':
         return MaterialPageRoute(builder: (_) => WalletPage());
       case '/cardCreate':

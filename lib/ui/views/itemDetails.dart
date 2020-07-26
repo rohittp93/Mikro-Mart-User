@@ -41,6 +41,8 @@ class _LayoutStartsState extends State<LayoutStarts> {
   List<CartItem> _cartItems;
   int _itemQuantity = 0;
   CartItem _cartItem;
+  Flushbar _outletChangeFlushbar;
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,27 +91,119 @@ class _LayoutStartsState extends State<LayoutStarts> {
               )
             : AddToCartButton(
                 itemAdded: () {
-                  CartItem cartItem = new CartItem(
-                      itemId: widget.item.id,
-                      itemImage: widget.item.item_image_path,
-                      itemQuantity: widget.item.item_quantity,
-                      cartQuantity: 1,
-                      itemName: widget.item.item_name,
-                      itemPrice: widget.item.item_price,
-                      maxQuantity: widget.item.max_cart_threshold,
-                      quantityInStock: widget.item.item_stock_quantity,
-                      cartPrice: widget.item.item_price);
+                  //TODO : Check if item is from the same outlet. If not, show flushbar with info to clear existing cart and continue
 
-                  _auth.addCartItem(cartItem, db);
+                  bool isFromSameOutlet = true;
 
-                  /*  setState(() {
-                    itemAdded = true;
-                  });*/
+                  for (CartItem cartItem in _cartItems) {
+                    if (cartItem.outletId != widget.item.outlet_id) {
+                      isFromSameOutlet = false;
+                      break;
+                    }
+                  }
+
+                  if (isFromSameOutlet) {
+                      addToCart(db);
+                  } else {
+                    outletChangeErrorSheet(_cartItems[0], widget.item, () {
+                      db.deleteAllCartItems().then((value) => {
+                      addToCart(db)
+                      });
+                    });
+                  }
                 },
               ),
       ],
     );
   }
+
+  outletChangeErrorSheet(CartItem cart_item, Item item, Function onContinue) {
+    _outletChangeFlushbar = Flushbar<List<String>>(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.easeOutCubic,
+      animationDuration: Duration(milliseconds: 600),
+      backgroundColor: MikroMartColors.purpleStart,
+      userInputForm: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child:
+              Text('Your cart contains items from ${cart_item.outletId}\n\nDo you wish to clear your cart & continue with order from ${item.outlet_id}',
+                style: TextStyle(color: Colors.white, fontSize: 16),),
+            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: FlatButton(
+                      child: Text('Cancel'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      color: Colors.white,
+                      textColor: MikroMartColors.purpleEnd,
+                      padding: EdgeInsets.all(6),
+                      onPressed: () {
+                        _outletChangeFlushbar.dismiss();
+                      },
+                    ),
+                  ),
+              Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: FlatButton(
+                      child: Text('Continue'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      color: Colors.white,
+                      textColor: MikroMartColors.purpleEnd,
+                      padding: EdgeInsets.all(6),
+                      onPressed: () {
+                        _outletChangeFlushbar.dismiss();
+                        onContinue.call();
+                      },
+                    ),
+                  ),
+            ],
+          ),
+          ],
+        ),
+      ),
+      boxShadows: [
+        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
+      ],
+      backgroundGradient: LinearGradient(colors: [
+        MikroMartColors.colorPrimaryDark,
+        MikroMartColors.colorPrimary
+      ]),
+      isDismissible: true,
+      icon: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
+    )..show(context);
+  }
+
+  void addToCart(AppDatabase db) {
+    CartItem cartItem = new CartItem(
+        itemId: widget.item.id,
+        itemImage: widget.item.item_image_path,
+        itemQuantity: widget.item.item_quantity,
+        cartQuantity: 1,
+        itemName: widget.item.item_name,
+        outletId: widget.item.outlet_id,
+        itemPrice: widget.item.item_price,
+        maxQuantity: widget.item.max_cart_threshold,
+        quantityInStock: widget.item.item_stock_quantity,
+        cartPrice: widget.item.item_price);
+
+    _auth.addCartItem(cartItem, db);
+  }
+
 }
 
 class AddToCartButton extends StatelessWidget {
@@ -167,7 +261,7 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
   //int _itemQuantity = 1;
   final AuthService _auth = AuthService();
 
-  Flushbar<List<String>> _addressNameFlushBar;
+  Flushbar _cartItemQuantityFlushbar;
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +353,7 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
   }
 
   showErrorBottomSheet(Item item, int itemQuantity) {
-    _addressNameFlushBar = Flushbar<List<String>>(
+    _cartItemQuantityFlushbar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
       flushbarStyle: FlushbarStyle.GROUNDED,
       reverseAnimationCurve: Curves.decelerate,
@@ -296,7 +390,7 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                   textColor: MikroMartColors.purpleEnd,
                   padding: EdgeInsets.all(6),
                   onPressed: () {
-                    _addressNameFlushBar.dismiss();
+                    _cartItemQuantityFlushbar.dismiss();
                   },
                 ),
               ),
@@ -316,12 +410,7 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
         Icons.check,
         color: Colors.white,
       ),
-    )..show(context).then((result) {
-        if (result != null) {
-          String address = result[0];
-          print('ADDRESS TYPED IS $address');
-        } else {}
-      });
+    )..show(context);
   }
 
   void updateCartItemQuantity(CartItem cartItem, int quantity, AppDatabase db) {

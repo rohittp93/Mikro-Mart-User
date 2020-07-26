@@ -2,7 +2,8 @@ import 'package:moor_flutter/moor_flutter.dart';
 
 part 'moor_database.g.dart';
 
-@DataClassName('User')
+@DataClassName('CartItem')
+/*
 class Users extends Table {
   TextColumn get uid => text()();
 
@@ -17,6 +18,7 @@ class Users extends Table {
   @override
   Set<Column> get primaryKey => {uid};
 }
+*/
 
 class CartItems extends Table {
   TextColumn get itemId => text()();
@@ -26,6 +28,8 @@ class CartItems extends Table {
   TextColumn get itemImage => text()();
 
   TextColumn get itemQuantity => text()();
+
+  TextColumn get outletId => text()();
 
   RealColumn get itemPrice => real()();
 
@@ -41,7 +45,7 @@ class CartItems extends Table {
   Set<Column> get primaryKey => {itemId};
 }
 
-@UseMoor(tables: [Users, CartItems])
+@UseMoor(tables: [CartItems])
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
@@ -50,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  Future<List<User>> getUsers() => select(users).get();
+ /* Future<List<User>> getUsers() => select(users).get();
 
   //Stream<List<Purpose>> watchAllPurpose() => select(purposes).watch();
   Future insertUser(User user) => into(users).insert(user);
@@ -58,7 +62,7 @@ class AppDatabase extends _$AppDatabase {
   Future updateUser(User user) => update(users).replace(user);
 
   Future deleteUser(User user) => delete(users).delete(user);
-
+*/
   Future<List<CartItem>> getCartItems() => select(cartItems).get();
 
   Stream<List<CartItem>> watchAllCartItems() => select(cartItems).watch();
@@ -70,5 +74,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future deleteCartItem(CartItem cartItem) =>
       delete(cartItems).delete(cartItem);
+
+  Future deleteAllCartItems() =>
+      delete(cartItems).go();
 
 }

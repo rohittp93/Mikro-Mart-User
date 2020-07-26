@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/firebase_service.dart';
@@ -38,7 +39,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     //final theme = Provider.of<ThemeChanger>(context);
-    //final user = Provider.of<User>(context);
+    AppDatabase db = Provider.of<AppDatabase>(context);
     return Scaffold(
       key: _scaffoldkey,
       resizeToAvoidBottomPadding: false,
@@ -418,7 +419,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                               dynamic result =
                               await _auth.registerWithEmailAndPassword(
-                                  this.name, this.email, this.password, this._userAddress);
+                                  this.name, this.email, this.password, this._userAddress, db);
 
                               if (result == null) {
                                 showSnackBar(

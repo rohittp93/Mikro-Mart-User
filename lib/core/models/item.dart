@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item {
-  String id, category_id,item_name, item_image_path, item_quantity, item_description;
+  String id, category_id,item_name, item_image_path, item_quantity, item_description, outlet_id;
   int item_stock_quantity, max_cart_threshold;
   var item_price;
   Timestamp created_time;
@@ -17,6 +17,7 @@ class Item {
     item_price = data['item_price'];
     item_quantity = data['item_quantity'];
     item_description = data['item_description'];
+    outlet_id = data['outlet_id'];
   }
 
 
@@ -33,7 +34,8 @@ class Item {
     item_price = int.parse(itemPriceStr.replaceAll('<em>', '').replaceAll('</em>', ''));
     item_quantity = data['item_quantity']['value'];
     item_description = data['item_description']['value'];
-    
+    outlet_id = data['outlet_id']['value'];
+
   }
 
 

@@ -7,358 +7,12 @@ part of 'moor_database.dart';
 // **************************************************************************
 
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
-class User extends DataClass implements Insertable<User> {
-  final String uid;
-  final String name;
-  final String email;
-  final String phone;
-  final bool phoneValidated;
-  User(
-      {@required this.uid,
-      @required this.name,
-      @required this.email,
-      @required this.phone,
-      @required this.phoneValidated});
-  factory User.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String prefix}) {
-    final effectivePrefix = prefix ?? '';
-    final stringType = db.typeSystem.forDartType<String>();
-    final boolType = db.typeSystem.forDartType<bool>();
-    return User(
-      uid: stringType.mapFromDatabaseResponse(data['${effectivePrefix}uid']),
-      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
-      email:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}email']),
-      phone:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}phone']),
-      phoneValidated: boolType
-          .mapFromDatabaseResponse(data['${effectivePrefix}phone_validated']),
-    );
-  }
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (!nullToAbsent || uid != null) {
-      map['uid'] = Variable<String>(uid);
-    }
-    if (!nullToAbsent || name != null) {
-      map['name'] = Variable<String>(name);
-    }
-    if (!nullToAbsent || email != null) {
-      map['email'] = Variable<String>(email);
-    }
-    if (!nullToAbsent || phone != null) {
-      map['phone'] = Variable<String>(phone);
-    }
-    if (!nullToAbsent || phoneValidated != null) {
-      map['phone_validated'] = Variable<bool>(phoneValidated);
-    }
-    return map;
-  }
-
-  UsersCompanion toCompanion(bool nullToAbsent) {
-    return UsersCompanion(
-      uid: uid == null && nullToAbsent ? const Value.absent() : Value(uid),
-      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
-      email:
-          email == null && nullToAbsent ? const Value.absent() : Value(email),
-      phone:
-          phone == null && nullToAbsent ? const Value.absent() : Value(phone),
-      phoneValidated: phoneValidated == null && nullToAbsent
-          ? const Value.absent()
-          : Value(phoneValidated),
-    );
-  }
-
-  factory User.fromJson(Map<String, dynamic> json,
-      {ValueSerializer serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
-    return User(
-      uid: serializer.fromJson<String>(json['uid']),
-      name: serializer.fromJson<String>(json['name']),
-      email: serializer.fromJson<String>(json['email']),
-      phone: serializer.fromJson<String>(json['phone']),
-      phoneValidated: serializer.fromJson<bool>(json['phoneValidated']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'uid': serializer.toJson<String>(uid),
-      'name': serializer.toJson<String>(name),
-      'email': serializer.toJson<String>(email),
-      'phone': serializer.toJson<String>(phone),
-      'phoneValidated': serializer.toJson<bool>(phoneValidated),
-    };
-  }
-
-  User copyWith(
-          {String uid,
-          String name,
-          String email,
-          String phone,
-          bool phoneValidated}) =>
-      User(
-        uid: uid ?? this.uid,
-        name: name ?? this.name,
-        email: email ?? this.email,
-        phone: phone ?? this.phone,
-        phoneValidated: phoneValidated ?? this.phoneValidated,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('User(')
-          ..write('uid: $uid, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
-          ..write('phone: $phone, ')
-          ..write('phoneValidated: $phoneValidated')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => $mrjf($mrjc(
-      uid.hashCode,
-      $mrjc(
-          name.hashCode,
-          $mrjc(email.hashCode,
-              $mrjc(phone.hashCode, phoneValidated.hashCode)))));
-  @override
-  bool operator ==(dynamic other) =>
-      identical(this, other) ||
-      (other is User &&
-          other.uid == this.uid &&
-          other.name == this.name &&
-          other.email == this.email &&
-          other.phone == this.phone &&
-          other.phoneValidated == this.phoneValidated);
-}
-
-class UsersCompanion extends UpdateCompanion<User> {
-  final Value<String> uid;
-  final Value<String> name;
-  final Value<String> email;
-  final Value<String> phone;
-  final Value<bool> phoneValidated;
-  const UsersCompanion({
-    this.uid = const Value.absent(),
-    this.name = const Value.absent(),
-    this.email = const Value.absent(),
-    this.phone = const Value.absent(),
-    this.phoneValidated = const Value.absent(),
-  });
-  UsersCompanion.insert({
-    @required String uid,
-    @required String name,
-    @required String email,
-    @required String phone,
-    @required bool phoneValidated,
-  })  : uid = Value(uid),
-        name = Value(name),
-        email = Value(email),
-        phone = Value(phone),
-        phoneValidated = Value(phoneValidated);
-  static Insertable<User> custom({
-    Expression<String> uid,
-    Expression<String> name,
-    Expression<String> email,
-    Expression<String> phone,
-    Expression<bool> phoneValidated,
-  }) {
-    return RawValuesInsertable({
-      if (uid != null) 'uid': uid,
-      if (name != null) 'name': name,
-      if (email != null) 'email': email,
-      if (phone != null) 'phone': phone,
-      if (phoneValidated != null) 'phone_validated': phoneValidated,
-    });
-  }
-
-  UsersCompanion copyWith(
-      {Value<String> uid,
-      Value<String> name,
-      Value<String> email,
-      Value<String> phone,
-      Value<bool> phoneValidated}) {
-    return UsersCompanion(
-      uid: uid ?? this.uid,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      phone: phone ?? this.phone,
-      phoneValidated: phoneValidated ?? this.phoneValidated,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (uid.present) {
-      map['uid'] = Variable<String>(uid.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
-    }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
-    }
-    if (phone.present) {
-      map['phone'] = Variable<String>(phone.value);
-    }
-    if (phoneValidated.present) {
-      map['phone_validated'] = Variable<bool>(phoneValidated.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('UsersCompanion(')
-          ..write('uid: $uid, ')
-          ..write('name: $name, ')
-          ..write('email: $email, ')
-          ..write('phone: $phone, ')
-          ..write('phoneValidated: $phoneValidated')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $UsersTable extends Users with TableInfo<$UsersTable, User> {
-  final GeneratedDatabase _db;
-  final String _alias;
-  $UsersTable(this._db, [this._alias]);
-  final VerificationMeta _uidMeta = const VerificationMeta('uid');
-  GeneratedTextColumn _uid;
-  @override
-  GeneratedTextColumn get uid => _uid ??= _constructUid();
-  GeneratedTextColumn _constructUid() {
-    return GeneratedTextColumn(
-      'uid',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
-  GeneratedTextColumn _name;
-  @override
-  GeneratedTextColumn get name => _name ??= _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn(
-      'name',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _emailMeta = const VerificationMeta('email');
-  GeneratedTextColumn _email;
-  @override
-  GeneratedTextColumn get email => _email ??= _constructEmail();
-  GeneratedTextColumn _constructEmail() {
-    return GeneratedTextColumn(
-      'email',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _phoneMeta = const VerificationMeta('phone');
-  GeneratedTextColumn _phone;
-  @override
-  GeneratedTextColumn get phone => _phone ??= _constructPhone();
-  GeneratedTextColumn _constructPhone() {
-    return GeneratedTextColumn(
-      'phone',
-      $tableName,
-      false,
-    );
-  }
-
-  final VerificationMeta _phoneValidatedMeta =
-      const VerificationMeta('phoneValidated');
-  GeneratedBoolColumn _phoneValidated;
-  @override
-  GeneratedBoolColumn get phoneValidated =>
-      _phoneValidated ??= _constructPhoneValidated();
-  GeneratedBoolColumn _constructPhoneValidated() {
-    return GeneratedBoolColumn(
-      'phone_validated',
-      $tableName,
-      false,
-    );
-  }
-
-  @override
-  List<GeneratedColumn> get $columns =>
-      [uid, name, email, phone, phoneValidated];
-  @override
-  $UsersTable get asDslTable => this;
-  @override
-  String get $tableName => _alias ?? 'users';
-  @override
-  final String actualTableName = 'users';
-  @override
-  VerificationContext validateIntegrity(Insertable<User> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('uid')) {
-      context.handle(
-          _uidMeta, uid.isAcceptableOrUnknown(data['uid'], _uidMeta));
-    } else if (isInserting) {
-      context.missing(_uidMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name'], _nameMeta));
-    } else if (isInserting) {
-      context.missing(_nameMeta);
-    }
-    if (data.containsKey('email')) {
-      context.handle(
-          _emailMeta, email.isAcceptableOrUnknown(data['email'], _emailMeta));
-    } else if (isInserting) {
-      context.missing(_emailMeta);
-    }
-    if (data.containsKey('phone')) {
-      context.handle(
-          _phoneMeta, phone.isAcceptableOrUnknown(data['phone'], _phoneMeta));
-    } else if (isInserting) {
-      context.missing(_phoneMeta);
-    }
-    if (data.containsKey('phone_validated')) {
-      context.handle(
-          _phoneValidatedMeta,
-          phoneValidated.isAcceptableOrUnknown(
-              data['phone_validated'], _phoneValidatedMeta));
-    } else if (isInserting) {
-      context.missing(_phoneValidatedMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {uid};
-  @override
-  User map(Map<String, dynamic> data, {String tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
-    return User.fromData(data, _db, prefix: effectivePrefix);
-  }
-
-  @override
-  $UsersTable createAlias(String alias) {
-    return $UsersTable(_db, alias);
-  }
-}
-
 class CartItem extends DataClass implements Insertable<CartItem> {
   final String itemId;
   final String itemName;
   final String itemImage;
   final String itemQuantity;
+  final String outletId;
   final double itemPrice;
   final double cartPrice;
   final int cartQuantity;
@@ -369,6 +23,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       @required this.itemName,
       @required this.itemImage,
       @required this.itemQuantity,
+      @required this.outletId,
       @required this.itemPrice,
       @required this.cartPrice,
       @required this.cartQuantity,
@@ -389,6 +44,8 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           .mapFromDatabaseResponse(data['${effectivePrefix}item_image']),
       itemQuantity: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}item_quantity']),
+      outletId: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}outlet_id']),
       itemPrice: doubleType
           .mapFromDatabaseResponse(data['${effectivePrefix}item_price']),
       cartPrice: doubleType
@@ -415,6 +72,9 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     }
     if (!nullToAbsent || itemQuantity != null) {
       map['item_quantity'] = Variable<String>(itemQuantity);
+    }
+    if (!nullToAbsent || outletId != null) {
+      map['outlet_id'] = Variable<String>(outletId);
     }
     if (!nullToAbsent || itemPrice != null) {
       map['item_price'] = Variable<double>(itemPrice);
@@ -447,6 +107,9 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       itemQuantity: itemQuantity == null && nullToAbsent
           ? const Value.absent()
           : Value(itemQuantity),
+      outletId: outletId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(outletId),
       itemPrice: itemPrice == null && nullToAbsent
           ? const Value.absent()
           : Value(itemPrice),
@@ -473,6 +136,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       itemName: serializer.fromJson<String>(json['itemName']),
       itemImage: serializer.fromJson<String>(json['itemImage']),
       itemQuantity: serializer.fromJson<String>(json['itemQuantity']),
+      outletId: serializer.fromJson<String>(json['outletId']),
       itemPrice: serializer.fromJson<double>(json['itemPrice']),
       cartPrice: serializer.fromJson<double>(json['cartPrice']),
       cartQuantity: serializer.fromJson<int>(json['cartQuantity']),
@@ -488,6 +152,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
       'itemName': serializer.toJson<String>(itemName),
       'itemImage': serializer.toJson<String>(itemImage),
       'itemQuantity': serializer.toJson<String>(itemQuantity),
+      'outletId': serializer.toJson<String>(outletId),
       'itemPrice': serializer.toJson<double>(itemPrice),
       'cartPrice': serializer.toJson<double>(cartPrice),
       'cartQuantity': serializer.toJson<int>(cartQuantity),
@@ -501,6 +166,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           String itemName,
           String itemImage,
           String itemQuantity,
+          String outletId,
           double itemPrice,
           double cartPrice,
           int cartQuantity,
@@ -511,6 +177,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
         itemName: itemName ?? this.itemName,
         itemImage: itemImage ?? this.itemImage,
         itemQuantity: itemQuantity ?? this.itemQuantity,
+        outletId: outletId ?? this.outletId,
         itemPrice: itemPrice ?? this.itemPrice,
         cartPrice: cartPrice ?? this.cartPrice,
         cartQuantity: cartQuantity ?? this.cartQuantity,
@@ -524,6 +191,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
           ..write('itemQuantity: $itemQuantity, ')
+          ..write('outletId: $outletId, ')
           ..write('itemPrice: $itemPrice, ')
           ..write('cartPrice: $cartPrice, ')
           ..write('cartQuantity: $cartQuantity, ')
@@ -543,13 +211,15 @@ class CartItem extends DataClass implements Insertable<CartItem> {
               $mrjc(
                   itemQuantity.hashCode,
                   $mrjc(
-                      itemPrice.hashCode,
+                      outletId.hashCode,
                       $mrjc(
-                          cartPrice.hashCode,
+                          itemPrice.hashCode,
                           $mrjc(
-                              cartQuantity.hashCode,
-                              $mrjc(quantityInStock.hashCode,
-                                  maxQuantity.hashCode)))))))));
+                              cartPrice.hashCode,
+                              $mrjc(
+                                  cartQuantity.hashCode,
+                                  $mrjc(quantityInStock.hashCode,
+                                      maxQuantity.hashCode))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -558,6 +228,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           other.itemName == this.itemName &&
           other.itemImage == this.itemImage &&
           other.itemQuantity == this.itemQuantity &&
+          other.outletId == this.outletId &&
           other.itemPrice == this.itemPrice &&
           other.cartPrice == this.cartPrice &&
           other.cartQuantity == this.cartQuantity &&
@@ -570,6 +241,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
   final Value<String> itemName;
   final Value<String> itemImage;
   final Value<String> itemQuantity;
+  final Value<String> outletId;
   final Value<double> itemPrice;
   final Value<double> cartPrice;
   final Value<int> cartQuantity;
@@ -580,6 +252,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     this.itemName = const Value.absent(),
     this.itemImage = const Value.absent(),
     this.itemQuantity = const Value.absent(),
+    this.outletId = const Value.absent(),
     this.itemPrice = const Value.absent(),
     this.cartPrice = const Value.absent(),
     this.cartQuantity = const Value.absent(),
@@ -591,6 +264,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     @required String itemName,
     @required String itemImage,
     @required String itemQuantity,
+    @required String outletId,
     @required double itemPrice,
     @required double cartPrice,
     @required int cartQuantity,
@@ -600,6 +274,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
         itemName = Value(itemName),
         itemImage = Value(itemImage),
         itemQuantity = Value(itemQuantity),
+        outletId = Value(outletId),
         itemPrice = Value(itemPrice),
         cartPrice = Value(cartPrice),
         cartQuantity = Value(cartQuantity),
@@ -610,6 +285,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     Expression<String> itemName,
     Expression<String> itemImage,
     Expression<String> itemQuantity,
+    Expression<String> outletId,
     Expression<double> itemPrice,
     Expression<double> cartPrice,
     Expression<int> cartQuantity,
@@ -621,6 +297,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       if (itemName != null) 'item_name': itemName,
       if (itemImage != null) 'item_image': itemImage,
       if (itemQuantity != null) 'item_quantity': itemQuantity,
+      if (outletId != null) 'outlet_id': outletId,
       if (itemPrice != null) 'item_price': itemPrice,
       if (cartPrice != null) 'cart_price': cartPrice,
       if (cartQuantity != null) 'cart_quantity': cartQuantity,
@@ -634,6 +311,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       Value<String> itemName,
       Value<String> itemImage,
       Value<String> itemQuantity,
+      Value<String> outletId,
       Value<double> itemPrice,
       Value<double> cartPrice,
       Value<int> cartQuantity,
@@ -644,6 +322,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       itemName: itemName ?? this.itemName,
       itemImage: itemImage ?? this.itemImage,
       itemQuantity: itemQuantity ?? this.itemQuantity,
+      outletId: outletId ?? this.outletId,
       itemPrice: itemPrice ?? this.itemPrice,
       cartPrice: cartPrice ?? this.cartPrice,
       cartQuantity: cartQuantity ?? this.cartQuantity,
@@ -666,6 +345,9 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     }
     if (itemQuantity.present) {
       map['item_quantity'] = Variable<String>(itemQuantity.value);
+    }
+    if (outletId.present) {
+      map['outlet_id'] = Variable<String>(outletId.value);
     }
     if (itemPrice.present) {
       map['item_price'] = Variable<double>(itemPrice.value);
@@ -692,6 +374,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
           ..write('itemQuantity: $itemQuantity, ')
+          ..write('outletId: $outletId, ')
           ..write('itemPrice: $itemPrice, ')
           ..write('cartPrice: $cartPrice, ')
           ..write('cartQuantity: $cartQuantity, ')
@@ -752,6 +435,18 @@ class $CartItemsTable extends CartItems
   GeneratedTextColumn _constructItemQuantity() {
     return GeneratedTextColumn(
       'item_quantity',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _outletIdMeta = const VerificationMeta('outletId');
+  GeneratedTextColumn _outletId;
+  @override
+  GeneratedTextColumn get outletId => _outletId ??= _constructOutletId();
+  GeneratedTextColumn _constructOutletId() {
+    return GeneratedTextColumn(
+      'outlet_id',
       $tableName,
       false,
     );
@@ -829,6 +524,7 @@ class $CartItemsTable extends CartItems
         itemName,
         itemImage,
         itemQuantity,
+        outletId,
         itemPrice,
         cartPrice,
         cartQuantity,
@@ -871,6 +567,12 @@ class $CartItemsTable extends CartItems
               data['item_quantity'], _itemQuantityMeta));
     } else if (isInserting) {
       context.missing(_itemQuantityMeta);
+    }
+    if (data.containsKey('outlet_id')) {
+      context.handle(_outletIdMeta,
+          outletId.isAcceptableOrUnknown(data['outlet_id'], _outletIdMeta));
+    } else if (isInserting) {
+      context.missing(_outletIdMeta);
     }
     if (data.containsKey('item_price')) {
       context.handle(_itemPriceMeta,
@@ -927,12 +629,10 @@ class $CartItemsTable extends CartItems
 
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
-  $UsersTable _users;
-  $UsersTable get users => _users ??= $UsersTable(this);
   $CartItemsTable _cartItems;
   $CartItemsTable get cartItems => _cartItems ??= $CartItemsTable(this);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [users, cartItems];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [cartItems];
 }

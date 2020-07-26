@@ -1,4 +1,9 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
+import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/orders.dart';
 
 class DatabaseService {
   // collection reference
@@ -8,6 +13,10 @@ class DatabaseService {
 
   final CollectionReference userCollection =
       Firestore.instance.collection('users');
+
+
+  final CollectionReference orderCollection =
+      Firestore.instance.collection('orders');
 
   Future updateUserData(
       String name,
@@ -33,7 +42,7 @@ class DatabaseService {
         'building_name': appartmentName,
       });
     } else {
-      if(setData){
+      if (setData) {
         return await userCollection.document(uid).setData({
           'two_factor_enabled': twoFactorEnabled,
           'phone_number': phoneNumber,
@@ -44,7 +53,7 @@ class DatabaseService {
           'email': email,
           'name': name,
         });
-      }else{
+      } else {
         return await userCollection.document(uid).updateData({
           'two_factor_enabled': twoFactorEnabled,
           'phone_number': phoneNumber,
@@ -72,5 +81,22 @@ class DatabaseService {
     } else {
       return null;
     }
+  }
+
+  Future<String> addOrder(String userId, OrderModel order) async {
+    //DocumentReference orderDocRef = userCollection.document(userId).collection('orders').document();
+    DocumentReference orderDocRef = orderCollection.document();
+
+    await orderDocRef.setData({
+      'order_status': order.order_status,
+      'total_amount': order.total_amount,
+      'user_name': order.user_name,
+      'user_house_name': order.user_house_name,
+      'user_location': order.user_location,
+      'order_items': FieldValue.arrayUnion(order.cart_items),
+      'created_time': FieldValue.serverTimestamp(),
+    });
+
+    return orderDocRef.documentID;
   }
 }

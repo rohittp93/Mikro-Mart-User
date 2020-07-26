@@ -210,13 +210,13 @@ class _LoginScreenState extends State<LoginScreen>
                                   _buttonAnimationState = 1;
                                 });
 
-                                User user = await   _auth.signInWithEmailAndPassword(
+                                bool phoneValidated = await   _auth.signInWithEmailAndPassword(
                                     this.email, this.password, db);
 
-                                if (user != null) {
+                                if (phoneValidated != null) {
                                   setState(() {
                                     _buttonAnimationState = 2;
-                                    _intentWidget = user.phoneValidated ? '/mainHome' : '/phoneNumberRegister';
+                                    _intentWidget =phoneValidated ? '/mainHome' : '/phoneNumberRegister';
                                   });
                                 } else {
                                   setState(() {

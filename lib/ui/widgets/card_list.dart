@@ -1,5 +1,4 @@
 import '../../core/card_list_model.dart';
-import '../views/PaymentPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 

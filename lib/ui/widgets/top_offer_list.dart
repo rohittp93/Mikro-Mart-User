@@ -1,15 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:userapp/core/card_model.dart';
 import 'package:userapp/core/models/item.dart';
-import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
-import '../../locator.dart';
 import 'package:provider/provider.dart';
-import '../../core/Dish_list.dart';
 import '../views/itemDetails.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
