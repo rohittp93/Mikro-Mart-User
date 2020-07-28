@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
+import 'package:userapp/ui/views/items_list.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:provider/provider.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
@@ -51,23 +52,22 @@ class _HomeCategoriesState extends State<HomeCategories> {
             ],
           ),
         ),
-        _buildCategoriesWidget(_categoriesNotifier.categoriesList, context),
+        _buildCategoriesWidget(_categoriesNotifier, context),
       ],
     );
   }
 }
 
-_buildCategoriesWidget(
-    UnmodifiableListView<Category> offerItemList, BuildContext context) {
+_buildCategoriesWidget(CategoriesNotifier categoriesNotifier, BuildContext context) {
   return Container(
     height: MediaQuery.of(context).size.height / 6,
     child: ListView.builder(
       primary: false,
       scrollDirection: Axis.horizontal,
       shrinkWrap: true,
-      itemCount: offerItemList == null ? 0 : offerItemList.length,
+      itemCount: categoriesNotifier.categoriesList == null ? 0 : categoriesNotifier.categoriesList.length,
       itemBuilder: (BuildContext context, int index) {
-        Category cat = offerItemList[index];
+        Category cat = categoriesNotifier.categoriesList[index];
 
         return Padding(
           padding: EdgeInsets.only(right: 10.0),
@@ -103,27 +103,43 @@ _buildCategoriesWidget(
                   height: MediaQuery.of(context).size.height / 6,
                   width: MediaQuery.of(context).size.height / 6,
                 ),
-              Container(
-                    height: MediaQuery.of(context).size.height / 6,
-                    width: MediaQuery.of(context).size.height / 6,
-                    padding: EdgeInsets.fromLTRB(2,0,2,10),
-                    constraints: BoxConstraints(
-                      minWidth: 20,
-                      minHeight: 20,
-                    ),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Text(
-                        cat.category_name,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
+              InkWell(
+                onTap: () {
+                  print('Tapped on category');
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (BuildContext
+                          context) =>
+                          new ItemsList(
+                            argument:
+                            categoriesNotifier
+                                .categoriesList[
+                            index],
+                          )));
+                },
+                child: Container(
+                      height: MediaQuery.of(context).size.height / 6,
+                      width: MediaQuery.of(context).size.height / 6,
+                      padding: EdgeInsets.fromLTRB(2,0,2,10),
+                      constraints: BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          cat.category_name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.normal,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
+              ),
               ],
             ),
           ),

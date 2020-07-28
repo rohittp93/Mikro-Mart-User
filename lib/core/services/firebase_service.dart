@@ -12,10 +12,12 @@ import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/orders.dart';
+import 'package:userapp/core/models/user.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/views/address_screen.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -124,6 +126,20 @@ class AuthService {
     }
   }
 
+  Future<void> updateUserAddress(AddressModel addressModel) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (addressModel.location.latitude != null) {
+      prefs.setDouble(PREF_USER_LAT, addressModel.location.latitude);
+    }
+    if (addressModel.location.longitude != null) {
+      prefs.setDouble(PREF_USER_LNG, addressModel.location.longitude);
+    }
+    if (addressModel.appartmentName != null) {
+      prefs.setString(PREF_USER_HOUSE_NAME, addressModel.appartmentName);
+    }
+  }
+
 // signout
   Future signOut() async {
     try {
@@ -144,15 +160,12 @@ class AuthService {
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
-          //Navigator.of(context).pop();
-          //registerPhoneWithSignedInUser(phone, credential, context);
 
           final result =
           await registerPhoneWithSignedInUser(phone, credential, context);
 
           if (result != null) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-                '/mainHome', (Route<dynamic> route) => false);
+            savePhoneAndCheckAddress(phone, context);
           } else {
             // error
           }
@@ -248,18 +261,7 @@ class AuthService {
                                     phone, credential, context);
 
                                 if (result != null) {
-                                  saveUserCreds(
-                                      id: null,
-                                      name: null,
-                                      email: null,
-                                      phone: phone,
-                                      lat: null,
-                                      lng: null,
-                                      house_name: null);
-
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                      '/mainHome',
-                                          (Route<dynamic> route) => false);
+                                  savePhoneAndCheckAddress(phone, context);
                                 } else {
                                   setState(() {
                                     _isLoading = false;
@@ -377,6 +379,21 @@ class AuthService {
     }
   }
 
+
+  Future<User> fetchUserDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return User(
+      id: prefs.getString(PREF_USER_ID),
+      name: prefs.getString(PREF_USER_NAME),
+      email: prefs.getString(PREF_USER_EMAIL),
+      phone: prefs.getString(PREF_USER_PHONE),
+      lat: prefs.getDouble(PREF_USER_LAT),
+      lng: prefs.getDouble(PREF_USER_LNG),
+      houseName: prefs.getString(PREF_USER_HOUSE_NAME),
+    );
+  }
+
   Future<String> registerPhoneWithSignedInUser(String phone,
       AuthCredential credential, context) async {
     final prefs = await SharedPreferences.getInstance();
@@ -427,13 +444,6 @@ class AuthService {
         DocumentSnapshot userDoc = await DatabaseService(uid: firebaseUser.uid)
             .fetchUserData(result.user.uid);
 
-        /*   User user = new User(
-            uid: firebaseUser.uid,
-            name: userDoc.data["name"],
-            email: userDoc.data["email"],
-            phoneValidated: userDoc.data["two_factor_enabled"],
-            phone: userDoc.data["phone_number"]);*/
-
         bool phoneValidated = userDoc.data["two_factor_enabled"];
 
         if (phoneValidated) {
@@ -477,6 +487,7 @@ class AuthService {
 
       final AuthResult authResult =
       await _auth.signInWithCredential(credential);
+
       final FirebaseUser user = authResult.user;
       final prefs = await SharedPreferences.getInstance();
       prefs.setBool(PREF_IS_SIGNED_IN, true);
@@ -485,15 +496,6 @@ class AuthService {
       await DatabaseService(uid: user.uid).fetchUserData(user.uid);
 
       if (userDoc.exists) {
-        /*User userModel = new User(
-            uid: user.uid,
-            name: userDoc.data["name"] == null
-                ? userDoc.data["email"]
-                : userDoc.data["name"],
-            email: userDoc.data["email"],
-            phoneValidated: userDoc.data["two_factor_enabled"],
-            phone: userDoc.data["phone_number"]);*/
-
         bool phoneValidated = userDoc.data["two_factor_enabled"];
         GeoPoint location = userDoc.data["location"];
 
@@ -529,6 +531,15 @@ class AuthService {
             true);
         prefs.setBool(PREF_IS_SIGNED_IN, true);
 
+        saveUserCreds(
+            id: user.uid,
+            name: user.email,
+            email: user.email,
+            phone: null,
+            lat: null,
+            lng: null,
+            house_name: null);
+
         return _userFromFirebaseUser(user, true, false);
       }
     } catch (e) {
@@ -538,6 +549,37 @@ class AuthService {
 
   Future<void> updateFCMToken(String userId, String fcmToken) async {
     await DatabaseService(uid: userId).updateFCMToken(userId, fcmToken);
+  }
+
+  Future<void> savePhoneAndCheckAddress(String phone, BuildContext context) async {
+    saveUserCreds(
+        id: null,
+        name: null,
+        email: null,
+        phone: phone,
+        lat: null,
+        lng: null,
+        house_name: null);
+
+
+    User user = await fetchUserDetails();
+    if (user.houseName == null || user.houseName.isEmpty) {
+      AddressModel addressModel = await Navigator.push(
+          context,
+          new MaterialPageRoute(
+            builder: (BuildContext context) => new AddressScreen(isDismissable: false,),
+            fullscreenDialog: true,
+          ));
+
+      await updateUserAddress(addressModel);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/mainHome', (Route<dynamic> route) => false);
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/mainHome', (Route<dynamic> route) => false);
+    }
+    /*Navigator.of(context).pushNamedAndRemoveUntil(
+        '/mainHome', (Route<dynamic> route) => false);*/
   }
 }
 

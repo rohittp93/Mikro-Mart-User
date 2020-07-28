@@ -348,7 +348,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           context,
                           new MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                new AddressScreen(),
+                                new AddressScreen(isDismissable: true,),
                             fullscreenDialog: true,
                           ));
 

@@ -59,8 +59,6 @@ class Router {
             builder: (context) => ItemsList(argument: data));
       case '/onBoarding':
         return MaterialPageRoute(builder: (context) => OnBoarding());
-      case '/addressScreen':
-        return MaterialPageRoute(builder: (context) => AddressScreen());
 
       default:
         return MaterialPageRoute(

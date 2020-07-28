@@ -9,6 +9,11 @@ import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
 class AddressScreen extends StatefulWidget {
+  final bool isDismissable;
+
+  const AddressScreen({Key key, @required this.isDismissable}) : super(key: key);
+
+
   @override
   _AddressScreenState createState() => _AddressScreenState();
 }
@@ -210,61 +215,64 @@ class _AddressScreenState extends State<AddressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldkey,
-      appBar: AppBar(
-        backgroundColor: MikroMartColors.colorPrimary,
-        title: Text(
-          "Tap to select your location",
-          style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500,
-              color: MikroMartColors.white,
-              decoration: TextDecoration.none),
-          textAlign: TextAlign.center,
-        ),
-      ),
-      body: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 50.0),
-            child: GoogleMap(
-              initialCameraPosition:
-                  CameraPosition(target: _outletLocation, zoom: 12),
-              circles: _circles,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-              onTap: _handleTap,
-              markers: _markers,
-            ),
+    return WillPopScope(
+      onWillPop: () => Future.value(widget.isDismissable),
+      child: Scaffold(
+        key: _scaffoldkey,
+        appBar: AppBar(
+          backgroundColor: MikroMartColors.colorPrimary,
+          title: Text(
+            "Tap to select your location",
+            style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: MikroMartColors.white,
+                decoration: TextDecoration.none),
+            textAlign: TextAlign.center,
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTap: () {
-                if (_markers.length == 1) {
-                  showFlatNameBottomSheet();
-                } else {
-                  showSnackBar('Select a location on map before continuing');
-                }
-              },
-              child: Container(
-                color: MikroMartColors.colorPrimary,
-                height: 50.0,
-                child: Center(
-                    child: Text(
-                  'DONE',
-                  style: TextStyle(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w700,
-                      color: MikroMartColors.white,
-                      decoration: TextDecoration.none),
-                )),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 50.0),
+              child: GoogleMap(
+                initialCameraPosition:
+                    CameraPosition(target: _outletLocation, zoom: 12),
+                circles: _circles,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                onTap: _handleTap,
+                markers: _markers,
               ),
             ),
-          )
-        ],
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () {
+                  if (_markers.length == 1) {
+                    showFlatNameBottomSheet();
+                  } else {
+                    showSnackBar('Select a location on map before continuing');
+                  }
+                },
+                child: Container(
+                  color: MikroMartColors.colorPrimary,
+                  height: 50.0,
+                  child: Center(
+                      child: Text(
+                    'DONE',
+                    style: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w700,
+                        color: MikroMartColors.white,
+                        decoration: TextDecoration.none),
+                  )),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

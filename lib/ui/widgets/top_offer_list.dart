@@ -132,14 +132,14 @@ class _TopOfferListState extends State<TopOfferList> {
                   style: style.headerStyle2,
                 ),
               ),
-              InkWell(
+             /* InkWell(
                 onTap: () {},
                 child: Text(
                   "View More",
                   style: style.subHeaderStyle
                       .copyWith(color: MikroMartColors.colorPrimary),
                 ),
-              )
+              )*/
             ],
           ),
         ),

@@ -96,6 +96,7 @@ class DatabaseService {
       'outlet_name': order.outlet_name,
       'order_items': FieldValue.arrayUnion(order.cart_items),
       'created_time': FieldValue.serverTimestamp(),
+      'user_id': userId,
     });
 
     return orderDocRef.documentID;

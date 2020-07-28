@@ -19,11 +19,11 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
   bool _isSnackbarActive = false;
   String _intentWidget = '/mainHome';
   int _buttonAnimationState = 0;
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final AuthService _auth = AuthService();
     AppDatabase db = Provider.of<AppDatabase>(context);
 
     return Scaffold(
