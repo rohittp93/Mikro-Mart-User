@@ -8,6 +8,7 @@ import 'package:userapp/ui/views/card_type.dart';
 import 'package:userapp/ui/views/items_list.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
 import 'package:userapp/ui/views/onBording.dart';
+import 'package:userapp/ui/views/orders_list.dart';
 import './views/HomePage.dart';
 import './views/mainHome.dart';
 import './views/shoppingCart.dart';
@@ -28,7 +29,7 @@ class Router {
         return MaterialPageRoute(builder: (_) => HomePage());
       case '/phoneNumberRegister':
         return MaterialPageRoute(builder: (_) => PhoneNumberRegister());
- /*     case '/otpPage':
+      /*     case '/otpPage':
         var argument = settings.arguments;
         return MaterialPageRoute(builder: (_) => OtpPage(argument: argument));*/
       case '/cardList':
@@ -53,6 +54,8 @@ class Router {
         return MaterialPageRoute(builder: (context) => NotificationPage());
       case '/shoppingCart':
         return MaterialPageRoute(builder: (context) => ShoppingCart());
+      case '/orders':
+        return MaterialPageRoute(builder: (context) => OrderList());
       case '/itemList':
         Category data = settings.arguments;
         return MaterialPageRoute(

@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 fullscreenDialog: true,
               ));
 
-          await _auth.updateUserAddress(addressModel);
+          await _auth.updateUserAddressInSharedPrefs(addressModel);
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/mainHome', (Route<dynamic> route) => false);
         } else {

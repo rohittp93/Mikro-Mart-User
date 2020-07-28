@@ -68,6 +68,14 @@ class DatabaseService {
     }
   }
 
+
+  Future updateUserAddress(GeoPoint addressLocation, String appartmentName) async {
+    return await userCollection.document(uid).updateData({
+      'location': addressLocation,
+      'building_name': appartmentName,
+    });
+  }
+
   Future updateFCMToken(String uid, String fcmToken) async {
     return await userCollection
         .document(uid)

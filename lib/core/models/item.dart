@@ -38,5 +38,13 @@ class Item {
 
   }
 
+  Item.fromOrderItemMap(data) {
+    id = data['cart_item_id'];
+    item_name = data['cart_item_name'];
+    item_image_path = data['item_image'];
+    item_price = data['item_price'];
+    item_quantity = data['cart_item_quantity'].toString();
+  }
+
 
 }

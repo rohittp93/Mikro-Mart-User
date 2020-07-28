@@ -41,13 +41,13 @@ class AuthService {
   //final AppDatabase appDatabase = AppDatabase();
 
   // create user object based on FirebaseUser
-  FirebaseUserModel _userFromFirebaseUser(FirebaseUser user, bool isSignedIn,
-      bool isPhoneVerified) {
+  FirebaseUserModel _userFromFirebaseUser(
+      FirebaseUser user, bool isSignedIn, bool isPhoneVerified) {
     return user != null
         ? FirebaseUserModel(
-        uid: user.uid,
-        isSignedIn: isSignedIn,
-        isPhoneVerified: isPhoneVerified)
+            uid: user.uid,
+            isSignedIn: isSignedIn,
+            isPhoneVerified: isPhoneVerified)
         : null;
   }
 
@@ -81,6 +81,8 @@ class AuthService {
       return null;
     }
   }
+
+
 
 // register with email & pw
   Future registerWithEmailAndPassword(String name, String email,
@@ -125,8 +127,19 @@ class AuthService {
       return null;
     }
   }
+  
+  updateAddressInFirestore(AddressModel userAddress) async {
+    final prefs = await SharedPreferences.getInstance();
 
-  Future<void> updateUserAddress(AddressModel addressModel) async {
+    String uId = prefs.getString(PREF_USER_ID);
+
+    GeoPoint addressLocation = new GeoPoint(
+        userAddress.location.latitude, userAddress.location.longitude);
+
+    await DatabaseService(uid: uId).updateUserAddress(addressLocation, userAddress.appartmentName);
+  }
+
+  Future<void> updateUserAddressInSharedPrefs(AddressModel addressModel) async {
     final prefs = await SharedPreferences.getInstance();
 
     if (addressModel.location.latitude != null) {
@@ -153,16 +166,15 @@ class AuthService {
   final _codeController = TextEditingController();
 
   // sign in with phone
-  Future signInWithPhone(String phone, BuildContext context,
-      AppDatabase db) async {
+  Future signInWithPhone(
+      String phone, BuildContext context, AppDatabase db) async {
     //await _auth.signOut();
     _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
-
           final result =
-          await registerPhoneWithSignedInUser(phone, credential, context);
+              await registerPhoneWithSignedInUser(phone, credential, context);
 
           if (result != null) {
             savePhoneAndCheckAddress(phone, context);
@@ -217,19 +229,19 @@ class AuthService {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                                    const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
                                 child: Container(
                                   width: 14,
                                   height: 14,
                                   child: _isLoading
                                       ? CircularProgressIndicator(
-                                    backgroundColor:
-                                    MikroMartColors.white,
-                                    valueColor:
-                                    new AlwaysStoppedAnimation<Color>(
-                                        MikroMartColors.purple),
-                                    strokeWidth: 1,
-                                  )
+                                          backgroundColor:
+                                              MikroMartColors.white,
+                                          valueColor:
+                                              new AlwaysStoppedAnimation<Color>(
+                                                  MikroMartColors.purple),
+                                          strokeWidth: 1,
+                                        )
                                       : Container(),
                                 ),
                               ),
@@ -252,13 +264,13 @@ class AuthService {
                                 });
                                 final code = _codeController.text.trim();
                                 AuthCredential credential =
-                                PhoneAuthProvider.getCredential(
-                                    verificationId: verificationId,
-                                    smsCode: code);
+                                    PhoneAuthProvider.getCredential(
+                                        verificationId: verificationId,
+                                        smsCode: code);
 
                                 final result =
-                                await registerPhoneWithSignedInUser(
-                                    phone, credential, context);
+                                    await registerPhoneWithSignedInUser(
+                                        phone, credential, context);
 
                                 if (result != null) {
                                   savePhoneAndCheckAddress(phone, context);
@@ -266,7 +278,7 @@ class AuthService {
                                   setState(() {
                                     _isLoading = false;
                                     _descriptionText =
-                                    "OTP did not match. Please try again";
+                                        "OTP did not match. Please try again";
                                   });
                                 }
                               },
@@ -302,8 +314,7 @@ class AuthService {
           cartMessage = CART_VALID;
         } else {
           cartMessage =
-          'There are currently on ${item.item_stock_quantity}  ${item
-              .item_name}s in stock';
+              'There are currently on ${item.item_stock_quantity}  ${item.item_name}s in stock';
           break;
         }
       } else {
@@ -315,8 +326,8 @@ class AuthService {
     return cartMessage;
   }
 
-  Future<String> placeOrder(List<CartItem> cartItems, double totalAmount,
-      AppDatabase db) async {
+  Future<String> placeOrder(
+      List<CartItem> cartItems, double totalAmount, AppDatabase db) async {
     FirebaseUser user = await _auth.currentUser();
     List<Map<String, dynamic>> orderItems = new List();
     final prefs = await SharedPreferences.getInstance();
@@ -341,19 +352,20 @@ class AuthService {
         user_location: new GeoPoint(
             prefs.getDouble(PREF_USER_LAT), prefs.getDouble(PREF_USER_LNG)));
 
-    String orderId = await DatabaseService(uid: user.uid).addOrder(
-        user.uid, orderModel);
+    String orderId =
+        await DatabaseService(uid: user.uid).addOrder(user.uid, orderModel);
 
     return orderId;
   }
 
-  saveUserCreds({@required String id,
-    @required String name,
-    @required String email,
-    @required String phone,
-    @required double lat,
-    @required double lng,
-    @required String house_name}) async {
+  saveUserCreds(
+      {@required String id,
+      @required String name,
+      @required String email,
+      @required String phone,
+      @required double lat,
+      @required double lng,
+      @required String house_name}) async {
     final prefs = await SharedPreferences.getInstance();
 
     if (id != null) {
@@ -379,7 +391,6 @@ class AuthService {
     }
   }
 
-
   Future<User> fetchUserDetails() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -394,14 +405,14 @@ class AuthService {
     );
   }
 
-  Future<String> registerPhoneWithSignedInUser(String phone,
-      AuthCredential credential, context) async {
+  Future<String> registerPhoneWithSignedInUser(
+      String phone, AuthCredential credential, context) async {
     final prefs = await SharedPreferences.getInstance();
     FirebaseUser user = await _auth.currentUser();
     if (user != null) {
       // successfully verified
       AuthResult authResult =
-      await user.linkWithCredential(credential).catchError((error) {
+          await user.linkWithCredential(credential).catchError((error) {
         return null;
       });
 
@@ -430,8 +441,8 @@ class AuthService {
   }
 
   // sign in with email & pw
-  Future<bool> signInWithEmailAndPassword(String email, String password,
-      AppDatabase db) async {
+  Future<bool> signInWithEmailAndPassword(
+      String email, String password, AppDatabase db) async {
     try {
       AuthResult result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -479,21 +490,21 @@ class AuthService {
       GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       final AuthResult authResult =
-      await _auth.signInWithCredential(credential);
+          await _auth.signInWithCredential(credential);
 
       final FirebaseUser user = authResult.user;
       final prefs = await SharedPreferences.getInstance();
       prefs.setBool(PREF_IS_SIGNED_IN, true);
 
       DocumentSnapshot userDoc =
-      await DatabaseService(uid: user.uid).fetchUserData(user.uid);
+          await DatabaseService(uid: user.uid).fetchUserData(user.uid);
 
       if (userDoc.exists) {
         bool phoneValidated = userDoc.data["two_factor_enabled"];
@@ -504,8 +515,8 @@ class AuthService {
             name: userDoc.data["name"],
             email: userDoc.data["email"],
             phone: userDoc.data["phone_number"],
-            lat: location.latitude,
-            lng: location.longitude,
+            lat: location!=null ? location.latitude : null,
+            lng: location!=null ? location.longitude : null,
             house_name: userDoc.data['building_name']);
 
         if (phoneValidated) {
@@ -519,16 +530,8 @@ class AuthService {
         return _userFromFirebaseUser(user, true, phoneValidated);
       } else {
         String fcmToken = await _fcm.getToken();
-        await DatabaseService(uid: user.uid).updateUserData(
-            user.email,
-            user.email,
-            false,
-            '',
-            user.uid,
-            fcmToken,
-            null,
-            null,
-            true);
+        await DatabaseService(uid: user.uid).updateUserData(user.email,
+            user.email, false, '', user.uid, fcmToken, null, null, true);
         prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         saveUserCreds(
@@ -551,7 +554,8 @@ class AuthService {
     await DatabaseService(uid: userId).updateFCMToken(userId, fcmToken);
   }
 
-  Future<void> savePhoneAndCheckAddress(String phone, BuildContext context) async {
+  Future<void> savePhoneAndCheckAddress(
+      String phone, BuildContext context) async {
     saveUserCreds(
         id: null,
         name: null,
@@ -561,17 +565,22 @@ class AuthService {
         lng: null,
         house_name: null);
 
-
     User user = await fetchUserDetails();
     if (user.houseName == null || user.houseName.isEmpty) {
       AddressModel addressModel = await Navigator.push(
           context,
           new MaterialPageRoute(
-            builder: (BuildContext context) => new AddressScreen(isDismissable: false,),
+            builder: (BuildContext context) => new AddressScreen(
+              isDismissable: false,
+            ),
             fullscreenDialog: true,
           ));
 
-      await updateUserAddress(addressModel);
+      GeoPoint addressLocation = new GeoPoint(
+          addressModel.location.latitude, addressModel.location.longitude);
+
+      await DatabaseService(uid: user.id).updateUserAddress(addressLocation, addressModel.appartmentName);
+      await updateUserAddressInSharedPrefs(addressModel);
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/mainHome', (Route<dynamic> route) => false);
     } else {
@@ -580,6 +589,14 @@ class AuthService {
     }
     /*Navigator.of(context).pushNamedAndRemoveUntil(
         '/mainHome', (Route<dynamic> route) => false);*/
+  }
+
+  Future<void> logoutUser(AppDatabase db) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    await _auth.signOut();
+    var logoutResult =  db.deleteAllCartItems();
+    return logoutResult;
   }
 }
 
@@ -601,7 +618,7 @@ getItemOffers(ItemNotifier notifier) async {
 
 getCategories(CategoriesNotifier notifier) async {
   QuerySnapshot snapshot =
-  await Firestore.instance.collection('categories').getDocuments();
+      await Firestore.instance.collection('categories').getDocuments();
 
   List<Category> _categories = [];
 
@@ -613,8 +630,30 @@ getCategories(CategoriesNotifier notifier) async {
   notifier.categoryList = _categories;
 }
 
-Future<List<DocumentSnapshot>> getItems(String categoryId,
-    int _per_page) async {
+final int ORDER_STATUS_QUEUED = 1;
+final int ORDER_STATUS_REJECTED = 2;
+final int ORDER_STATUS_PROCESSING = 3;
+final int ORDER_STATUS_PROCESSED = 4;
+final int ORDER_STATUS_COMPLETED = 5;
+
+String showOrderStatus(int order) {
+  switch (order) {
+    case 1:
+      return 'Order queued';
+    case 2:
+      return 'Order rejected';
+    case 3:
+      return 'Order processing';
+    case 4:
+      return 'Order processed';
+    case 5:
+      return 'Order completed';
+    default:
+  }
+}
+
+Future<List<DocumentSnapshot>> getItems(
+    String categoryId, int _per_page) async {
   QuerySnapshot snapshot;
   try {
     snapshot = await Firestore.instance
@@ -630,8 +669,46 @@ Future<List<DocumentSnapshot>> getItems(String categoryId,
   return snapshot.documents;
 }
 
-Future<List<DocumentSnapshot>> getMoreItems(String categoryId, int _per_page,
-    DocumentSnapshot lastDocument) async {
+Future<List<DocumentSnapshot>> getOrders(int _per_page) async {
+  final prefs = await SharedPreferences.getInstance();
+  String uid = prefs.getString("user_id");
+
+  QuerySnapshot snapshot;
+  try {
+    snapshot = await Firestore.instance
+        .collection('orders')
+        .orderBy('created_time')
+        .limit(_per_page)
+        .where('user_id', isEqualTo: uid)
+        .getDocuments();
+  } catch (e) {
+    return null;
+  }
+
+  return snapshot.documents;
+}
+
+Future<List<DocumentSnapshot>> getMoreOrders(
+    int _per_page, DocumentSnapshot lastDocument) async {
+  final prefs = await SharedPreferences.getInstance();
+  String uid = prefs.getString("user_id");
+
+  QuerySnapshot snapshot;
+  try {
+    snapshot = await Firestore.instance
+        .collection('orders')
+        .orderBy('created_time')
+        .where('user_id', isEqualTo: uid)
+        .startAfterDocument(lastDocument)
+        .limit(_per_page)
+        .getDocuments();
+  } catch (e) {
+    return null;
+  }
+}
+
+Future<List<DocumentSnapshot>> getMoreItems(
+    String categoryId, int _per_page, DocumentSnapshot lastDocument) async {
   QuerySnapshot snapshot;
   try {
     snapshot = await Firestore.instance

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:provider/provider.dart';
+import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/user.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/theme.dart';
+import 'package:userapp/ui/views/orders_list.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:flare_flutter/flare_actor.dart';
 
@@ -29,12 +31,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    AppDatabase db = Provider.of<AppDatabase>(context);
+
     return FutureBuilder(
       future: _auth.fetchUserDetails(),
       builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
         switch (snapshot.connectionState) {
-          case ConnectionState.none: return new Text('Press button to start');
-          case ConnectionState.waiting: return new Text('Awaiting result...');
+          case ConnectionState.none:
+            return new Text('Press button to start');
+          case ConnectionState.waiting:
+            return new Text('Awaiting result...');
           default:
             if (snapshot.hasError)
               return new Text('Error: ${snapshot.error}');
@@ -60,8 +66,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Container(
                                       padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .spaceAround,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
                                         children: <Widget>[
                                           Text(
                                             'PROFILE',
@@ -82,67 +88,69 @@ class _ProfilePageState extends State<ProfilePage> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 20.0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .spaceEvenly,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
                                           Container(
-                                            width:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width * 0.45,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.45,
                                             child: Column(
-                                              mainAxisAlignment: MainAxisAlignment
-                                                  .center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: <Widget>[
                                                 Text('Email',
                                                     style: style.mediumTextTitle
                                                         .copyWith(
-                                                        fontWeight: FontWeight
-                                                            .w800),
-                                                    textAlign: TextAlign
-                                                        .center),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w800),
+                                                    textAlign:
+                                                        TextAlign.center),
                                                 SizedBox(
                                                   height: 5,
                                                 ),
                                                 Text(
-                                                    (_user != null && _user.email!=null)
-                                                    ? _user.email
-                                                    : '',
+                                                    (_user != null &&
+                                                            _user.email != null)
+                                                        ? _user.email
+                                                        : '',
                                                     style: TextStyle(
                                                       fontSize: 15.0,
                                                     ),
-                                                    textAlign: TextAlign
-                                                        .center),
+                                                    textAlign:
+                                                        TextAlign.center),
                                               ],
                                             ),
                                           ),
                                           Container(
-                                            color: Colors.white.withOpacity(
-                                                0.5),
+                                            color:
+                                                Colors.white.withOpacity(0.5),
                                             width: 1.0,
                                             height: 40.0,
                                           ),
                                           Container(
-                                            width:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width * 0.45,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.45,
                                             child: Column(
                                               children: <Widget>[
                                                 Text('Phone',
                                                     style: style.mediumTextTitle
                                                         .copyWith(
-                                                        fontWeight: FontWeight
-                                                            .w800),
-                                                    textAlign: TextAlign
-                                                        .center),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w800),
+                                                    textAlign:
+                                                        TextAlign.center),
                                                 SizedBox(
                                                   height: 5,
                                                 ),
                                                 Text(
-                                                  (_user != null && _user.phone!=null)
+                                                  (_user != null &&
+                                                          _user.phone != null)
                                                       ? _user.phone
                                                       : '',
                                                   style: TextStyle(
@@ -171,36 +179,33 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 25),
-                                            height:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .height * 0.08,
-                                            width: MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width,
                                             child: Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   children: <Widget>[
                                                     Text(
                                                       'Username',
-                                                      style: style.mediumTextTitle,
+                                                      style:
+                                                          style.mediumTextTitle,
                                                     ),
                                                     SizedBox(
                                                       height: 4,
                                                     ),
                                                     Text(
-                                                      (_user != null && _user.name!=null)
+                                                      (_user != null &&
+                                                              _user.name !=
+                                                                  null)
                                                           ? _user.name
                                                           : '',
-                                                      style: style.mediumTextSubtitle,
+                                                      style: style
+                                                          .mediumTextSubtitle,
                                                     )
                                                   ],
                                                 ),
@@ -209,63 +214,139 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                           ),
                                         ),
+                                        SizedBox(
+                                          height: 30,
+                                        ),
                                         InkWell(
                                           onTap: () async {
                                             var result = await Navigator.push(
                                                 context,
                                                 new MaterialPageRoute(
-                                                  builder: (BuildContext context) =>
-                                                  new AddressScreen(isDismissable: true,),
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          new AddressScreen(
+                                                    isDismissable: true,
+                                                  ),
                                                   fullscreenDialog: true,
                                                 ));
 
                                             AddressModel addressModel = result;
-                                            _auth.updateUserAddress(addressModel);
+                                            _auth.updateAddressInFirestore(
+                                                addressModel);
 
-                                            setState(() {
+                                            setState(() {});
 
-                                            });
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 25),
-                                            height:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .height * 0.08,
-                                            width: MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width,
                                             child: Row(
                                               mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   children: <Widget>[
                                                     Text(
                                                       'Address',
-                                                      style: style.mediumTextTitle,
+                                                      style:
+                                                          style.mediumTextTitle,
                                                     ),
                                                     SizedBox(
                                                       height: 4,
                                                     ),
                                                     Text(
-                                                      (_user != null && _user.houseName!=null) ? _user
-                                                          .houseName : '',
-                                                      style: style.mediumTextSubtitle,
+                                                      (_user != null &&
+                                                              _user.houseName !=
+                                                                  null)
+                                                          ? _user.houseName
+                                                          : '',
+                                                      style: style
+                                                          .mediumTextSubtitle,
                                                     )
                                                   ],
                                                 ),
-                                                Icon(Icons.edit)
+                                                Icon(
+                                                  Icons.edit,
+                                                  color: Colors.grey,
+                                                )
                                               ],
                                             ),
                                           ),
                                         ),
+                                        SizedBox(
+                                          height: 30,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              12, 0, 12, 0),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          OrderList()));
+                                            },
+                                            child: Card(
+                                              elevation: 2,
+                                              child: Container(
+                                                height: 50,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 25),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Center(
+                                                      child: Text(
+                                                        'View Order History',
+                                                        style: style
+                                                            .mediumTextTitle,
+                                                      ),
+                                                    ),
+                                                    Center(
+                                                      child: Icon(
+                                                        Icons.arrow_forward_ios,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 80,
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.fromLTRB(12, 0, 12, 0),
+                                            child: FlatButton(
+                                              onPressed: () async {
+                                                showLogoutAlert(db);
+
+
+                                              },
+                                              color: MikroMartColors.colorPrimary,
+                                              child: Container(
+                                                height: 40,
+                                                alignment: Alignment.center,
+                                                child: Text('LOGOUT', style: TextStyle(color: Colors.white, fontSize: 16),),
+                                              ),
+                                            ),
+                                          ),
+                                        )
                                       ],
                                     )
                                   ],
@@ -284,4 +365,58 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
   }
+
+
+  showLogoutAlert(AppDatabase db) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context)
+    {
+
+      return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                  "Are you sure you want to logout?"),
+              titleTextStyle: TextStyle(
+                  fontSize: 16.0,
+                  color: MikroMartColors.purple,
+                  fontStyle: FontStyle.normal),
+              actions: <Widget>[
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlatButton(
+                      child: Text('Cancel'),
+                      textColor: MikroMartColors.colorPrimary,
+                      onPressed: () async {
+                        FocusScope.of(context)
+                            .requestFocus(FocusNode());
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlatButton(
+                      child: Text('Confirm'),
+                      textColor: MikroMartColors.colorPrimary,
+                      onPressed: () async {
+                        FocusScope.of(context)
+                            .requestFocus(FocusNode());
+                        await _auth.logoutUser(db);
+                        Navigator.pushNamedAndRemoveUntil(context, "/splashScreen", (r) => false);
+                      },
+                    ),
+                  ),
+                )
+              ],
+            );
+          });
+    });
+  }
+
 }
