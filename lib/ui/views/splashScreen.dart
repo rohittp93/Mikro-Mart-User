@@ -7,6 +7,7 @@ import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/user.dart';
 import 'package:userapp/core/services/firebase_service.dart';
+import 'package:userapp/ui/shared/colors.dart';
 
 import 'address_screen.dart';
 
@@ -21,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   startTime() async {
     final prefs = await SharedPreferences.getInstance();
-    var _duration = new Duration(seconds: 3);
+    var _duration = new Duration(seconds: 2);
     return new Timer(_duration, () {
       navigationPage(prefs.getBool("signed_in") ?? false,
           prefs.getBool("phone_authenticated") ?? false);
@@ -94,15 +95,18 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     startTime();
     return new Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: MikroMartColors.colorPrimary,
       body: new Center(
-        child: new Image.asset(
-          Theme.of(context).brightness == Brightness.light
-              ? 'assets/icons&splashs/splash_day.png'
-              : 'assets/icons&splashs/splash_night.png',
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          fit: BoxFit.cover,
+        child: Container(
+          height: 150,
+          width: 150,
+          child: new Image.asset(
+            'assets/logo.png',
+            color: Colors.white,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

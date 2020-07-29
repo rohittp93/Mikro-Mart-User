@@ -9,6 +9,10 @@ import 'package:provider/provider.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
 class HomeCategories extends StatefulWidget {
+  final Function onViewMoreClicked;
+
+  const HomeCategories({Key key, this.onViewMoreClicked}) : super(key: key);
+
   @override
   _HomeCategoriesState createState() => _HomeCategoriesState();
 }
@@ -41,14 +45,24 @@ class _HomeCategoriesState extends State<HomeCategories> {
                   style: style.headerStyle2,
                 ),
               ),
-              InkWell(
-                onTap: () {},
-                child: Text(
-                  "View More",
-                  style: style.subHeaderStyle
-                      .copyWith(color: Theme.of(context).primaryColor),
+             /* InkWell(
+                onTap: () {
+                  widget.onViewMoreClicked();
+                },
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(
+                    8,
+                    4,
+                    8,
+                    4,
+                  ),
+                  child: Text(
+                    "View More",
+                    style: style.subHeaderStyle
+                        .copyWith(color: Theme.of(context).primaryColor),
+                  ),
                 ),
-              )
+              )*/
             ],
           ),
         ),
@@ -58,14 +72,17 @@ class _HomeCategoriesState extends State<HomeCategories> {
   }
 }
 
-_buildCategoriesWidget(CategoriesNotifier categoriesNotifier, BuildContext context) {
+_buildCategoriesWidget(
+    CategoriesNotifier categoriesNotifier, BuildContext context) {
   return Container(
     height: MediaQuery.of(context).size.height / 6,
     child: ListView.builder(
       primary: false,
       scrollDirection: Axis.horizontal,
       shrinkWrap: true,
-      itemCount: categoriesNotifier.categoriesList == null ? 0 : categoriesNotifier.categoriesList.length,
+      itemCount: categoriesNotifier.categoriesList == null
+          ? 0
+          : categoriesNotifier.categoriesList.length,
       itemBuilder: (BuildContext context, int index) {
         Category cat = categoriesNotifier.categoriesList[index];
 
@@ -103,43 +120,39 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier, BuildContext conte
                   height: MediaQuery.of(context).size.height / 6,
                   width: MediaQuery.of(context).size.height / 6,
                 ),
-              InkWell(
-                onTap: () {
-                  print('Tapped on category');
-                  Navigator.push(
-                      context,
-                      new MaterialPageRoute(
-                          builder: (BuildContext
-                          context) =>
-                          new ItemsList(
-                            argument:
-                            categoriesNotifier
-                                .categoriesList[
-                            index],
-                          )));
-                },
-                child: Container(
-                      height: MediaQuery.of(context).size.height / 6,
-                      width: MediaQuery.of(context).size.height / 6,
-                      padding: EdgeInsets.fromLTRB(2,0,2,10),
-                      constraints: BoxConstraints(
-                        minWidth: 20,
-                        minHeight: 20,
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Text(
-                          cat.category_name,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          textAlign: TextAlign.center,
+                InkWell(
+                  onTap: () {
+                    print('Tapped on category');
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (BuildContext context) => new ItemsList(
+                                  argument:
+                                      categoriesNotifier.categoriesList[index],
+                                )));
+                  },
+                  child: Container(
+                    height: MediaQuery.of(context).size.height / 6,
+                    width: MediaQuery.of(context).size.height / 6,
+                    padding: EdgeInsets.fromLTRB(2, 0, 2, 10),
+                    constraints: BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20,
+                    ),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Text(
+                        cat.category_name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-              ),
+                  ),
+                ),
               ],
             ),
           ),

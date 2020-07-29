@@ -153,6 +153,17 @@ class AuthService {
     }
   }
 
+
+  Future<GeoPoint> getUserAddress() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    double lat =  prefs.getDouble(PREF_USER_LAT);
+    double lng = prefs.getDouble(PREF_USER_LNG);
+
+    return new GeoPoint(
+        lat, lng);
+  }
+
 // signout
   Future signOut() async {
     try {
@@ -342,6 +353,8 @@ class AuthService {
       });
     }
 
+    String userPhone = prefs.getString(PREF_USER_PHONE);
+
     OrderModel orderModel = new OrderModel(
         order_status: ORDER_PLACED,
         cart_items: orderItems,
@@ -353,7 +366,7 @@ class AuthService {
             prefs.getDouble(PREF_USER_LAT), prefs.getDouble(PREF_USER_LNG)));
 
     String orderId =
-        await DatabaseService(uid: user.uid).addOrder(user.uid, orderModel);
+        await DatabaseService(uid: user.uid).addOrder(user.uid, orderModel, userPhone);
 
     return orderId;
   }

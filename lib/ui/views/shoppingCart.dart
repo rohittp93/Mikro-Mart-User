@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/helpers/great_circle_distance_base.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
@@ -226,6 +229,19 @@ class _ShoppingCartState extends State<ShoppingCart> {
     );
   }
 
+  getDeliveryCharge(LatLng outletLocation) async {
+    GeoPoint userAddress = await _auth.getUserAddress();
+    var gcd = new GreatCircleDistance.fromDegrees(
+        latitude1: outletLocation.latitude,
+        longitude1: outletLocation.longitude,
+        latitude2: userAddress.latitude,
+        longitude2: userAddress.longitude);
+    double distance = gcd.haversineDistance();
+    
+    double deliveryCharge = distance * 6;
+    
+    return deliveryCharge;
+  }
 
   Widget _cartItemBuilder(BuildContext context, int index) {
     AppDatabase db = Provider.of<AppDatabase>(context);
@@ -300,9 +316,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
                       minWidth: 40,
                       height: 40,
                       child: OutlineButton(
-                        child: new Icon(
-                          Icons.remove,
-                          color: MikroMartColors.colorPrimary,
+                        child: Container(
+                          width: 20,
+                          child: new Icon(
+                            Icons.remove,
+                            color: MikroMartColors.colorPrimary,
+                          ),
                         ),
                         borderSide: BorderSide(
                           color: MikroMartColors.colorPrimary,
@@ -372,6 +391,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
       ),
     );
   }
+
 
   showErrorBottomSheet(CartItem item, int itemQuantity) {
     _addressNameFlushBar = Flushbar<List<String>>(

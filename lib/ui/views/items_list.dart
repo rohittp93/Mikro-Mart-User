@@ -255,55 +255,97 @@ class _ItemsListState extends State<ItemsList> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: <Widget>[
-                                              Hero(
-                                                transitionOnUserGestures: true,
-                                                tag: item.item_name,
-                                                child: Image(
-                                                  image: NetworkImage(
-                                                      item.item_image_path),
-                                                  fit: BoxFit.contain,
-                                                ),
-                                              ),
-                                          Flexible(
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(8.0, 8.0, 0, 4.0),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                              Stack(
+                                                alignment:
+                                                    Alignment.bottomRight,
                                                 children: <Widget>[
-                                                   Align(
-                                                      alignment: Alignment
-                                                          .topLeft,
-                                                      child: Text(
-                                                        item.item_name,
-                                                        overflow:
-                                                        TextOverflow
-                                                            .ellipsis,
-                                                        maxLines: 2,
-                                                        style: style
-                                                            .itemnNameText,
-                                                      ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 4,
+                                                  Hero(
+                                                    transitionOnUserGestures:
+                                                        true,
+                                                    tag: item.item_name,
+                                                    child: Image(
+                                                      image: NetworkImage(
+                                                          item.item_image_path),
+                                                      fit: BoxFit.contain,
+                                                    ),
                                                   ),
                                                   Align(
-                                                    alignment: Alignment
-                                                        .centerLeft,
-                                                    child: Text(
-                                                      '₹ ' +
-                                                          item.item_price
-                                                              .toString(),
-                                                      overflow:
-                                                      TextOverflow
-                                                          .ellipsis,
-                                                      style: style
-                                                          .itemPriceText,
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Container(
+                                                      color: MikroMartColors
+                                                          .transparentGray.withOpacity(0.6),
+                                                      height: 25,
+                                                      child: Center(
+                                                        child: Text(
+                                                          item.outlet_id,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 1,
+                                                          style: style
+                                                              .itemnNameText
+                                                              .copyWith(
+                                                            fontSize: 14,
+                                                              color: Colors
+                                                                  .white),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          ),
+                                              Flexible(
+                                                child: Container(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      8.0, 8.0, 0, 4.0),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: <Widget>[
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.topLeft,
+                                                        child: Text(
+                                                          item.item_name,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 2,
+                                                          style: style
+                                                              .itemnNameText,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 2,
+                                                      ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          '₹ ' +
+                                                              item.item_price
+                                                                  .toString(),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: style
+                                                              .itemPriceText,
+                                                        ),
+                                                      ),
+                                                      item.item_stock_quantity==0?Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          'Item out of stock',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: style
+                                                              .itemPriceText.copyWith(fontStyle: FontStyle.italic,color: MikroMartColors.colorPrimary),
+                                                        ),
+                                                      ): Container(),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),

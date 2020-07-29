@@ -43,7 +43,6 @@ class _LayoutStartsState extends State<LayoutStarts> {
   CartItem _cartItem;
   Flushbar _outletChangeFlushbar;
 
-
   @override
   Widget build(BuildContext context) {
     AppDatabase db = Provider.of<AppDatabase>(context);
@@ -93,28 +92,90 @@ class _LayoutStartsState extends State<LayoutStarts> {
                 itemAdded: () {
                   //TODO : Check if item is from the same outlet. If not, show flushbar with info to clear existing cart and continue
 
+                  //outOfStockBottomSheet();
                   bool isFromSameOutlet = true;
 
-                  for (CartItem cartItem in _cartItems) {
-                    if (cartItem.outletId != widget.item.outlet_id) {
-                      isFromSameOutlet = false;
-                      break;
-                    }
-                  }
-
-                  if (isFromSameOutlet) {
-                      addToCart(db);
+                  if (widget.item.item_stock_quantity == 0) {
+                    outOfStockBottomSheet(widget.item);
                   } else {
-                    outletChangeErrorSheet(_cartItems[0], widget.item, () {
-                      db.deleteAllCartItems().then((value) => {
-                      addToCart(db)
+                    for (CartItem cartItem in _cartItems) {
+                      if (cartItem.outletId != widget.item.outlet_id) {
+                        isFromSameOutlet = false;
+                        break;
+                      }
+                    }
+
+                    if (isFromSameOutlet) {
+                      addToCart(db);
+                    } else {
+                      outletChangeErrorSheet(_cartItems[0], widget.item, () {
+                        db
+                            .deleteAllCartItems()
+                            .then((value) => {addToCart(db)});
                       });
-                    });
+                    }
                   }
                 },
               ),
       ],
     );
+  }
+
+
+  outOfStockBottomSheet(Item item) {
+    _outletChangeFlushbar = Flushbar<List<String>>(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.easeOutCubic,
+      animationDuration: Duration(milliseconds: 600),
+      duration: Duration(seconds: 4),
+      backgroundColor: MikroMartColors.purpleStart,
+      userInputForm: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child: Text(
+                '${item.item_name} is out of stock',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: FlatButton(
+                  child: Text('OK'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  color: Colors.white,
+                  textColor: MikroMartColors.purpleEnd,
+                  padding: EdgeInsets.all(6),
+                  onPressed: () {
+                    _outletChangeFlushbar.dismiss();
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      boxShadows: [
+        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
+      ],
+      backgroundGradient: LinearGradient(colors: [
+        MikroMartColors.colorPrimaryDark,
+        MikroMartColors.colorPrimary
+      ]),
+      isDismissible: true,
+      icon: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
+    )..show(context);
   }
 
   outletChangeErrorSheet(CartItem cart_item, Item item, Function onContinue) {
@@ -132,44 +193,45 @@ class _LayoutStartsState extends State<LayoutStarts> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child:
-              Text('Your cart contains items from ${cart_item.outletId}\n\nDo you wish to clear your cart & continue with order from ${item.outlet_id}',
-                style: TextStyle(color: Colors.white, fontSize: 16),),
+              child: Text(
+                'Your cart contains items from ${cart_item.outletId}\n\nDo you wish to clear your cart & continue with order from ${item.outlet_id}',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: FlatButton(
-                      child: Text('Cancel'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      color: Colors.white,
-                      textColor: MikroMartColors.purpleEnd,
-                      padding: EdgeInsets.all(6),
-                      onPressed: () {
-                        _outletChangeFlushbar.dismiss();
-                      },
-                    ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: FlatButton(
+                    child: Text('Cancel'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    color: Colors.white,
+                    textColor: MikroMartColors.purpleEnd,
+                    padding: EdgeInsets.all(6),
+                    onPressed: () {
+                      _outletChangeFlushbar.dismiss();
+                    },
                   ),
-              Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: FlatButton(
-                      child: Text('Continue'),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      color: Colors.white,
-                      textColor: MikroMartColors.purpleEnd,
-                      padding: EdgeInsets.all(6),
-                      onPressed: () {
-                        _outletChangeFlushbar.dismiss();
-                        onContinue.call();
-                      },
-                    ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: FlatButton(
+                    child: Text('Continue'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    color: Colors.white,
+                    textColor: MikroMartColors.purpleEnd,
+                    padding: EdgeInsets.all(6),
+                    onPressed: () {
+                      _outletChangeFlushbar.dismiss();
+                      onContinue.call();
+                    },
                   ),
-            ],
-          ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -203,7 +265,6 @@ class _LayoutStartsState extends State<LayoutStarts> {
 
     _auth.addCartItem(cartItem, db);
   }
-
 }
 
 class AddToCartButton extends StatelessWidget {
@@ -339,9 +400,6 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                     } else {
                       showErrorBottomSheet(widget.item, widget.itemQuantity);
                     }
-                    /*setState(() {
-                      _itemQuantity = quantity;
-                    });*/
                   },
                 ),
               ),
@@ -772,30 +830,31 @@ class SheetContainer extends StatelessWidget {
                   ],
                 ),
                 SizedBox(
-                  height: 40,
+                  height: 30,
                 ),
                 Text(
                   'Product Description',
                   style: style.itemDetailHeader,
                 ),
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0,0,16,0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
                   child: Text(
                     data.item_description,
                     style: style.textTheme,
                   ),
-                ),  SizedBox(
-                  height: 40,
+                ),
+                SizedBox(
+                  height: 30,
                 ),
                 Text(
                   'Outlet',
                   style: style.itemDetailHeader,
                 ),
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 Text(
                   data.outlet_id,

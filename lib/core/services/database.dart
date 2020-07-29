@@ -91,7 +91,7 @@ class DatabaseService {
     }
   }
 
-  Future<String> addOrder(String userId, OrderModel order) async {
+  Future<String> addOrder(String userId, OrderModel order, String userPhone) async {
     //DocumentReference orderDocRef = userCollection.document(userId).collection('orders').document();
     DocumentReference orderDocRef = orderCollection.document();
 
@@ -105,6 +105,7 @@ class DatabaseService {
       'order_items': FieldValue.arrayUnion(order.cart_items),
       'created_time': FieldValue.serverTimestamp(),
       'user_id': userId,
+      'user_phone': userPhone,
     });
 
     return orderDocRef.documentID;

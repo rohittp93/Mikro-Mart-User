@@ -42,6 +42,7 @@ dependencies:
   algolia: 0.1.7
   flutter_spinkit:
 
+
   flushbar: 1.10.4
 
 
@@ -58,12 +59,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.7.2"
+  flutter_launcher_icons: 0.7.5
   moor_generator:
   build_runner:
 
 flutter_icons:
-  image_path: "assets/icons&splashs/Asset 41.png"
+  image_path: "assets/logo.png"
   android: true
   ios: true
 

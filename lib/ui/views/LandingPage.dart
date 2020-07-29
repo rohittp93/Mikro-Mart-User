@@ -7,6 +7,10 @@ import '../../core/Dish_list.dart';
 import '../widgets/home_categories.dart';
 
 class LandingPage extends StatelessWidget {
+  final Function onViewMoreClicked;
+
+  const LandingPage({Key key, this.onViewMoreClicked}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<FoodList>(
@@ -17,7 +21,7 @@ class LandingPage extends StatelessWidget {
           children: <Widget>[
             CustomAppBar(title: 'Mikro Mart',),
             TopOfferList(),
-            HomeCategories(),
+            HomeCategories(onViewMoreClicked: onViewMoreClicked),
             //DishCategories(),
             //PopularItems()
             Container(padding: EdgeInsets.only(bottom: 100))

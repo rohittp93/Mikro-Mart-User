@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:userapp/appspush.dart';
+import 'package:userapp/ui/views/appspush.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
@@ -21,8 +21,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return AppPushs(
-      child: ChangeNotifierProvider<ThemeChanger>(
+    return ChangeNotifierProvider<ThemeChanger>(
         create: (_) => ThemeChanger(),
         child: Provider(
           create: (context) => AppDatabase(),
@@ -30,8 +29,7 @@ class MyApp extends StatelessWidget {
           child: StreamProvider<FirebaseUserModel>.value(
               value: AuthService().user, child: MaterialAppWithTheme()),
         ),
-      ),
-    );
+      );
   }
 }
 

@@ -3,7 +3,7 @@ import 'package:userapp/ui/shared/colors.dart';
 
 const headerStyle = TextStyle(fontSize: 35, fontWeight: FontWeight.w900);
 const headerStyle2 = TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: MikroMartColors.textGray);
-const itemDetailHeader = TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: MikroMartColors.textGray);
+const itemDetailHeader = TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: MikroMartColors.textGray);
 const subHeaderStyle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500);
 const cardTitleStyle = TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500);
 const cardPriceStyle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400);

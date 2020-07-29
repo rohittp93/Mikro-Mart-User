@@ -10,7 +10,8 @@ class TabNavigatorRoutes {
 }
 
 class TabNavigator extends StatelessWidget {
-  TabNavigator({this.navigatorKey, this.tabItem});
+  final Function onViewMoreClicked;
+  TabNavigator({this.navigatorKey, this.tabItem, this.onViewMoreClicked});
   final GlobalKey<NavigatorState> navigatorKey;
   final String tabItem;
 
@@ -19,7 +20,7 @@ class TabNavigator extends StatelessWidget {
 
     Widget child ;
     if(tabItem == "Home")
-      child = LandingPage();
+      child = LandingPage(onViewMoreClicked: onViewMoreClicked);
     else if(tabItem == "Search")
       child = SearchPanel();
     else if(tabItem == "Cart")
