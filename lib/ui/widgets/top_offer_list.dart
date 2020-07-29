@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
@@ -13,8 +15,10 @@ class TopOfferList extends StatefulWidget {
 }
 
 class _TopOfferListState extends State<TopOfferList> {
-  final PageController ctrl = PageController(viewportFraction: 0.8);
-
+  //final PageController ctrl = PageController(viewportFraction: 0.8);
+  final PageController ctrl = PageController(viewportFraction: 0.8,
+    initialPage: 0,
+  );
   int currentPage = 0;
   _buildStoryPage(Item data, bool active, context) {
     final double blur = active ? 18 : 0;
@@ -107,10 +111,26 @@ class _TopOfferListState extends State<TopOfferList> {
       }
     });
 
+
     ItemNotifier itemNotifier =
-        Provider.of<ItemNotifier>(context, listen: false);
+    Provider.of<ItemNotifier>(context, listen: false);
 
     firebase.getItemOffers(itemNotifier);
+
+
+    Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      if (currentPage < itemNotifier.offerItemList.length) {
+        currentPage++;
+      } else {
+        currentPage = 0;
+      }
+
+      ctrl.animateToPage(
+        currentPage,
+        duration: Duration(milliseconds: 350),
+        curve: Curves.easeIn,
+      );
+    });
 
     super.initState();
   }

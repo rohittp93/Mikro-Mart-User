@@ -114,14 +114,7 @@ class _OrderListState extends State<OrderList> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (v) {
-          FocusScope.of(context).requestFocus(_blankFocusNode);
-        },
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+      body:Container(
           color: MikroMartColors.white,
           child: Align(
             alignment: Alignment.topCenter,
@@ -137,114 +130,109 @@ class _OrderListState extends State<OrderList> {
                         ? Center(
                             child: Text('No items to display'),
                           )
-                        : Flexible(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: <Widget>[
-                                  ListView.separated(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      OrderModel orderModel = _products[index];
+                        : Expanded(
+                            child: Container(
+                                child: ListView.separated(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    OrderModel orderModel = _products[index];
 
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              new MaterialPageRoute(
-                                                  builder:
-                                                      (BuildContext context) =>
-                                                          new OrderDetail(
-                                                            orderModel:
-                                                                orderModel,
-                                                          )));
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              6.0, 0, 6, 3),
-                                          child: Card(
-                                            elevation: 4,
-                                            child: Container(
-                                              color: Colors.white,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(12, 12, 0, 0),
-                                                    child: Text(
-                                                      "Order ID : " +
-                                                          orderModel.order_id,
-                                                      style: style
-                                                          .mediumTextTitle
-                                                          .copyWith(
-                                                              color:
-                                                                  MikroMartColors
-                                                                      .purple),
-                                                    ),
+                                    return InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            new MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                new OrderDetail(
+                                                  orderModel:
+                                                  orderModel,
+                                                )));
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            6.0, 0, 6, 3),
+                                        child: Card(
+                                          elevation: 4,
+                                          child: Container(
+                                            color: Colors.white,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(12, 12, 0, 0),
+                                                  child: Text(
+                                                    "Order ID : " +
+                                                        orderModel.order_id,
+                                                    style: style
+                                                        .mediumTextTitle
+                                                        .copyWith(
+                                                        color:
+                                                        MikroMartColors
+                                                            .purple),
                                                   ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(12, 6, 0, 0),
-                                                    child: Text(
-                                                      "Order Status : " +
-                                                          firebase.showOrderStatus(
-                                                              orderModel
-                                                                  .order_status),
-                                                      style: style
-                                                          .mediumTextSubtitle,
-                                                    ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(12, 6, 0, 0),
+                                                  child: Text(
+                                                    "Order Status : " +
+                                                        firebase.showOrderStatus(
+                                                            orderModel
+                                                                .order_status),
+                                                    style: style
+                                                        .mediumTextSubtitle,
                                                   ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(12, 6, 0, 0),
-                                                    child: Text(
-                                                      "Ordered Time : " +
-                                                          formatTimestamp(
-                                                              (orderModel
-                                                                  .created_time
-                                                                  .toDate()
-                                                                  .millisecondsSinceEpoch)),
-                                                      style: style
-                                                          .mediumTextSubtitle,
-                                                    ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(12, 6, 0, 0),
+                                                  child: Text(
+                                                    "Ordered Time : " +
+                                                        formatTimestamp(
+                                                            (orderModel
+                                                                .created_time
+                                                                .toDate()
+                                                                .millisecondsSinceEpoch)),
+                                                    style: style
+                                                        .mediumTextSubtitle,
                                                   ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(12, 6, 0, 12),
-                                                    child: Text(
-                                                      "Order Total : ₹ " +
-                                                          orderModel
-                                                              .total_amount
-                                                              .toString(),
-                                                      style: style
-                                                          .mediumTextSubtitle,
-                                                    ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .fromLTRB(12, 6, 0, 12),
+                                                  child: Text(
+                                                    "Order Total : ₹ " +
+                                                        orderModel
+                                                            .total_amount
+                                                            .toString(),
+                                                    style: style
+                                                        .mediumTextSubtitle,
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                    itemCount: _products.length,
-                                    separatorBuilder:
-                                        (BuildContext context, int index) {
-                                      return Divider(color: Colors.transparent);
-                                    },
-                                  ),
-                                ],
-                              ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: _products.length,
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    return Divider(color: Colors.transparent);
+                                  },
+                                ),
                             ),
                           )),
               ],
             ),
-          ),
         ),
       ),
     );

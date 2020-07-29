@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:userapp/ui/views/appspush.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
@@ -15,7 +16,12 @@ import './ui/router.dart';
 
 void main() {
   setupLocator();
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(new MyApp());
+  });
+  //runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
