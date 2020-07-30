@@ -7,7 +7,6 @@ import 'package:userapp/ui/views/address_screen.dart';
 import 'package:userapp/ui/views/card_type.dart';
 import 'package:userapp/ui/views/items_list.dart';
 import 'package:userapp/ui/views/notificationPage.dart';
-import 'package:userapp/ui/views/onBording.dart';
 import 'package:userapp/ui/views/orders_list.dart';
 import './views/HomePage.dart';
 import './views/mainHome.dart';
@@ -60,8 +59,6 @@ class Router {
         Category data = settings.arguments;
         return MaterialPageRoute(
             builder: (context) => ItemsList(argument: data));
-      case '/onBoarding':
-        return MaterialPageRoute(builder: (context) => OnBoarding());
 
       default:
         return MaterialPageRoute(

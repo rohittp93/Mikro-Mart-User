@@ -616,7 +616,7 @@ class AuthService {
 getItemOffers(ItemNotifier notifier) async {
   QuerySnapshot snapshot = await Firestore.instance
       .collection('items')
-      .where('category_id', isEqualTo: 'KtAXEw9SFk1jtMUtNRON')
+      .where('category_id', isEqualTo: 'OFFERS')
       .getDocuments();
 
   List<Item> _itemList = [];

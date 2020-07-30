@@ -32,7 +32,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
 
-  LatLng _outletLocation = LatLng(10.008746, 76.329626);
+  LatLng _outletLocation = LatLng(10.065723, 76.495566);
 
   //final ArgumentCallback<LatLng> onMapTap;
 
@@ -42,8 +42,8 @@ class _AddressScreenState extends State<AddressScreen> {
     _circles.add(
       Circle(
           circleId: CircleId("0"),
-          center: LatLng(10.008746, 76.329626),
-          radius: 5000,
+          center: LatLng(10.065723, 76.495566),
+          radius: 8000,
           strokeWidth: 1,
           fillColor: Color.fromRGBO(219, 39, 47, 0.1)),
     );
@@ -91,7 +91,7 @@ class _AddressScreenState extends State<AddressScreen> {
     print(
         'Distance from location 1 to 2 using the Vicenty`s formula is: ${gcd.vincentyDistance()}');*/
 
-    return (gcd.haversineDistance() < 5000);
+    return (gcd.haversineDistance() < 8000);
   }
 
   TextFormField textFormField() {

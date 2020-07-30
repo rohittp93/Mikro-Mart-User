@@ -60,6 +60,7 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
         StreamProvider<List<CartItem>>.value(value: db.watchAllCartItems()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         onGenerateRoute: Router.generateRoute,
         initialRoute: '/splashScreen',
         theme: theme.getTheme(),

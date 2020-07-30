@@ -13,6 +13,7 @@ import '../shared/text_styles.dart' as style;
 import 'package:flare_flutter/flare_actor.dart';
 
 import 'address_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -82,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 80.0,
+                                      height: 10.0,
                                     ),
                                     Container(
                                       padding: EdgeInsets.symmetric(
@@ -235,7 +236,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 addressModel);
 
                                             setState(() {});
-
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
@@ -325,28 +325,88 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                         ),
                                         SizedBox(
-                                          height: 80,
+                                          height: 180,
                                         ),
-                                        Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsets.fromLTRB(12, 0, 12, 0),
-                                            child: FlatButton(
-                                              onPressed: () async {
-                                                showLogoutAlert(db);
-
-
-                                              },
-                                              color: MikroMartColors.colorPrimary,
-                                              child: Container(
-                                                height: 40,
-                                                alignment: Alignment.center,
-                                                child: Text('LOGOUT', style: TextStyle(color: Colors.white, fontSize: 16),),
-                                              ),
-                                            ),
-                                          ),
-                                        )
+                                       Align(
+                                         alignment: Alignment.bottomLeft,
+                                         child: Column(
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: <Widget>[
+                                             Container(
+                                               padding: EdgeInsets.symmetric(
+                                                   horizontal: 20),
+                                               child: Text(
+                                                 'Contact support :',
+                                                 style: style.mediumTextTitle.copyWith(fontSize: 15),
+                                               ),
+                                             ),
+                                             GestureDetector(
+                                               onTap: () async{
+                                                 const url = "tel:+9090080858";
+                                                 if (await canLaunch(url) != null) {
+                                                   await launch(url);
+                                                 } else {
+                                                   throw 'Could not launch $url';
+                                                 }
+                                               },
+                                               child: Container(
+                                                 padding: EdgeInsets.fromLTRB(
+                                                     20, 20, 20, 0),
+                                                 child: Text(
+                                                   'Phone : 9090080858',
+                                                   style: style.lightTextSubtitle,
+                                                 ),
+                                               ),
+                                             ),
+                                             GestureDetector(
+                                               onTap: () async {
+                                                 String url =
+                                                 _emailLaunchUri.toString();
+                                                 if (await canLaunch(url)) {
+                                                   await launch(url);
+                                                 } else {
+                                                   throw 'Could not launch $url';
+                                                 }
+                                               },
+                                               child: Container(
+                                                 padding: EdgeInsets.fromLTRB(
+                                                     20, 20, 20, 20),
+                                                 child: Text(
+                                                   'Email : mikromarts@gmail.com',
+                                                   style: style.lightTextSubtitle,
+                                                 ),
+                                               ),
+                                             ),
+                                             SizedBox(
+                                               height: 20,
+                                             ),
+                                             Align(
+                                               alignment: Alignment.bottomCenter,
+                                               child: Padding(
+                                                 padding: EdgeInsets.fromLTRB(
+                                                     12, 0, 12, 0),
+                                                 child: FlatButton(
+                                                   onPressed: () async {
+                                                     showLogoutAlert(db);
+                                                   },
+                                                   color:
+                                                   MikroMartColors.colorPrimary,
+                                                   child: Container(
+                                                     height: 40,
+                                                     alignment: Alignment.center,
+                                                     child: Text(
+                                                       'LOGOUT',
+                                                       style: TextStyle(
+                                                           color: Colors.white,
+                                                           fontSize: 16),
+                                                     ),
+                                                   ),
+                                                 ),
+                                               ),
+                                             )
+                                           ],
+                                         ),
+                                       )
                                       ],
                                     )
                                   ],
@@ -366,19 +426,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'mikromarts@gmail.com',
+      queryParameters: {'subject': 'Mikro Mart App'});
+
 
   showLogoutAlert(AppDatabase db) {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context)
-    {
-
-      return StatefulBuilder(
-          builder: (context, setState) {
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: Text(
-                  "Are you sure you want to logout?"),
+              title: Text("Are you sure you want to logout?"),
               titleTextStyle: TextStyle(
                   fontSize: 16.0,
                   color: MikroMartColors.purple,
@@ -391,8 +452,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text('Cancel'),
                       textColor: MikroMartColors.colorPrimary,
                       onPressed: () async {
-                        FocusScope.of(context)
-                            .requestFocus(FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
                         Navigator.pop(context);
                       },
                     ),
@@ -405,10 +465,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text('Confirm'),
                       textColor: MikroMartColors.colorPrimary,
                       onPressed: () async {
-                        FocusScope.of(context)
-                            .requestFocus(FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
                         await _auth.logoutUser(db);
-                        Navigator.pushNamedAndRemoveUntil(context, "/splashScreen", (r) => false);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/splashScreen", (r) => false);
                       },
                     ),
                   ),
@@ -416,7 +476,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             );
           });
-    });
+        });
   }
-
 }

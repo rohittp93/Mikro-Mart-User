@@ -255,44 +255,47 @@ class _ItemsListState extends State<ItemsList> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: <Widget>[
-                                              Stack(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                children: <Widget>[
-                                                  Hero(
-                                                    transitionOnUserGestures:
-                                                        true,
-                                                    tag: item.item_name,
-                                                    child: Image(
-                                                      image: NetworkImage(
-                                                          item.item_image_path),
-                                                      fit: BoxFit.contain,
+                                              AspectRatio(
+                                                aspectRatio: 2/1.2,
+                                                child: Stack(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  children: <Widget>[
+                                                    Hero(
+                                                      transitionOnUserGestures:
+                                                          true,
+                                                      tag: item.item_name,
+                                                      child: Image(
+                                                        image: NetworkImage(
+                                                            item.item_image_path),
+                                                        fit: BoxFit.contain,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.bottomRight,
-                                                    child: Container(
-                                                      color: MikroMartColors
-                                                          .transparentGray.withOpacity(0.6),
-                                                      height: 25,
-                                                      child: Center(
-                                                        child: Text(
-                                                          item.outlet_id,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                          style: style
-                                                              .itemnNameText
-                                                              .copyWith(
-                                                            fontSize: 14,
-                                                              color: Colors
-                                                                  .white),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.bottomRight,
+                                                      child: Container(
+                                                        color: MikroMartColors
+                                                            .transparentGray.withOpacity(0.6),
+                                                        height: 25,
+                                                        child: Center(
+                                                          child: (item!=null && item.outlet_id!= null) ? Text(
+                                                            item.outlet_id,
+                                                            overflow: TextOverflow
+                                                                .ellipsis,
+                                                            maxLines: 1,
+                                                            style: style
+                                                                .itemnNameText
+                                                                .copyWith(
+                                                              fontSize: 14,
+                                                                color: Colors
+                                                                    .white),
+                                                          ) : Container(),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                               Flexible(
                                                 child: Container(

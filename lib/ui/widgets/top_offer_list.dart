@@ -70,13 +70,19 @@ class _TopOfferListState extends State<TopOfferList> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: Text(
-                  '${data.item_name}',
-                  style: style.cardTitleStyle
-                      .copyWith(color: MikroMartColors.colorPrimary),
+              Flexible(
+                fit: FlexFit.loose,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    '${data.item_name}',
+                    maxLines: 2,
+                    overflow: TextOverflow
+                        .ellipsis,
+                    style: style.cardTitleStyle
+                        .copyWith(color: MikroMartColors.colorPrimary, fontSize: 20),
 
+                  ),
                 ),
               ),
               Padding(
