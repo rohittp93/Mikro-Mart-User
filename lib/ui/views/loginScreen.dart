@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen>
   bool isLoginFormValid = false;
   String _intentWidget = '/phoneNumberRegister';
   bool _isSnackbarActive = false;
+  bool _signingWithGoogle = false;
   int _buttonAnimationState = 0;
 
   @override
@@ -107,8 +108,9 @@ class _LoginScreenState extends State<LoginScreen>
                             obscureText: false,
                             textAlign: TextAlign.left,
                             textInputAction: TextInputAction.next,
-                            onSubmitted: (v){
-                              FocusScope.of(context).requestFocus(passwordFocus);
+                            onSubmitted: (v) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocus);
                             },
                             decoration: InputDecoration(
                               border: InputBorder.none,
@@ -203,38 +205,44 @@ class _LoginScreenState extends State<LoginScreen>
                           onPressed: () async {
                             FocusScope.of(context).requestFocus(FocusNode());
 
-                            if (this.email.length != 0 || validateEmail(this.email)) {
+                            if (this.email.length != 0 ||
+                                validateEmail(this.email)) {
                               if (this.password.length != 0 &&
                                   this.password.length > 6) {
                                 setState(() {
                                   _buttonAnimationState = 1;
                                 });
 
-                                bool phoneValidated = await   _auth.signInWithEmailAndPassword(
-                                    this.email, this.password, db);
+                                bool phoneValidated =
+                                    await _auth.signInWithEmailAndPassword(
+                                        this.email, this.password, db);
 
                                 if (phoneValidated != null) {
                                   setState(() {
                                     _buttonAnimationState = 2;
-                                    _intentWidget =phoneValidated ? '/mainHome' : '/phoneNumberRegister';
+                                    _intentWidget = phoneValidated
+                                        ? '/mainHome'
+                                        : '/phoneNumberRegister';
                                   });
                                 } else {
                                   setState(() {
                                     _buttonAnimationState = 0;
                                   });
 
-                                  showSnackBar('Email & passwords don\'t match');
+                                  showSnackBar(
+                                      'Email & passwords don\'t match');
                                 }
                               } else {
-                                showSnackBar('Password must be 6+ characters long');
+                                showSnackBar(
+                                    'Password must be 6+ characters long');
                               }
                             } else {
                               showSnackBar('Email ID is invalid');
                             }
-
                           },
                         ),
-                        margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 80.0),
+                        margin: const EdgeInsets.only(
+                            left: 30.0, right: 30.0, top: 80.0),
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width,
@@ -268,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(30.0,20.0,30.0,0),
+                        padding: const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(40),
                           child: Container(
@@ -277,8 +285,15 @@ class _LoginScreenState extends State<LoginScreen>
                             color: MikroMartColors.colorPrimary,
                             child: InkWell(
                               onTap: () async {
+                                setState(() {
+                                  _signingWithGoogle = true;
+                                });
                                 FirebaseUserModel user =
                                     await _auth.signInWithGoogle(db);
+
+                                setState(() {
+                                  _signingWithGoogle = false;
+                                });
 
                                 if (user == null) {
                                   _scaffoldkey.currentState
@@ -292,8 +307,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     Navigator.of(context)
                                         .pushReplacementNamed('/mainHome');
                                   } else {
-                                    Navigator.of(context)
-                                        .pushReplacementNamed(
+                                    Navigator.of(context).pushReplacementNamed(
                                         '/phoneNumberRegister');
                                   }
                                 }
@@ -302,14 +316,10 @@ class _LoginScreenState extends State<LoginScreen>
                                 child: Container(
                                   child: Text(
                                     "SIGN IN WITH GOOGLE",
-                                    textAlign:
-                                    TextAlign.center,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                        color:
-                                        Colors.white,
-                                        fontWeight:
-                                        FontWeight
-                                            .bold),
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -324,6 +334,36 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ],
               ),
+              _signingWithGoogle
+                  ? Container(
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      color: MikroMartColors.textGray.withOpacity(0.6),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'Signing in with Google',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                                height: 30,
+                                width: 30,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  value: null,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container(),
             ],
           ),
         ),
@@ -339,15 +379,14 @@ class _LoginScreenState extends State<LoginScreen>
     return (!regex.hasMatch(value)) ? false : true;
   }
 
-
   void showSnackBar(String message) {
     if (!_isSnackbarActive) {
       _isSnackbarActive = true;
       _scaffoldkey.currentState
           .showSnackBar(SnackBar(
-        content: new Text(message),
-        duration: new Duration(seconds: 3),
-      ))
+            content: new Text(message),
+            duration: new Duration(seconds: 3),
+          ))
           .closed
           .then((value) => _isSnackbarActive = false);
     }

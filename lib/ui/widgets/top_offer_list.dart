@@ -16,10 +16,12 @@ class TopOfferList extends StatefulWidget {
 
 class _TopOfferListState extends State<TopOfferList> {
   //final PageController ctrl = PageController(viewportFraction: 0.8);
-  final PageController ctrl = PageController(viewportFraction: 0.8,
+  final PageController ctrl = PageController(
+    viewportFraction: 0.8,
     initialPage: 0,
   );
   int currentPage = 0;
+
   _buildStoryPage(Item data, bool active, context) {
     final double blur = active ? 18 : 0;
     final double offset = active ? 12 : 0;
@@ -77,11 +79,9 @@ class _TopOfferListState extends State<TopOfferList> {
                   child: Text(
                     '${data.item_name}',
                     maxLines: 2,
-                    overflow: TextOverflow
-                        .ellipsis,
-                    style: style.cardTitleStyle
-                        .copyWith(color: MikroMartColors.colorPrimary, fontSize: 20),
-
+                    overflow: TextOverflow.ellipsis,
+                    style: style.cardTitleStyle.copyWith(
+                        color: MikroMartColors.colorPrimary, fontSize: 20),
                   ),
                 ),
               ),
@@ -117,12 +117,10 @@ class _TopOfferListState extends State<TopOfferList> {
       }
     });
 
-
     ItemNotifier itemNotifier =
-    Provider.of<ItemNotifier>(context, listen: false);
+        Provider.of<ItemNotifier>(context, listen: false);
 
     firebase.getItemOffers(itemNotifier);
-
 
     Timer.periodic(Duration(seconds: 5), (Timer timer) {
       if (currentPage < itemNotifier.offerItemList.length) {
@@ -158,7 +156,7 @@ class _TopOfferListState extends State<TopOfferList> {
                   style: style.headerStyle2,
                 ),
               ),
-             /* InkWell(
+              /* InkWell(
                 onTap: () {},
                 child: Text(
                   "View More",
@@ -171,15 +169,33 @@ class _TopOfferListState extends State<TopOfferList> {
         ),
         Container(
           height: MediaQuery.of(context).size.height * 0.52,
-          child: PageView.builder(
-            controller: ctrl,
-            itemCount: itemNotifier.offerItemList.length,
-            itemBuilder: (context, index) {
-              bool active = index == currentPage;
-              return _buildStoryPage(
-                  itemNotifier.offerItemList[index], active, context);
-            },
-          ),
+          child: itemNotifier.offerItemList.length != 0
+              ? PageView.builder(
+                  controller: ctrl,
+                  itemCount: itemNotifier.offerItemList.length,
+                  itemBuilder: (context, index) {
+                    bool active = index == currentPage;
+                    return _buildStoryPage(
+                        itemNotifier.offerItemList[index], active, context);
+                  },
+                )
+              : Container(
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    0,
+                    16,
+                    0,
+                  ),
+                  child: Center(
+                    child: Text(
+                      'There are no offers at the moment',
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: MikroMartColors.subtitleGray,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
         )
       ],
     );

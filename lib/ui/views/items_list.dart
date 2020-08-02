@@ -103,7 +103,8 @@ class _ItemsListState extends State<ItemsList> {
       _products.add(item);
     });
 
-    _lastDocument = _productSnapshots[_productSnapshots.length - 1];
+    if (_productSnapshots.length > 1)
+      _lastDocument = _productSnapshots[_productSnapshots.length - 1];
 
     setState(() {
       _isLoading = false;
@@ -213,8 +214,11 @@ class _ItemsListState extends State<ItemsList> {
                         flex: 1,
                         child: Center(child: CircularProgressIndicator()))
                     : (_products.length == 0
-                        ? Center(
-                            child: Text('No items to display'),
+                        ? Flexible(
+                            flex: 1,
+                            child: Center(
+                              child: Text('No items to display'),
+                            ),
                           )
                         : Flexible(
                             child: SingleChildScrollView(
@@ -256,7 +260,7 @@ class _ItemsListState extends State<ItemsList> {
                                                 CrossAxisAlignment.center,
                                             children: <Widget>[
                                               AspectRatio(
-                                                aspectRatio: 2/1.2,
+                                                aspectRatio: 2 / 1.2,
                                                 child: Stack(
                                                   alignment:
                                                       Alignment.bottomRight,
@@ -266,8 +270,8 @@ class _ItemsListState extends State<ItemsList> {
                                                           true,
                                                       tag: item.item_name,
                                                       child: Image(
-                                                        image: NetworkImage(
-                                                            item.item_image_path),
+                                                        image: NetworkImage(item
+                                                            .item_image_path),
                                                         fit: BoxFit.contain,
                                                       ),
                                                     ),
@@ -276,21 +280,29 @@ class _ItemsListState extends State<ItemsList> {
                                                           Alignment.bottomRight,
                                                       child: Container(
                                                         color: MikroMartColors
-                                                            .transparentGray.withOpacity(0.6),
+                                                            .transparentGray
+                                                            .withOpacity(0.6),
                                                         height: 25,
                                                         child: Center(
-                                                          child: (item!=null && item.outlet_id!= null) ? Text(
-                                                            item.outlet_id,
-                                                            overflow: TextOverflow
-                                                                .ellipsis,
-                                                            maxLines: 1,
-                                                            style: style
-                                                                .itemnNameText
-                                                                .copyWith(
-                                                              fontSize: 14,
-                                                                color: Colors
-                                                                    .white),
-                                                          ) : Container(),
+                                                          child: (item !=
+                                                                      null &&
+                                                                  item.outlet_id !=
+                                                                      null)
+                                                              ? Text(
+                                                                  item.outlet_id,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  maxLines: 1,
+                                                                  style: style
+                                                                      .itemnNameText
+                                                                      .copyWith(
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              Colors.white),
+                                                                )
+                                                              : Container(),
                                                         ),
                                                       ),
                                                     ),
@@ -334,17 +346,25 @@ class _ItemsListState extends State<ItemsList> {
                                                               .itemPriceText,
                                                         ),
                                                       ),
-                                                      item.item_stock_quantity==0?Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Text(
-                                                          'Item out of stock',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: style
-                                                              .itemPriceText.copyWith(fontStyle: FontStyle.italic,color: MikroMartColors.colorPrimary),
-                                                        ),
-                                                      ): Container(),
+                                                      item.item_stock_quantity ==
+                                                              0
+                                                          ? Align(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Text(
+                                                                'Item out of stock',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: style.itemPriceText.copyWith(
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .italic,
+                                                                    color: MikroMartColors
+                                                                        .colorPrimary),
+                                                              ),
+                                                            )
+                                                          : Container(),
                                                     ],
                                                   ),
                                                 ),
