@@ -19,6 +19,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   //final FirebaseMessaging _fcm = FirebaseMessaging();
   final AuthService _auth = AuthService();
+  bool isAddressPageVisible = false;
 
   startTime() async {
     final prefs = await SharedPreferences.getInstance();
@@ -58,23 +59,32 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       if (isPhoneAuthenticated) {
         //Check Address
-
-        User user = await _auth.fetchUserDetails();
-        if (user.houseName == null || user.houseName.isEmpty) {
+        print('TAG 1');
+       /* User user = await _auth.fetchUserDetails();
+        print('TAG 2');
+        if (user.houseName == null ||
+            user.houseName.isEmpty && !isAddressPageVisible) {
+          isAddressPageVisible = true;
           AddressModel addressModel = await Navigator.push(
               context,
               new MaterialPageRoute(
-                builder: (BuildContext context) => new AddressScreen(isDismissable: false,),
+                builder: (BuildContext context) => new AddressScreen(
+                  isDismissable: false,
+                ),
                 fullscreenDialog: true,
               ));
-
+          isAddressPageVisible = false;
           await _auth.updateUserAddressInSharedPrefs(addressModel);
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/mainHome', (Route<dynamic> route) => false);
         } else {
           Navigator.of(context).pushNamedAndRemoveUntil(
               '/mainHome', (Route<dynamic> route) => false);
-        }
+        }*/
+
+
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/mainHome', (Route<dynamic> route) => false);
       } else {
         Navigator.of(context).pushReplacementNamed('/phoneNumberRegister');
       }

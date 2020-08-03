@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:userapp/core/helpers/great_circle_distance_base.dart';
 import 'package:userapp/core/models/address_model.dart';
@@ -11,8 +12,8 @@ import '../shared/text_styles.dart' as style;
 class AddressScreen extends StatefulWidget {
   final bool isDismissable;
 
-  const AddressScreen({Key key, @required this.isDismissable}) : super(key: key);
-
+  const AddressScreen({Key key, @required this.isDismissable})
+      : super(key: key);
 
   @override
   _AddressScreenState createState() => _AddressScreenState();
@@ -21,22 +22,22 @@ class AddressScreen extends StatefulWidget {
 class _AddressScreenState extends State<AddressScreen> {
   Set<Marker> _markers = HashSet<Marker>();
   Set<Circle> _circles = HashSet<Circle>();
-  GoogleMapController _mapController;
+  var _mapController;
   Flushbar<List<String>> _addressNameFlushBar;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Form _userInputForm;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSnackbarActive = false;
-  var _controller;
+
+  //var _controller;
   LatLng _locationAddress = null;
-
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
-
   LatLng _outletLocation = LatLng(10.065723, 76.495566);
+  bool initStateCalled = false;
 
-  //final ArgumentCallback<LatLng> onMapTap;
+  LatLng _latlong;
 
-  void onMapCreated() {}
+  var _isFetchingCurrentLocation = true;
 
   void _setCircles() {
     _circles.add(
@@ -49,10 +50,49 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
 
+  Future getCurrentLocation() async {
+    print('Initstate called');
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    print(position.latitude);
+
+    GeolocationStatus geolocationStatus  = await Geolocator().checkGeolocationPermissionStatus();
+
+    if(geolocationStatus == GeolocationStatus.denied || geolocationStatus == GeolocationStatus.disabled) {
+      setState(() {
+        _isFetchingCurrentLocation = false;
+      });
+    }
+
+    await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+
+
+
+
+    setState(() {
+      _latlong = new LatLng(position.latitude, position.longitude);
+      _isFetchingCurrentLocation = false;
+    });
+    var _cameraPosition = CameraPosition(target: _latlong, zoom: 18.0);
+    _mapController
+        .animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
+
+    _markers.add(Marker(
+      markerId: MarkerId(_latlong.toString()),
+      position: _latlong,
+      infoWindow: InfoWindow(
+        title: 'Current location',
+      ),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+    ));
+  }
+
   @override
   void initState() {
     super.initState();
     _setCircles();
+    getCurrentLocation();
   }
 
   _handleTap(LatLng point) {
@@ -72,6 +112,10 @@ class _AddressScreenState extends State<AddressScreen> {
           icon:
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
         ));
+
+        setState(() {
+          _latlong = point;
+        });
       } else {
         showErrorDialog();
       }
@@ -84,12 +128,6 @@ class _AddressScreenState extends State<AddressScreen> {
         longitude1: _outletLocation.longitude,
         latitude2: addressLocation.latitude,
         longitude2: addressLocation.longitude);
-    /* print(
-        'Distance from location 1 to 2 using the Haversine formula is: ${gcd.haversineDistance()}');
-    print(
-        'Distance from location 1 to 2 using the Spherical Law of Cosines is: ${gcd.sphericalLawOfCosinesDistance()}');
-    print(
-        'Distance from location 1 to 2 using the Vicenty`s formula is: ${gcd.vincentyDistance()}');*/
 
     return (gcd.haversineDistance() < 8000);
   }
@@ -104,10 +142,7 @@ class _AddressScreenState extends State<AddressScreen> {
         decoration: InputDecoration(
           fillColor: Colors.white12,
           filled: true,
-          /* icon: Icon(Icons.label, color: MikroMartColors.white),*/
           border: UnderlineInputBorder(),
-          /*helperText: 'This location will be used by the delivery agent to deliver items to you.',
-          helperStyle: TextStyle(color: Colors.white70),*/
           labelText: 'Enter your house name or appartment name',
           labelStyle: TextStyle(color: Colors.white70),
         ));
@@ -168,7 +203,6 @@ class _AddressScreenState extends State<AddressScreen> {
         Icons.check,
         color: Colors.white,
       ),
-
     )..show(context).then((result) {
         if (result != null) {
           String address = result[0];
@@ -176,6 +210,39 @@ class _AddressScreenState extends State<AddressScreen> {
         } else {}
       });
   }
+
+/*  showFlatNameBottomSheet() {
+    Dialog errorDialog = Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      //this right here
+      child: Container(
+        height: 200.0,
+        width: 300.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Center(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 10),
+                child: TextField(),
+              ),
+            ),
+            FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Reselect location',
+                  style: TextStyle(
+                      color: MikroMartColors.colorPrimary, fontSize: 18.0),
+                ))
+          ],
+        ),
+      ),
+    );
+    showDialog(
+        context: context, builder: (BuildContext context) => errorDialog);
+  }*/
 
   showErrorDialog() {
     Dialog errorDialog = Dialog(
@@ -240,18 +307,50 @@ class _AddressScreenState extends State<AddressScreen> {
                     CameraPosition(target: _outletLocation, zoom: 12),
                 circles: _circles,
                 onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
+                  _mapController = (controller);
+                  _mapController.complete(controller);
+                  //getCurrentLocation();
                 },
                 onTap: _handleTap,
                 markers: _markers,
               ),
             ),
+            _isFetchingCurrentLocation ? Container(
+                width: MediaQuery.of(context).size.width,
+                height: 40,
+                color: Colors.white.withOpacity(0.7),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Center(
+                        child: Text(
+                      'Fetching Current Location',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          value: null,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                )): Container(),
             Align(
               alignment: Alignment.bottomCenter,
               child: GestureDetector(
                 onTap: () {
                   if (_markers.length == 1) {
-                    showFlatNameBottomSheet();
+                    if (_getDistanceBetween(_latlong)) {
+                      showFlatNameBottomSheet();
+                    } else {
+                      showErrorDialog();
+                    }
                   } else {
                     showSnackBar('Select a location on map before continuing');
                   }

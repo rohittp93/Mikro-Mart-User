@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Item {
   String id, category_id,item_name, item_image_path, item_quantity, item_description, outlet_id;
   int item_stock_quantity, max_cart_threshold;
-  var item_price;
+  var item_price, item_mrp;
   Timestamp created_time;
 
   Item.fromMap(Map<String, dynamic> data, String itemId) {
@@ -15,6 +15,7 @@ class Item {
     max_cart_threshold = data['max_cart_threshold'];
     created_time = data['created_time'];
     item_price = data['item_price'];
+    item_mrp = data['item_mrp'];
     item_quantity = data['item_quantity'];
     item_description = data['item_description'];
     outlet_id = data['outlet_id'];
@@ -32,6 +33,11 @@ class Item {
     max_cart_threshold = int.parse(data['max_cart_threshold']['value']);
     String itemPriceStr = data['item_price']['value'];
     item_price = int.parse(itemPriceStr.replaceAll('<em>', '').replaceAll('</em>', ''));
+
+
+    String itemMrpStr = data['item_mrp']['value'];
+    item_mrp = int.parse(itemMrpStr.replaceAll('<em>', '').replaceAll('</em>', ''));
+    
     item_quantity = data['item_quantity']['value'];
     item_description = data['item_description']['value'];
     outlet_id = data['outlet_id']['value'];

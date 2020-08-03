@@ -135,8 +135,8 @@ class AuthService {
 
     GeoPoint addressLocation = new GeoPoint(
         userAddress.location.latitude, userAddress.location.longitude);
-
     await DatabaseService(uid: uId).updateUserAddress(addressLocation, userAddress.appartmentName);
+    await updateUserAddressInSharedPrefs(userAddress);
   }
 
   Future<void> updateUserAddressInSharedPrefs(AddressModel addressModel) async {

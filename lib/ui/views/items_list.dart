@@ -231,6 +231,7 @@ class _ItemsListState extends State<ItemsList> {
                                     controller: _scrollController,
                                     physics: ScrollPhysics(),
                                     crossAxisCount: 2,
+                                    childAspectRatio: 1/1.13,
                                     padding: EdgeInsets.only(
                                         left: 16, right: 16, bottom: 50),
                                     scrollDirection: Axis.vertical,
@@ -275,6 +276,42 @@ class _ItemsListState extends State<ItemsList> {
                                                         fit: BoxFit.contain,
                                                       ),
                                                     ),
+                                                    item.item_mrp != null
+                                                        ? calculatePercentage(
+                                                                    item.item_price,
+                                                                    item.item_mrp) !=
+                                                                0
+                                                            ? Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topRight,
+                                                                child:
+                                                                    Container(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              8),
+                                                                  child: Text(
+                                                                    calculatePercentage(item.item_price,
+                                                                                item.item_mrp)
+                                                                            .toString() +
+                                                                        '% OFF',
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: style
+                                                                        .itemPriceText
+                                                                        .copyWith(
+                                                                            color:
+                                                                                MikroMartColors.white,
+                                                                            fontWeight: FontWeight.bold),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : Container()
+                                                        : Container(),
                                                     Align(
                                                       alignment:
                                                           Alignment.bottomRight,
@@ -322,12 +359,13 @@ class _ItemsListState extends State<ItemsList> {
                                                         alignment:
                                                             Alignment.topLeft,
                                                         child: Text(
+                                                          //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
                                                           item.item_name,
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           maxLines: 2,
                                                           style: style
-                                                              .itemnNameText,
+                                                              .itemnNameText.copyWith(fontSize: 15),
                                                         ),
                                                       ),
                                                       SizedBox(
@@ -343,7 +381,7 @@ class _ItemsListState extends State<ItemsList> {
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style: style
-                                                              .itemPriceText,
+                                                              .itemPriceText.copyWith(fontSize: 15,color: MikroMartColors.black),
                                                         ),
                                                       ),
                                                       item.item_stock_quantity ==
@@ -364,7 +402,43 @@ class _ItemsListState extends State<ItemsList> {
                                                                         .colorPrimary),
                                                               ),
                                                             )
-                                                          : Container(),
+                                                          : item.item_mrp !=
+                                                                  null
+                                                              ? Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .centerLeft,
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    children: <
+                                                                        Widget>[
+                                                                      Text(
+                                                                        'MRP: ₹' +
+                                                                            item.item_mrp.toString(),
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        style: style.itemPriceText.copyWith(
+                                                                            decoration: TextDecoration
+                                                                                .lineThrough,
+                                                                            fontSize:
+                                                                                13.5,
+                                                                            color:
+                                                                                MikroMartColors.ErroColor),
+                                                                      ),
+                                                                      /*   calculatePercentage(item.item_price, item.item_mrp) !=
+                                                                              0
+                                                                          ? Text(
+                                                                        calculatePercentage(item.item_price, item.item_mrp).toString() + '% OFF',
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: style.itemPriceText.copyWith(color: MikroMartColors.greenShadowColor),
+                                                                            )
+                                                                          : Container(),*/
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              : Container(),
                                                     ],
                                                   ),
                                                 ),
@@ -385,6 +459,21 @@ class _ItemsListState extends State<ItemsList> {
         ),
       ),
     );
+  }
+
+  calculatePercentage(itemRate, mrpRate) {
+    if (itemRate != 0.0 && mrpRate != 0.0) {
+      if (itemRate == mrpRate) {
+        return 0;
+      } else {
+        if (mrpRate > itemRate) {
+          double percentage = (100 - ((itemRate / mrpRate) * 100));
+          return percentage.round();
+        } else {
+          return 0;
+        }
+      }
+    }
   }
 
   Future<void> _submitSearch(String val) async {

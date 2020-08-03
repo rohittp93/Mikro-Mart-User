@@ -5,6 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/data/moor_database.dart';
+import 'package:userapp/core/models/address_model.dart';
+import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/tab_navigator.dart';
 import 'package:userapp/ui/views/appspush.dart';
@@ -13,6 +16,7 @@ import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
 import './ProfilePage.dart';
+import 'address_screen.dart';
 import 'favoritePage.dart';
 
 class MainHome extends StatefulWidget {
@@ -24,6 +28,7 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
   //int currentPage = 0;
   String _currentPage = "Home";
   List<String> pageKeys = ["Home", "Search", "Cart", "Profile"];
+  final AuthService _auth = AuthService();
 
   Map<String, GlobalKey<NavigatorState>> _navigatorKeys = {
     "Home": GlobalKey<NavigatorState>(),
@@ -49,6 +54,7 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    checkIfAddressAdded();
   }
 
 
@@ -61,6 +67,25 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
       DeviceOrientation.portraitDown,
     ]);
     super.dispose();
+  }
+
+
+  checkIfAddressAdded() async {
+    User user = await _auth.fetchUserDetails();
+    if (user.houseName == null ||
+        user.houseName.isEmpty) {
+      AddressModel addressModel = await Navigator.push(
+          context,
+          new MaterialPageRoute(
+            builder: (BuildContext context) =>
+            new AddressScreen(
+              isDismissable: false,
+            ),
+            fullscreenDialog: true,
+          ));
+      await _auth.updateAddressInFirestore(
+          addressModel);
+    }
   }
 
   @override
