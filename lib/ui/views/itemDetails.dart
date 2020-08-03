@@ -121,7 +121,6 @@ class _LayoutStartsState extends State<LayoutStarts> {
     );
   }
 
-
   outOfStockBottomSheet(Item item) {
     _outletChangeFlushbar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
@@ -796,17 +795,81 @@ class SheetContainer extends StatelessWidget {
               padding: EdgeInsets.only(left: 15),
               children: <Widget>[
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      data.item_name,
-                      style: style.itemDetailHeader,
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        data.item_name + ' - ' + data.item_quantity,
+                        style: style.itemDetailHeader,
+                      ),
+                    ),
+
+                    Flexible(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                            child: Text(
+                              '${'₹ ' + data.item_price.toString()}',
+                              style: style.itemDetailHeader.copyWith(
+                                  color: MikroMartColors.colorPrimary),
+                            ),
+                          ),
+                          data.item_mrp != null
+                              ? Padding(
+                            padding:
+                            const EdgeInsets.fromLTRB(0, 5, 15, 0),
+                            child: Text(
+                              'MRP: ₹' + data.item_mrp.toString(),
+                              overflow: TextOverflow.ellipsis,
+                              style: style.itemPriceText.copyWith(
+                                  decoration: TextDecoration.lineThrough,
+                                  fontSize: 16,
+                                  color: MikroMartColors.ErroColor),
+                            ),
+                          )
+                              : Container(),
+
+                          data.item_mrp!=null ? Padding(
+                            padding:
+                            const EdgeInsets.fromLTRB(0, 10, 15, 0),
+                            child: Container(
+                              color: Colors
+                                  .green,
+                              padding:
+                              EdgeInsets
+                                  .all(
+                                  8),
+                              child: Text(
+                                calculatePercentage(data.item_price,
+                                    data.item_mrp)
+                                    .toString() +
+                                    '% OFF',
+                                overflow:
+                                TextOverflow
+                                    .ellipsis,
+                                style: style
+                                    .itemPriceText
+                                    .copyWith(
+                                    color:
+                                    MikroMartColors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ) : Container(),
+                        ],
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 0,
                 ),
-                Row(
+              /*  Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Flexible(
@@ -816,19 +879,38 @@ class SheetContainer extends StatelessWidget {
                         style: style.textTheme,
                       ),
                     ),
-                    Flexible(
+                   *//* Flexible(
                       flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
-                        child: Text(
-                          '${'₹ ' + data.item_price.toString()}',
-                          style: style.itemDetailHeader
-                              .copyWith(color: MikroMartColors.colorPrimary),
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                            child: Text(
+                              '${'₹ ' + data.item_price.toString()}',
+                              style: style.itemDetailHeader.copyWith(
+                                  color: MikroMartColors.colorPrimary),
+                            ),
+                          ),
+                          data.item_mrp != null
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 15, 0),
+                                  child: Text(
+                                    'MRP: ₹' + data.item_mrp.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: style.itemPriceText.copyWith(
+                                        decoration: TextDecoration.lineThrough,
+                                        fontSize: 16,
+                                        color: MikroMartColors.ErroColor),
+                                  ),
+                                )
+                              : Container(),
+                        ],
                       ),
-                    ),
+                    ),*//*
                   ],
-                ),
+                ),*/
                 SizedBox(
                   height: 30,
                 ),
@@ -869,6 +951,21 @@ class SheetContainer extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  calculatePercentage(itemRate, mrpRate) {
+    if (itemRate != 0.0 && mrpRate != 0.0) {
+      if (itemRate == mrpRate) {
+        return 0;
+      } else {
+        if (mrpRate > itemRate) {
+          double percentage = (100 - ((itemRate / mrpRate) * 100));
+          return percentage.round();
+        } else {
+          return 0;
+        }
+      }
+    }
   }
 
   drawerHandle() {

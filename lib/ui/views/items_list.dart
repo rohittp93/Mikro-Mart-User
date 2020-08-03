@@ -231,7 +231,7 @@ class _ItemsListState extends State<ItemsList> {
                                     controller: _scrollController,
                                     physics: ScrollPhysics(),
                                     crossAxisCount: 2,
-                                    childAspectRatio: 1/1.13,
+                                    childAspectRatio: 1/1.2,
                                     padding: EdgeInsets.only(
                                         left: 16, right: 16, bottom: 50),
                                     scrollDirection: Axis.vertical,
@@ -360,12 +360,12 @@ class _ItemsListState extends State<ItemsList> {
                                                             Alignment.topLeft,
                                                         child: Text(
                                                           //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
-                                                          item.item_name,
+                                                          item.item_name + ' - ' + item.item_quantity,
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                          maxLines: 2,
+                                                          maxLines: 3,
                                                           style: style
-                                                              .itemnNameText.copyWith(fontSize: 15),
+                                                              .itemnNameText.copyWith(fontSize: 16),
                                                         ),
                                                       ),
                                                       SizedBox(
@@ -381,7 +381,7 @@ class _ItemsListState extends State<ItemsList> {
                                                           overflow: TextOverflow
                                                               .ellipsis,
                                                           style: style
-                                                              .itemPriceText.copyWith(fontSize: 15,color: MikroMartColors.black),
+                                                              .itemPriceText.copyWith(fontSize: 15,color: MikroMartColors.black, fontWeight: FontWeight.bold),
                                                         ),
                                                       ),
                                                       item.item_stock_quantity ==
@@ -423,7 +423,7 @@ class _ItemsListState extends State<ItemsList> {
                                                                             decoration: TextDecoration
                                                                                 .lineThrough,
                                                                             fontSize:
-                                                                                13.5,
+                                                                                14,
                                                                             color:
                                                                                 MikroMartColors.ErroColor),
                                                                       ),

@@ -161,7 +161,7 @@ class _SearchPanelState extends State<SearchPanel> {
                                         child: CircularProgressIndicator()),
                                   )))
                               : _isSearching
-                                  ? GridView.count(
+                                  ? /*GridView.count(
                                       controller: _scrollController,
                                       physics: ScrollPhysics(),
                                       crossAxisCount: 2,
@@ -236,7 +236,225 @@ class _SearchPanelState extends State<SearchPanel> {
                                           ),
                                         );
                                       }),
-                                    )
+                                    )*/
+        GridView.count(
+        controller: _scrollController,
+        physics: ScrollPhysics(),
+        crossAxisCount: 2,
+        childAspectRatio: 1/1.2,
+        padding: EdgeInsets.only(
+            left: 16, right: 16, bottom: 50),
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        children: List.generate(
+            _searchedProducts.length, (index) {
+          Item item = _searchedProducts[index];
+          return Card(
+            elevation: 2,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => ItemDetails(
+                          data: item,
+                        )));
+              },
+              child: Column(
+                mainAxisAlignment:
+                MainAxisAlignment.center,
+                crossAxisAlignment:
+                CrossAxisAlignment.center,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 2 / 1.2,
+                    child: Stack(
+                      alignment:
+                      Alignment.bottomRight,
+                      children: <Widget>[
+                        Hero(
+                          transitionOnUserGestures:
+                          true,
+                          tag: item.item_name,
+                          child: Image(
+                            image: NetworkImage(item
+                                .item_image_path),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        item.item_mrp != null
+                            ? calculatePercentage(
+                            item.item_price,
+                            item.item_mrp) !=
+                            0
+                            ? Align(
+                          alignment:
+                          Alignment
+                              .topRight,
+                          child:
+                          Container(
+                            color: Colors
+                                .green,
+                            padding:
+                            EdgeInsets
+                                .all(
+                                8),
+                            child: Text(
+                              calculatePercentage(item.item_price,
+                                  item.item_mrp)
+                                  .toString() +
+                                  '% OFF',
+                              overflow:
+                              TextOverflow
+                                  .ellipsis,
+                              style: style
+                                  .itemPriceText
+                                  .copyWith(
+                                  color:
+                                  MikroMartColors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                            : Container()
+                            : Container(),
+                        Align(
+                          alignment:
+                          Alignment.bottomRight,
+                          child: Container(
+                            color: MikroMartColors
+                                .transparentGray
+                                .withOpacity(0.6),
+                            height: 25,
+                            child: Center(
+                              child: (item !=
+                                  null &&
+                                  item.outlet_id !=
+                                      null)
+                                  ? Text(
+                                item.outlet_id,
+                                overflow:
+                                TextOverflow
+                                    .ellipsis,
+                                maxLines: 1,
+                                style: style
+                                    .itemnNameText
+                                    .copyWith(
+                                    fontSize:
+                                    14,
+                                    color:
+                                    Colors.white),
+                              )
+                                  : Container(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(
+                          8.0, 8.0, 0, 4.0),
+                      child: Column(
+                        mainAxisAlignment:
+                        MainAxisAlignment
+                            .center,
+                        children: <Widget>[
+                          Align(
+                            alignment:
+                            Alignment.topLeft,
+                            child: Text(
+                              //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
+                              item.item_name + ' - ' + item.item_quantity,
+                              overflow: TextOverflow
+                                  .ellipsis,
+                              maxLines: 3,
+                              style: style
+                                  .itemnNameText.copyWith(fontSize: 16),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Align(
+                            alignment: Alignment
+                                .centerLeft,
+                            child: Text(
+                              '₹ ' +
+                                  item.item_price
+                                      .toString(),
+                              overflow: TextOverflow
+                                  .ellipsis,
+                              style: style
+                                  .itemPriceText.copyWith(fontSize: 15,color: MikroMartColors.black, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          item.item_stock_quantity ==
+                              0
+                              ? Align(
+                            alignment: Alignment
+                                .centerLeft,
+                            child: Text(
+                              'Item out of stock',
+                              overflow:
+                              TextOverflow
+                                  .ellipsis,
+                              style: style.itemPriceText.copyWith(
+                                  fontStyle:
+                                  FontStyle
+                                      .italic,
+                                  color: MikroMartColors
+                                      .colorPrimary),
+                            ),
+                          )
+                              : item.item_mrp !=
+                              null
+                              ? Align(
+                            alignment:
+                            Alignment
+                                .centerLeft,
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+                              children: <
+                                  Widget>[
+                                Text(
+                                  'MRP: ₹' +
+                                      item.item_mrp.toString(),
+                                  overflow:
+                                  TextOverflow.ellipsis,
+                                  style: style.itemPriceText.copyWith(
+                                      decoration: TextDecoration
+                                          .lineThrough,
+                                      fontSize:
+                                      14,
+                                      color:
+                                      MikroMartColors.ErroColor),
+                                ),
+                                /*   calculatePercentage(item.item_price, item.item_mrp) !=
+                                                                              0
+                                                                          ? Text(
+                                                                        calculatePercentage(item.item_price, item.item_mrp).toString() + '% OFF',
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              style: style.itemPriceText.copyWith(color: MikroMartColors.greenShadowColor),
+                                                                            )
+                                                                          : Container(),*/
+                              ],
+                            ),
+                          )
+                              : Container(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      )
                                   : ListView.separated(
                                       scrollDirection: Axis.vertical,
                                       shrinkWrap: true,
@@ -286,6 +504,21 @@ class _SearchPanelState extends State<SearchPanel> {
     );
   }
 
+  calculatePercentage(itemRate, mrpRate) {
+    if (itemRate != 0.0 && mrpRate != 0.0) {
+      if (itemRate == mrpRate) {
+        return 0;
+      } else {
+        if (mrpRate > itemRate) {
+          double percentage = (100 - ((itemRate / mrpRate) * 100));
+          return percentage.round();
+        } else {
+          return 0;
+        }
+      }
+    }
+  }
+
   Future<void> _submitSearch(String val) async {
     setState(() {
       _isLoading = true;
@@ -315,26 +548,6 @@ class _SearchPanelState extends State<SearchPanel> {
         }
       });
     });
-
-    /*for (var i = 0; i < snapShots.length; i++) {
-      AlgoliaObjectSnapshot snap = snapShots[i];
-      Map<String, dynamic> highlightResult = snap.highlightResult;
-
-      Item item = Item.fromSearchMap(highlightResult, 'id');
-
-      print('ITEM -> ${item.item_name}');
-
-      _searchedProducts.add(item);
-    }
-
-    setState(() {
-      _isLoading = false;
-      if (_searchedProducts.length != 0) {
-        _isSearching = true;
-      } else {
-        _isSearching = false;
-      }
-    });*/
   }
 
   Future<List<AlgoliaObjectSnapshot>> _operation(String input) async {

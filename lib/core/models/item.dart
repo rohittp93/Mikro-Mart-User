@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item {
-  String id, category_id,item_name, item_image_path, item_quantity, item_description, outlet_id;
+  String id,
+      category_id,
+      item_name,
+      item_image_path,
+      item_quantity,
+      item_description,
+      outlet_id;
   int item_stock_quantity, max_cart_threshold;
   var item_price, item_mrp;
   Timestamp created_time;
@@ -21,27 +27,34 @@ class Item {
     outlet_id = data['outlet_id'];
   }
 
-
   Item.fromSearchMap(Map<String, dynamic> data, String itemId) {
     id = itemId;
     category_id = data['category_id']['value'];
     item_name = data['item_name']['value'];
     item_name = item_name.replaceAll('<em>', '').replaceAll('</em>', '');
     item_image_path = data['item_image_path']['value'];
-    item_image_path = item_image_path.replaceAll('<em>', '').replaceAll('</em>', '');
+    item_image_path =
+        item_image_path.replaceAll('<em>', '').replaceAll('</em>', '');
     item_stock_quantity = int.parse(data['item_stock_quantity']['value']);
     max_cart_threshold = int.parse(data['max_cart_threshold']['value']);
     String itemPriceStr = data['item_price']['value'];
-    item_price = int.parse(itemPriceStr.replaceAll('<em>', '').replaceAll('</em>', ''));
+    item_price =
+        double.parse(itemPriceStr.replaceAll('<em>', '').replaceAll('</em>', ''));
 
+    if (data['item_mrp']!= null) {
+      String itemMrpStr = data['item_mrp']['value'];
+      print(itemMrpStr);
 
-    String itemMrpStr = data['item_mrp']['value'];
-    item_mrp = int.parse(itemMrpStr.replaceAll('<em>', '').replaceAll('</em>', ''));
-    
+      item_mrp =
+          double.parse(itemMrpStr.replaceAll('<em>', '').replaceAll('</em>', ''));
+    }
+
     item_quantity = data['item_quantity']['value'];
-    item_description = data['item_description']['value'];
-    outlet_id = data['outlet_id']['value'];
+    item_description = data['item_description']['value'].replaceAll('<em>', '').replaceAll('</em>', '');
 
+    outlet_id = data['outlet_id']['value'];
+    outlet_id =
+        outlet_id.replaceAll('<em>', '').replaceAll('</em>', '');
   }
 
   Item.fromOrderItemMap(data) {
@@ -51,6 +64,4 @@ class Item {
     item_price = data['item_price'];
     item_quantity = data['cart_item_quantity'].toString();
   }
-
-
 }

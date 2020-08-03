@@ -16,6 +16,8 @@ class TopOfferList extends StatefulWidget {
 
 class _TopOfferListState extends State<TopOfferList> {
   //final PageController ctrl = PageController(viewportFraction: 0.8);
+  bool isLoading = true;
+  double _top = 0;
   final PageController ctrl = PageController(
     viewportFraction: 0.8,
     initialPage: 0,
@@ -24,10 +26,12 @@ class _TopOfferListState extends State<TopOfferList> {
 
   _buildStoryPage(Item data, bool active, context) {
     final double blur = active ? 18 : 0;
-    final double offset = active ? 12 : 0;
-    final double top = active ? 10 : 50;
+    final double offset = active ? 10 : 0;
+    //_top = active ? 10 : 10;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         GestureDetector(
           onTap: () {
@@ -41,26 +45,58 @@ class _TopOfferListState extends State<TopOfferList> {
           child: Hero(
             transitionOnUserGestures: true,
             tag: data.item_name,
-            child: AnimatedContainer(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.height * 0.45 - top - 7 - 8,
-              duration: Duration(milliseconds: 700),
-              curve: Curves.easeOutQuint,
-              margin: EdgeInsets.only(
-                  top: top,
-                  bottom: 15,
-                  right: MediaQuery.of(context).size.width * 0.1),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(
-                      image: NetworkImage(data.item_image_path),
-                      fit: BoxFit.cover),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: blur,
-                        offset: Offset(offset, offset))
-                  ]),
+            child: Stack(
+              children: <Widget>[
+                AnimatedContainer(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.width * 0.7,
+                  duration: Duration(milliseconds: 700),
+                  curve: Curves.easeOutQuint,
+                  margin: EdgeInsets.only(
+                      top: _top,
+                      bottom: 15,
+                      right: MediaQuery.of(context).size.width * 0.1),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      image: DecorationImage(
+                          image: NetworkImage(data.item_image_path),
+                          fit: BoxFit.cover),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: blur,
+                            offset: Offset(offset, offset))
+                      ]),
+                ),
+                data.item_mrp != null
+                    ? Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              top: 0,
+                              right: MediaQuery.of(context).size.width * 0.1),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(16)),
+                            ),
+                            padding: EdgeInsets.all(12),
+                            child: Text(
+                              calculatePercentage(
+                                          data.item_price, data.item_mrp)
+                                      .toString() +
+                                  '% OFF',
+                              overflow: TextOverflow.ellipsis,
+                              style: style.itemPriceText.copyWith(
+                                  color: MikroMartColors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
             ),
           ),
         ),
@@ -70,7 +106,7 @@ class _TopOfferListState extends State<TopOfferList> {
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Flexible(
                 fit: FlexFit.loose,
@@ -85,28 +121,77 @@ class _TopOfferListState extends State<TopOfferList> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: MikroMartColors.colorPrimary,
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 7),
-                  child: Text(
-                    '\₹ ' + data.item_price.toString(),
-                    style: style.cardPriceStyle.copyWith(color: Colors.white),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: MikroMartColors.colorPrimary,
+                            borderRadius: BorderRadius.circular(10)),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 7),
+                        child: Text(
+                          '\₹ ' + data.item_price.toString(),
+                          style: style.cardPriceStyle.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  data.item_mrp != null
+                      ? Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            0,
+                            0,
+                            20,
+                            0,
+                          ),
+                          child: Container(
+                            /*decoration: BoxDecoration(
+                color: MikroMartColors.colorPrimary,
+                borderRadius: BorderRadius.circular(10)),*/
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 7),
+                            child: Text(
+                              'MRP \₹ ' + data.item_mrp.toString(),
+                              style: style.cardPriceStyle.copyWith(
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ],
               )
             ],
           ),
-        )
+        ),
       ],
     );
   }
 
+  calculatePercentage(itemRate, mrpRate) {
+    if (itemRate != 0.0 && mrpRate != 0.0) {
+      if (itemRate == mrpRate) {
+        return 0;
+      } else {
+        if (mrpRate > itemRate) {
+          double percentage = (100 - ((itemRate / mrpRate) * 100));
+          return percentage.round();
+        } else {
+          return 0;
+        }
+      }
+    }
+  }
+
   @override
-  void initState() {
+  Future<void> initState() {
     ctrl.addListener(() {
       int next = ctrl.page.round();
 
@@ -120,20 +205,24 @@ class _TopOfferListState extends State<TopOfferList> {
     ItemNotifier itemNotifier =
         Provider.of<ItemNotifier>(context, listen: false);
 
-    firebase.getItemOffers(itemNotifier);
+    fetchItems(itemNotifier);
 
     Timer.periodic(Duration(seconds: 5), (Timer timer) {
-      if (currentPage < itemNotifier.offerItemList.length) {
-        currentPage++;
-      } else {
-        currentPage = 0;
-      }
+     // if (itemNotifier.offerItemList.length > 1) {
+        if (currentPage < itemNotifier.offerItemList.length) {
+          currentPage++;
+        } else {
+          currentPage = 0;
+        }
 
-      ctrl.animateToPage(
-        currentPage,
-        duration: Duration(milliseconds: 350),
-        curve: Curves.easeIn,
-      );
+        if (ctrl.positions.length > 0) {
+          ctrl.animateToPage(
+            currentPage,
+            duration: Duration(milliseconds: 350),
+            curve: Curves.easeIn,
+          );
+        }
+     //}
     });
 
     super.initState();
@@ -156,48 +245,51 @@ class _TopOfferListState extends State<TopOfferList> {
                   style: style.headerStyle2,
                 ),
               ),
-              /* InkWell(
-                onTap: () {},
-                child: Text(
-                  "View More",
-                  style: style.subHeaderStyle
-                      .copyWith(color: MikroMartColors.colorPrimary),
-                ),
-              )*/
             ],
           ),
         ),
         Container(
-          height: MediaQuery.of(context).size.height * 0.52,
-          child: itemNotifier.offerItemList.length != 0
-              ? PageView.builder(
-                  controller: ctrl,
-                  itemCount: itemNotifier.offerItemList.length,
-                  itemBuilder: (context, index) {
-                    bool active = index == currentPage;
-                    return _buildStoryPage(
-                        itemNotifier.offerItemList[index], active, context);
-                  },
-                )
-              : Container(
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    0,
-                    16,
-                    0,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'There are no offers at the moment',
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: MikroMartColors.subtitleGray,
-                          fontWeight: FontWeight.bold),
+          // height: MediaQuery.of(context).size.height * 0.52,
+          height: MediaQuery.of(context).size.width,
+          child: isLoading
+              ? Center(child: Center(child: CircularProgressIndicator()))
+              : itemNotifier.offerItemList.length != 0
+                  ? PageView.builder(
+                      controller: ctrl,
+                      itemCount: itemNotifier.offerItemList.length,
+                      itemBuilder: (context, index) {
+                        bool active = index == currentPage;
+                        return _buildStoryPage(
+                            itemNotifier.offerItemList[index], active, context);
+                      },
+                    )
+                  : Container(
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        0,
+                        16,
+                        0,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'There are no offers at the moment',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: MikroMartColors.subtitleGray,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
         )
       ],
     );
+  }
+
+  Future<void> fetchItems(ItemNotifier itemNotifier) async {
+    await firebase.getItemOffers(itemNotifier);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }

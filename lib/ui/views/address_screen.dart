@@ -28,6 +28,7 @@ class _AddressScreenState extends State<AddressScreen> {
   Form _userInputForm;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSnackbarActive = false;
+  Flushbar _errorFlushBar;
 
   //var _controller;
   LatLng _locationAddress = null;
@@ -244,7 +245,7 @@ class _AddressScreenState extends State<AddressScreen> {
         context: context, builder: (BuildContext context) => errorDialog);
   }*/
 
-  showErrorDialog() {
+/*  showErrorDialog() {
     Dialog errorDialog = Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       //this right here
@@ -278,6 +279,65 @@ class _AddressScreenState extends State<AddressScreen> {
     );
     showDialog(
         context: context, builder: (BuildContext context) => errorDialog);
+  }*/
+
+
+  showErrorDialog() {
+    _errorFlushBar = Flushbar<List<String>>(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.easeOutCubic,
+      animationDuration: Duration(milliseconds: 600),
+      backgroundColor: MikroMartColors.purpleStart,
+      userInputForm: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child:  Text(
+                'We do not provide delivery to this location yet. Please select an area within the circular region',
+                style: TextStyle(color: MikroMartColors.white),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: FlatButton(
+                    child: Text('Reselect Location'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    color: Colors.white,
+                    textColor: MikroMartColors.purpleEnd,
+                    padding: EdgeInsets.all(6),
+                    onPressed: () {
+                      _errorFlushBar.dismiss();
+                      //onContinue.call();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      boxShadows: [
+        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
+      ],
+      backgroundGradient: LinearGradient(colors: [
+        MikroMartColors.colorPrimaryDark,
+        MikroMartColors.colorPrimary
+      ]),
+      isDismissible: true,
+      icon: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
+    )..show(context);
   }
 
   @override

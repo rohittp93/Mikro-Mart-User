@@ -626,6 +626,11 @@ getItemOffers(ItemNotifier notifier) async {
     _itemList.add(item);
   });
 
+  //TODO : COMMENT
+  for (var i = 0; i < 2; i++) {
+    _itemList.add(_itemList[0]);
+  }
+
   notifier.offerList = _itemList;
 }
 
