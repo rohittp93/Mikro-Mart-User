@@ -56,170 +56,178 @@ class _OrderDetailState extends State<OrderDetail> {
         onTapDown: (v) {
 
         },
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: MikroMartColors.white,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                TitleAppBar(title: 'Order Detail'),
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 6,12,0),
-                        child: Text(
-                          "Order ID : " + widget.orderModel.order_id,
-                          style: style.mediumTextTitle
-                              .copyWith(
-                              color:
-                              MikroMartColors
-                                  .textGray),
-                        ),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 6,12,0),
-                        child: Text(
-                          "Order Status : " + firebase.showOrderStatus(
-                              widget.orderModel
-                                  .order_status),
-                          style: style.mediumTextTitle
-                              .copyWith(
-                              color:
-                              MikroMartColors
-                                  .textGray),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 6,12,0),
-                        child: Text(
-                          "Order Total : " + widget.orderModel
-                              .total_amount
-                              .toString(),
-                          style: style.mediumTextTitle
-                              .copyWith(
-                              color:
-                              MikroMartColors
-                                  .textGray),
-                        ),
-                      ), Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 6,12,0),
-                        child: Text(
-                          "Ordered Time : " +
-                              formatTimestamp(
-                                  (widget.orderModel
-                                      .created_time
-                                      .toDate()
-                                      .millisecondsSinceEpoch)),
-                          style: style
-                              .mediumTextSubtitle,
-                        ),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 18, 12, 0),
-                          child: Text('ITEMS',
-                            style: style.mediumTextTitle,
+        child: SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: MikroMartColors.white,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  TitleAppBar(title: 'Order Detail'),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6,12,0),
+                            child: Text(
+                              "Order ID : " + widget.orderModel.order_id,
+                              style: style.mediumTextTitle
+                                  .copyWith(
+                                  color:
+                                  MikroMartColors
+                                      .textGray),
+                            ),
                           ),
-                        ),
-                      ),
-                      ListView.separated(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemBuilder:
-                            (BuildContext context, int index) {
-                          Item item = _orderItems[index];
-
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(
-                                6.0, 0, 6, 3),
-                            child: Card(
-                              elevation: 4,
-                              child: Container(
-                                color: Colors.white,
-                                child: Row(
-                                  children: <Widget>[
-                                    Container(
-                                      height: 80,
-                                      width: 100,
-                                      child: Padding(
-                                          padding:
-                                          const EdgeInsets.fromLTRB(
-                                              12, 6, 0, 0),
-                                          child: Image(
-                                            image: NetworkImage(
-                                                item.item_image_path),
-                                            fit: BoxFit.cover,
-                                          )
-                                      ),
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: <Widget>[
-
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.fromLTRB(
-                                              12, 12, 0, 0),
-                                          child: Text(
-                                            "ID : " +
-                                                item.id,
-                                            style: style.mediumTextSubtitle
-                                                .copyWith(
-                                                color:
-                                                MikroMartColors
-                                                    .purple),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.fromLTRB(
-                                              12, 6, 0, 0),
-                                          child: Text(
-                                            "Name : " +
-                                                item.item_name,
-                                            style: style
-                                                .mediumTextSubtitle,
-                                          ),
-                                        ),
-
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.fromLTRB(
-                                              12, 6, 0, 12),
-                                          child: Text(
-                                            "Price : ₹ " +
-                                                item.item_price.toString(),
-                                            style: style
-                                                .mediumTextSubtitle,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6,12,0),
+                            child: Text(
+                              "Order Status : " + firebase.showOrderStatus(
+                                  widget.orderModel
+                                      .order_status),
+                              style: style.mediumTextTitle
+                                  .copyWith(
+                                  color:
+                                  MikroMartColors
+                                      .textGray),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6,12,0),
+                            child: Text(
+                              "Order Total : " + widget.orderModel
+                                  .total_amount
+                                  .toString(),
+                              style: style.mediumTextTitle
+                                  .copyWith(
+                                  color:
+                                  MikroMartColors
+                                      .textGray),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 6,12,0),
+                            child: Text(
+                              "Ordered Time : " +
+                                  formatTimestamp(
+                                      (widget.orderModel
+                                          .created_time
+                                          .toDate()
+                                          .millisecondsSinceEpoch)),
+                              style: style
+                                  .mediumTextSubtitle,
+                            ),
+                          ),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 18, 12, 0),
+                              child: Text('ITEMS',
+                                style: style.mediumTextTitle,
                               ),
                             ),
-                          );
-                        },
-                        itemCount: _orderItems.length,
-                        separatorBuilder:
-                            (BuildContext context, int index) {
-                          return Divider(color: Colors.transparent);
-                        },
+                          ),
+                          Container(
+                            child: Expanded(
+                              child: ListView.separated(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemBuilder:
+                                    (BuildContext context, int index) {
+                                  Item item = _orderItems[index];
+
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        6.0, 0, 6, 3),
+                                    child: Card(
+                                      elevation: 4,
+                                      child: Container(
+                                        color: Colors.white,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              height: 80,
+                                              width: 100,
+                                              child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      12, 6, 0, 0),
+                                                  child: Image(
+                                                    image: NetworkImage(
+                                                        item.item_image_path),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                              ),
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: <Widget>[
+
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      12, 12, 0, 0),
+                                                  child: Text(
+                                                    "ID : " +
+                                                        item.id,
+                                                    style: style.mediumTextSubtitle
+                                                        .copyWith(
+                                                        color:
+                                                        MikroMartColors
+                                                            .purple),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      12, 6, 0, 0),
+                                                  child: Text(
+                                                    "Name : " +
+                                                        item.item_name,
+                                                    style: style
+                                                        .mediumTextSubtitle,
+                                                  ),
+                                                ),
+
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      12, 6, 0, 12),
+                                                  child: Text(
+                                                    "Price : ₹ " +
+                                                        item.item_price.toString(),
+                                                    style: style
+                                                        .mediumTextSubtitle,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                itemCount: _orderItems.length,
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  return Divider(color: Colors.transparent);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                ],
+              ),
             ),
           ),
         ),

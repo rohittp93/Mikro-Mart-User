@@ -68,7 +68,7 @@ class _ItemsListState extends State<ItemsList> {
     super.initState();
     _getProducts();
 
-    _controller.addListener(_onSearchChanged);
+   // _controller.addListener(_onSearchChanged);
 
     _scrollController.addListener(() {
       double maxScroll = _scrollController.position.maxScrollExtent;
@@ -183,6 +183,7 @@ class _ItemsListState extends State<ItemsList> {
                           }
                           _searchString = val;
                         });
+                        _onSearchChanged();
                       },
                       onSubmitted: (val) async {
                         _submitSearch(val);

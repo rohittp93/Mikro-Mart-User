@@ -11,17 +11,12 @@ import 'package:userapp/ui/shared/colors.dart';
 
 import 'address_screen.dart';
 
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => new _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  //final FirebaseMessaging _fcm = FirebaseMessaging();
+class SplashScreen extends StatelessWidget {
   final AuthService _auth = AuthService();
   bool isAddressPageVisible = false;
 
-  startTime() async {
+
+  startTime(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     //var _duration = new Duration(seconds: 2);
     /*return new Timer(_duration, () {
@@ -33,18 +28,12 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(Duration(seconds: 2), () {
       print('SplashTag : FutureDelayed Called');
       navigationPage(prefs.getBool("signed_in") ?? false,
-          prefs.getBool("phone_authenticated") ?? false);
+          prefs.getBool("phone_authenticated") ?? false, context);
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    startTime();
-  }
-
   Future<void> navigationPage(bool is_signed_in,
-      bool isPhoneAuthenticated) async {
+      bool isPhoneAuthenticated, BuildContext context) async {
     print('SplashTag : NavigateToPage CAlled');
 
     if (!is_signed_in) {
@@ -61,6 +50,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    startTime(context);
+
     print('SplashTag : WidgetBuild CAlled');
     return new Scaffold(
       backgroundColor: MikroMartColors.colorPrimary,
@@ -86,33 +77,6 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
-/*@override
-Widget build(BuildContext context) {
-  //  startTime();
-  return new Scaffold(
-    backgroundColor: MikroMartColors.colorPrimary,
-    body: new Center(
-      child: Container(
-        height: 150,
-        width: 150,
-        child: new Image.asset(
-          'assets/logo.png',
-          color: Colors.white,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
-          fit: BoxFit.cover,
-        ),
-      ),
-    ),
-  );
-}}*/
 
 class Message {
   final String title;

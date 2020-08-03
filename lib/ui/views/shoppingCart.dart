@@ -354,30 +354,33 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         ),
                       ),
                     ),
-                    ButtonTheme(
-                      minWidth: 40,
-                      height: 40,
-                      child: OutlineButton(
-                        child: new Icon(
-                          Icons.add,
-                          color: MikroMartColors.colorPrimary,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ButtonTheme(
+                        minWidth: 40,
+                        height: 40,
+                        child: OutlineButton(
+                          child: new Icon(
+                            Icons.add,
+                            color: MikroMartColors.colorPrimary,
+                          ),
+                          borderSide: BorderSide(
+                            color: MikroMartColors.colorPrimary,
+                            style: BorderStyle.solid, //Style of the border
+                            width: 0.8, //width of the border
+                          ),
+                          onPressed: () {
+                            if (validateCartCount(_cartItems[index],
+                                _cartItems[index].cartQuantity)) {
+                              int quantity = _cartItems[index].cartQuantity + 1;
+                              updateCartItemQuantity(
+                                  _cartItems[index], quantity, db);
+                            } else {
+                              showErrorBottomSheet(_cartItems[index],
+                                  _cartItems[index].cartQuantity);
+                            }
+                          },
                         ),
-                        borderSide: BorderSide(
-                          color: MikroMartColors.colorPrimary,
-                          style: BorderStyle.solid, //Style of the border
-                          width: 0.8, //width of the border
-                        ),
-                        onPressed: () {
-                          if (validateCartCount(_cartItems[index],
-                              _cartItems[index].cartQuantity)) {
-                            int quantity = _cartItems[index].cartQuantity + 1;
-                            updateCartItemQuantity(
-                                _cartItems[index], quantity, db);
-                          } else {
-                            showErrorBottomSheet(_cartItems[index],
-                                _cartItems[index].cartQuantity);
-                          }
-                        },
                       ),
                     ),
                   ],

@@ -42,23 +42,30 @@ class Router {
       case '/paymentPage':
         return MaterialPageRoute(builder: (_) => PaymentPage());
       case '/splashScreen':
-        return MaterialPageRoute(builder: (_) => SplashScreen());
+        final splash =  new SplashScreen();
+        return MaterialPageRoute(builder: (_) => splash);
       case '/profilePage':
-        return MaterialPageRoute(builder: (_) => ProfilePage());
+        final profile =  new ProfilePage();
+        return MaterialPageRoute(builder: (_) => profile);
       case '/favoritePage':
         return MaterialPageRoute(builder: (_) => FavoriteList());
       case '/mainHome':
-        return MaterialPageRoute(builder: (_) => MainHome());
+        final home =  MainHome();
+        return MaterialPageRoute(builder: (_) => home);
       case '/notification':
-        return MaterialPageRoute(builder: (context) => NotificationPage());
+        final page = NotificationPage();
+        return MaterialPageRoute(builder: (context) => page);
       case '/shoppingCart':
-        return MaterialPageRoute(builder: (context) => ShoppingCart());
+        final shoppingRoute = ShoppingCart();
+        return MaterialPageRoute(builder: (context) => shoppingRoute);
       case '/orders':
-        return MaterialPageRoute(builder: (context) => OrderList());
+        final ordersRoute = OrderList();
+        return MaterialPageRoute(builder: (context) => ordersRoute);
       case '/itemList':
         Category data = settings.arguments;
+        final itemsListRoute = ItemsList(argument: data);
         return MaterialPageRoute(
-            builder: (context) => ItemsList(argument: data));
+            builder: (context) => itemsListRoute);
 
       default:
         return MaterialPageRoute(
