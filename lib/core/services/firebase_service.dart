@@ -82,8 +82,6 @@ class AuthService {
     }
   }
 
-
-
 // register with email & pw
   Future registerWithEmailAndPassword(String name, String email,
       String password, AddressModel userAddress, AppDatabase db) async {
@@ -127,7 +125,7 @@ class AuthService {
       return null;
     }
   }
-  
+
   updateAddressInFirestore(AddressModel userAddress) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -135,7 +133,8 @@ class AuthService {
 
     GeoPoint addressLocation = new GeoPoint(
         userAddress.location.latitude, userAddress.location.longitude);
-    await DatabaseService(uid: uId).updateUserAddress(addressLocation, userAddress.appartmentName);
+    await DatabaseService(uid: uId)
+        .updateUserAddress(addressLocation, userAddress.appartmentName);
     await updateUserAddressInSharedPrefs(userAddress);
   }
 
@@ -153,15 +152,13 @@ class AuthService {
     }
   }
 
-
   Future<GeoPoint> getUserAddress() async {
     final prefs = await SharedPreferences.getInstance();
 
-    double lat =  prefs.getDouble(PREF_USER_LAT);
+    double lat = prefs.getDouble(PREF_USER_LAT);
     double lng = prefs.getDouble(PREF_USER_LNG);
 
-    return new GeoPoint(
-        lat, lng);
+    return new GeoPoint(lat, lng);
   }
 
 // signout
@@ -337,8 +334,8 @@ class AuthService {
     return cartMessage;
   }
 
-  Future<String> placeOrder(
-      List<CartItem> cartItems, double totalAmount, AppDatabase db) async {
+  Future<String> placeOrder(List<CartItem> cartItems, double totalAmount,
+      AppDatabase db, String moreItemsStr) async {
     FirebaseUser user = await _auth.currentUser();
     List<Map<String, dynamic>> orderItems = new List();
     final prefs = await SharedPreferences.getInstance();
@@ -349,11 +346,12 @@ class AuthService {
         'cart_item_name': cartItem.itemName,
         'cart_item_quantity': cartItem.cartQuantity,
         'item_price': cartItem.itemPrice,
-        'item_image': cartItem.itemImage
+        'item_image': cartItem.itemImage,
       });
     }
 
     String userPhone = prefs.getString(PREF_USER_PHONE);
+    //moreItemsStr.isNotEmpty ? 'item_extra' : moreItemsStr: null
 
     OrderModel orderModel = new OrderModel(
         order_status: ORDER_PLACED,
@@ -362,11 +360,12 @@ class AuthService {
         outlet_name: cartItems[0].outletId,
         user_name: prefs.getString(PREF_USER_NAME),
         user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
+        extra_item: moreItemsStr.isNotEmpty ? moreItemsStr : null,
         user_location: new GeoPoint(
             prefs.getDouble(PREF_USER_LAT), prefs.getDouble(PREF_USER_LNG)));
 
-    String orderId =
-        await DatabaseService(uid: user.uid).addOrder(user.uid, orderModel, userPhone);
+    String orderId = await DatabaseService(uid: user.uid)
+        .addOrder(user.uid, orderModel, userPhone);
 
     return orderId;
   }
@@ -528,8 +527,8 @@ class AuthService {
             name: userDoc.data["name"],
             email: userDoc.data["email"],
             phone: userDoc.data["phone_number"],
-            lat: location!=null ? location.latitude : null,
-            lng: location!=null ? location.longitude : null,
+            lat: location != null ? location.latitude : null,
+            lng: location != null ? location.longitude : null,
             house_name: userDoc.data['building_name']);
 
         if (phoneValidated) {
@@ -592,7 +591,8 @@ class AuthService {
       GeoPoint addressLocation = new GeoPoint(
           addressModel.location.latitude, addressModel.location.longitude);
 
-      await DatabaseService(uid: user.id).updateUserAddress(addressLocation, addressModel.appartmentName);
+      await DatabaseService(uid: user.id)
+          .updateUserAddress(addressLocation, addressModel.appartmentName);
       await updateUserAddressInSharedPrefs(addressModel);
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/mainHome', (Route<dynamic> route) => false);
@@ -608,7 +608,7 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     await _auth.signOut();
-    var logoutResult =  db.deleteAllCartItems();
+    var logoutResult = db.deleteAllCartItems();
     return logoutResult;
   }
 }
@@ -695,7 +695,7 @@ Future<List<DocumentSnapshot>> getOrders(int _per_page) async {
   try {
     snapshot = await Firestore.instance
         .collection('orders')
-        .orderBy('created_time')
+        .orderBy('created_time', descending: true)
         .limit(_per_page)
         .where('user_id', isEqualTo: uid)
         .getDocuments();

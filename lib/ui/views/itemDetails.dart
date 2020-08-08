@@ -71,6 +71,8 @@ class _LayoutStartsState extends State<LayoutStarts> {
       });
     }
 
+    print('ITEMDETAIL : ${widget.item.id}');
+
     return Stack(
       children: <Widget>[
         CarDetailsAnimation(data: widget.item),
@@ -91,7 +93,6 @@ class _LayoutStartsState extends State<LayoutStarts> {
             : AddToCartButton(
                 itemAdded: () {
                   //TODO : Check if item is from the same outlet. If not, show flushbar with info to clear existing cart and continue
-
                   //outOfStockBottomSheet();
                   bool isFromSameOutlet = true;
 
@@ -814,7 +815,7 @@ class SheetContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
                             child: Text(
-                              '${'₹ ' + data.item_price.toString()}',
+                              '${'₹ ' + data.item_price.toStringAsFixed(2)}',
                               style: style.itemDetailHeader.copyWith(
                                   color: MikroMartColors.colorPrimary),
                             ),
@@ -823,18 +824,18 @@ class SheetContainer extends StatelessWidget {
                               ? Padding(
                             padding:
                             const EdgeInsets.fromLTRB(0, 5, 15, 0),
-                            child: Text(
-                              'MRP: ₹' + data.item_mrp.toString(),
+                            child: data.item_mrp != data.item_price ? Text(
+                              'MRP: ₹' + data.item_mrp.toStringAsFixed(2),
                               overflow: TextOverflow.ellipsis,
                               style: style.itemPriceText.copyWith(
                                   decoration: TextDecoration.lineThrough,
                                   fontSize: 16,
                                   color: MikroMartColors.ErroColor),
-                            ),
+                            ): Container(),
                           )
                               : Container(),
 
-                          data.item_mrp!=null ? Padding(
+                          (data.item_mrp!=null && data.item_mrp != data.item_price) ? Padding(
                             padding:
                             const EdgeInsets.fromLTRB(0, 10, 15, 0),
                             child: Container(

@@ -304,8 +304,8 @@ class _LoginScreenState extends State<LoginScreen>
                                   ));
                                 } else {
                                   if (user.isPhoneVerified) {
-                                    Navigator.of(context)
-                                        .pushReplacementNamed('/mainHome');
+                                    Navigator.of(context).pushNamedAndRemoveUntil(
+                                        '/mainHome', (Route<dynamic> route) => false);
                                   } else {
                                     Navigator.of(context).pushReplacementNamed(
                                         '/phoneNumberRegister');

@@ -31,12 +31,14 @@ class TitleAppBar extends StatelessWidget {
                 ),
             ),
               ),
-            Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Text(
-                this.title,
-                style: style.appBarTextTheme,
-                textAlign: TextAlign.center,
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 0.0,top:8,bottom: 8),
+                child: Text(
+                  this.title,
+                  style: style.appBarTextTheme,
+                  textAlign: TextAlign.start,
+                ),
               ),
             ),
           ],

@@ -12,6 +12,7 @@ class MikroMartColors {
   static const orangeDark =  Color(0xFFFF5C16);
   static const errorRed =  Color(0xFFBA413D);
   static const orangeLight =  Color(0xFFFF8E40);
+  static const cardYellowLight =  Color(0xFFF3F24D);
   static const purple = Color(0xff7541B6);
   static const purpleStart = Color(0xff9453E7);
   static const purpleEnd = Color(0xff432669);

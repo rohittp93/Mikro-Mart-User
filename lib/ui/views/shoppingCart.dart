@@ -34,6 +34,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
   Flushbar<List<String>> _addressNameFlushBar;
   double _totalAmount = 0.0;
+  TextEditingController _textEditingController = TextEditingController();
 
   String _orderId = '';
 
@@ -86,10 +87,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
                           padding: const EdgeInsets.all(8.0),
                           child: RaisedButton(
                             onPressed: () async {
-                              //showOrderConfirmationDialog();
-                              showFirestoreError(
-                                  'Your order total is \₹ ${_totalAmount}\nOnce confirmed, we will process your order and deliver within 3 to 4 hours',
-                                  MikroMartColors.greenEndColor, () {
+                              //showBottomSheetDialog();
+                              showBottomSheet(
+                                  '', MikroMartColors.greenEndColor, () {
                                 /* print(
                               'Confirmed. Proceed with order');*/
                                 confirmOrder(db);
@@ -248,148 +248,154 @@ class _ShoppingCartState extends State<ShoppingCart> {
   Widget _cartItemBuilder(BuildContext context, int index) {
     AppDatabase db = Provider.of<AppDatabase>(context);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      child: Container(
-        height: 80,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.6),
-                offset: Offset(0.0, 1.4), //(x,y)
-                blurRadius: 3.0,
-              ),
-            ],
-            color: Colors.white.withOpacity(0.9)),
-        child: Row(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(4.0),
-              width: 100,
-              height: 80,
-              child: Image(
-                image: NetworkImage(_cartItems[index].itemImage),
-                fit: BoxFit.cover,
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      _cartItems[index].itemName,
-                      style: TextStyle(
-                          color: MikroMartColors.textGray,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text(_cartItems[index].itemQuantity,
-                        style: TextStyle(
-                            color: MikroMartColors.textGray,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400)),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Text('\₹ ' + _cartItems[index].cartPrice.toString(),
-                        style: TextStyle(
-                            color: MikroMartColors.textGray,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600)),
-                  ],
+    return Wrap(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.6),
+                    offset: Offset(0.0, 1.4), //(x,y)
+                    blurRadius: 3.0,
+                  ),
+                ],
+                color: Colors.white.withOpacity(0.9)),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(4.0),
+                  width: 100,
+                  height: 80,
+                  child: Image(
+                    image: NetworkImage(_cartItems[index].itemImage),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-              child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    ButtonTheme(
-                      minWidth: 40,
-                      height: 40,
-                      child: OutlineButton(
-                        child: Container(
-                          width: 20,
-                          child: new Icon(
-                            Icons.remove,
-                            color: MikroMartColors.colorPrimary,
-                          ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          _cartItems[index].itemName,
+                          maxLines: 2,
+                          style: TextStyle(
+                              color: MikroMartColors.textGray,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
                         ),
-                        borderSide: BorderSide(
-                          color: MikroMartColors.colorPrimary,
-                          style: BorderStyle.solid, //Style of the border
-                          width: 0.8, //width of the border
+                        Text(_cartItems[index].itemQuantity,
+                            style: TextStyle(
+                                color: MikroMartColors.textGray,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400)),
+                        SizedBox(
+                          height: 8,
                         ),
-                        onPressed: () {
-                          if (_cartItems[index].cartQuantity != 0) {
-                            int quantity = _cartItems[index].cartQuantity - 1;
+                        Text('\₹ ' + _cartItems[index].cartPrice.toStringAsFixed(2),
+                              style: TextStyle(
+                                  color: MikroMartColors.textGray,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600)),
 
-                            if (quantity == 0) {
-                              setState(() {
-                                _orderingState = NOT_ORDERING;
-                              });
-
-                              deleteCartItem(_cartItems[index], db);
-                            } else {
-                              updateCartItemQuantity(
-                                  _cartItems[index], quantity, db);
-                            }
-                          } else {}
-                        },
-                      ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                      child: Text(
-                        _cartItems[index].cartQuantity.toString(),
-                        style: style.arialTheme.copyWith(
-                          color: MikroMartColors.colorPrimary,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ButtonTheme(
-                        minWidth: 40,
-                        height: 40,
-                        child: OutlineButton(
-                          child: new Icon(
-                            Icons.add,
-                            color: MikroMartColors.colorPrimary,
-                          ),
-                          borderSide: BorderSide(
-                            color: MikroMartColors.colorPrimary,
-                            style: BorderStyle.solid, //Style of the border
-                            width: 0.8, //width of the border
-                          ),
-                          onPressed: () {
-                            if (validateCartCount(_cartItems[index],
-                                _cartItems[index].cartQuantity)) {
-                              int quantity = _cartItems[index].cartQuantity + 1;
-                              updateCartItemQuantity(
-                                  _cartItems[index], quantity, db);
-                            } else {
-                              showErrorBottomSheet(_cartItems[index],
-                                  _cartItems[index].cartQuantity);
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                  child: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        ButtonTheme(
+                          minWidth: 40,
+                          height: 40,
+                          child: OutlineButton(
+                            child: Container(
+                              width: 20,
+                              child: new Icon(
+                                Icons.remove,
+                                color: MikroMartColors.colorPrimary,
+                              ),
+                            ),
+                            borderSide: BorderSide(
+                              color: MikroMartColors.colorPrimary,
+                              style: BorderStyle.solid, //Style of the border
+                              width: 0.8, //width of the border
+                            ),
+                            onPressed: () {
+                              if (_cartItems[index].cartQuantity != 0) {
+                                int quantity = _cartItems[index].cartQuantity - 1;
+
+                                if (quantity == 0) {
+                                  setState(() {
+                                    _orderingState = NOT_ORDERING;
+                                  });
+
+                                  deleteCartItem(_cartItems[index], db);
+                                } else {
+                                  updateCartItemQuantity(
+                                      _cartItems[index], quantity, db);
+                                }
+                              } else {}
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                          child: Text(
+                            _cartItems[index].cartQuantity.toString(),
+                            style: style.arialTheme.copyWith(
+                              color: MikroMartColors.colorPrimary,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ButtonTheme(
+                            minWidth: 40,
+                            height: 40,
+                            child: OutlineButton(
+                              child: new Icon(
+                                Icons.add,
+                                color: MikroMartColors.colorPrimary,
+                              ),
+                              borderSide: BorderSide(
+                                color: MikroMartColors.colorPrimary,
+                                style: BorderStyle.solid, //Style of the border
+                                width: 0.8, //width of the border
+                              ),
+                              onPressed: () {
+                                if (validateCartCount(_cartItems[index],
+                                    _cartItems[index].cartQuantity)) {
+                                  int quantity = _cartItems[index].cartQuantity + 1;
+                                  updateCartItemQuantity(
+                                      _cartItems[index], quantity, db);
+                                } else {
+                                  showErrorBottomSheet(_cartItems[index],
+                                      _cartItems[index].cartQuantity);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -459,7 +465,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
       });
   }
 
-  showFirestoreError(String error, Color color, Function action,
+  showBottomSheet(String error, Color color, Function action,
       bool dismissable, bool showCancel) {
     _addressNameFlushBar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
@@ -475,12 +481,27 @@ class _ShoppingCartState extends State<ShoppingCart> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child: Text(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: !dismissable ? RichText(
+                text: new TextSpan(
+                  // Note: Styles for TextSpans must be explicitly defined.
+                  // Child text spans will inherit styles from parent
+                  style: new TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.white,
+                  ),
+                  children: <TextSpan>[
+                    new TextSpan(text: 'Your order total is \₹ ',),
+                    new TextSpan(text: '${_totalAmount}\n', style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    new TextSpan(text: 'Once confirmed, we will process your order and deliver within 3 to 4 hours',),
+                  ],
+                ),
+              ): Text(
                 error,
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
+            !dismissable ? textFormField() : Container(),
             Container(
               alignment: Alignment.centerRight,
               width: MediaQuery.of(context).size.width,
@@ -529,8 +550,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
       ),
       boxShadows: [
         BoxShadow(
-            color: Colors.orange, offset: Offset(0.0, 0.2), blurRadius: 5.0)
+            color: MikroMartColors.subtitleGray, offset: Offset(0.0, 0.2), blurRadius: 5.0)
       ],
+      borderRadius: 8.0,
       backgroundGradient:
           LinearGradient(colors: [color, color.withOpacity(0.7)]),
       isDismissible: true,
@@ -540,6 +562,38 @@ class _ShoppingCartState extends State<ShoppingCart> {
       ),
     )..show(context);
   }
+
+
+  textFormField() {
+    return Container(
+      padding: EdgeInsets.only(top: 20,left: 8.0, right: 8.0),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'You could add items you did\'t find on Mikro Mart & we will try to deliver it to you in this order',
+            style: TextStyle(color: Colors.white, fontSize: 15),
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+              controller: _textEditingController,
+              initialValue: null,
+              style: TextStyle(color: Colors.white),
+              maxLines: 1,
+              maxLength: 100,
+              decoration: InputDecoration(
+                fillColor: Colors.white12,
+                filled: true,
+                border: UnderlineInputBorder(),
+                labelText: 'Add items',
+                labelStyle: TextStyle(color: Colors.white70),
+              )),
+        ],
+      ),
+    );
+  }
+
 
   bool validateCartCount(CartItem cartItem, int itemQuantity) {
     return (itemQuantity + 1) <= cartItem.maxQuantity;
@@ -565,7 +619,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
       _totalAmount = total;
     });
 
-    return '\₹ ' + total.toString();
+    return '\₹ ' + total.toStringAsFixed(2);
   }
 
   String returnDisplayText(int orderingState) {
@@ -594,7 +648,11 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
       if (cartItemsValid == 'cart_valid') {
         print('CART ITEMS ARE VALID. PROCEED WITH CHECKOUT');
-        String result = await _auth.placeOrder(_cartItems, _totalAmount, db);
+        String moreItemsStr = '';
+        if (_textEditingController.text.length > 0) {
+          moreItemsStr = _textEditingController.text;
+        }
+        String result = await _auth.placeOrder(_cartItems, _totalAmount, db, moreItemsStr);
         if (result != null) {
           setState(() {
             _orderId = result;
@@ -605,12 +663,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
           setState(() {
             _orderingState = ORDER_FAILED;
           });
-          showFirestoreError('Something went wrong. Please try again later',
+          showBottomSheet('Something went wrong. Please try again later',
               MikroMartColors.colorPrimary, null, true, false);
         }
       } else {
         print('CART ITEMS ARE INVALID. CANNOT PROCEED');
-        showFirestoreError(
+        showBottomSheet(
             cartItemsValid, MikroMartColors.colorPrimary, null, true, false);
         setState(() {
           _orderingState = ORDER_FAILED;

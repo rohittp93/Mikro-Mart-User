@@ -11,6 +11,7 @@ class OrderModel {
   GeoPoint user_location;
   String outlet_name;
   String order_id;
+  String extra_item;
 
   OrderModel({
     @required this.order_status,
@@ -20,6 +21,7 @@ class OrderModel {
     @required this.user_house_name,
     @required this.user_location,
     @required this.outlet_name,
+    @required this.extra_item,
   });
 
   OrderModel.fromMap(Map<String, dynamic> data, String orderId) {

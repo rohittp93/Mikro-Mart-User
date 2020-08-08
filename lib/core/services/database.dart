@@ -102,6 +102,7 @@ class DatabaseService {
       'user_house_name': order.user_house_name,
       'user_location': order.user_location,
       'outlet_name': order.outlet_name,
+      'extra_item': order.extra_item!=null ? order.extra_item : null,
       'order_items': FieldValue.arrayUnion(order.cart_items),
       'created_time': FieldValue.serverTimestamp(),
       'user_id': userId,

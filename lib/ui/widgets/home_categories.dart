@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
+import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/items_list.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:provider/provider.dart';
@@ -58,6 +59,10 @@ class _HomeCategoriesState extends State<HomeCategories> {
 
 _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
     BuildContext context, ScrollController scrollController) {
+  var size = MediaQuery.of(context).size;
+  final double itemHeight = (size.height) / 2;
+  //final double itemWidth = size.width / 2;
+
   return Container(
     child: SingleChildScrollView(
       child: Column(
@@ -66,7 +71,7 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
           SizedBox(
             height: 5,
           ),
-          GridView.count(
+          /*GridView.count(
             controller: scrollController,
             physics: ScrollPhysics(),
             crossAxisCount: 2,
@@ -142,6 +147,133 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),*/
+          GridView.count(
+            controller: scrollController,
+            physics: ScrollPhysics(),
+            crossAxisCount: 2,
+            scrollDirection: Axis.vertical,
+            padding: EdgeInsets.only(bottom: 10),
+            childAspectRatio: 1/0.9,
+            shrinkWrap: true,
+            children: List.generate(categoriesNotifier.categoriesList.length,
+                (index) {
+              Category cat = categoriesNotifier.categoriesList[index];
+              return InkWell(
+                onTap: () {
+                  print('Tapped on category');
+                  Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          new ItemsList(
+                            argument: categoriesNotifier
+                                .categoriesList[index],
+                          )));
+                },
+                child: Card(
+                  elevation: 4,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: EdgeInsets.all(0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Stack(
+                              children: <Widget>[
+                                Image(
+                                  image: NetworkImage(cat.category_image_path),
+                                  fit: BoxFit.cover,
+                                ),
+                                /*AspectRatio(
+                                  aspectRatio: 2 / 1.2,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        // Add one stop for each color. Stops should increase from 0 to 1
+                                        stops: [0.1, 0.7],
+                                        colors: [
+                                          Color.fromARGB(90, 0, 0, 0),
+                                          Color.fromARGB(100, 0, 0, 0),
+                                        ],
+                                      ),
+                                    ),
+                                    height:
+                                        MediaQuery.of(context).size.height / 6,
+                                    width: MediaQuery.of(context).size.height / 6,
+                                  ),
+                                ),*/
+
+                                /*InkWell(
+                                  onTap: () {
+                                    print('Tapped on category');
+                                    Navigator.push(
+                                        context,
+                                        new MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                new ItemsList(
+                                                  argument: categoriesNotifier
+                                                      .categoriesList[index],
+                                                )));
+                                  },
+                                  child: AspectRatio(
+                                    aspectRatio: 2 / 1.2,
+                                    child: Container(
+                                      padding: EdgeInsets.fromLTRB(2, 0, 2, 10),
+                                      constraints: BoxConstraints(
+                                        minWidth: 20,
+                                        minHeight: 20,
+                                      ),
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Text(
+                                          cat.category_name,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),*/
+                              ],
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text(
+                                    cat.category_name,
+                                    maxLines: 2,
+                                    overflow:
+                                    TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: MikroMartColors.colorPrimary,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
