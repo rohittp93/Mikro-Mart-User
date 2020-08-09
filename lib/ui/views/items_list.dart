@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:userapp/core/helpers/algolia.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import 'package:userapp/ui/widgets/titleAppBar.dart';
@@ -136,20 +137,19 @@ class _ItemsListState extends State<ItemsList> {
     List<DocumentSnapshot> items = await firebase.getMoreItems(
         widget.argument.id, _per_page, _lastDocument);
 
-    if (items.length < _per_page) {
+    if (items != null && items.length < _per_page) {
       _moreProductsAvailable = false;
+
+      _productSnapshots.addAll(items);
+      _lastDocument = _productSnapshots[_productSnapshots.length - 1];
+
+      items.forEach((document) {
+        Item item = Item.fromMap(document.data, document.documentID);
+        _products.add(item);
+      });
+
+      setState(() {});
     }
-
-    _productSnapshots.addAll(items);
-    _lastDocument = _productSnapshots[_productSnapshots.length - 1];
-
-    items.forEach((document) {
-      Item item = Item.fromMap(document.data, document.documentID);
-      _products.add(item);
-    });
-
-    setState(() {});
-
     _gettingMoreProducts = false;
   }
 
@@ -235,7 +235,8 @@ class _ItemsListState extends State<ItemsList> {
                                 ? IconButton(
                                     onPressed: () {
                                       _controller.clear();
-                                      FocusScope.of(context).requestFocus(FocusNode());
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
                                       setState(() {
                                         _searchString = '';
                                         _isSearching = false;
@@ -279,16 +280,32 @@ class _ItemsListState extends State<ItemsList> {
                                       left: 16, right: 16, bottom: 50),
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
-                                  itemBuilder: (BuildContext context, int index) {
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
                                     Item item = _isSearching
                                         ? _searchedProducts[index]
                                         : _products[index];
+
+                                    ItemQuantity displayableItemQuantity =
+                                        new ItemQuantity();
+
+                                    for (var i = 0;
+                                        i < item.item_quantity_list.length;
+                                        i++) {
+                                      if (item.item_quantity_list[i]
+                                          .display_quantity) {
+                                        displayableItemQuantity =
+                                            item.item_quantity_list[i];
+                                        break;
+                                      }
+                                    }
 
                                     return Card(
                                       elevation: 2,
                                       child: InkWell(
                                         onTap: () {
-                                          FocusScope.of(context).requestFocus(FocusNode());
+                                          FocusScope.of(context)
+                                              .requestFocus(FocusNode());
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -304,19 +321,25 @@ class _ItemsListState extends State<ItemsList> {
                                               Stack(
                                                 children: <Widget>[
                                                   ClipRRect(
-                                                    borderRadius: BorderRadius.only(topRight:  Radius.circular(6),
-                                                        topLeft:  Radius.circular(6)),
-
-                                        child: AspectRatio(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                            topRight: Radius
+                                                                .circular(6),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    6)),
+                                                    child: AspectRatio(
                                                       aspectRatio: 1,
                                                       child: Container(
                                                           width: itemWidth,
                                                           child: Column(
                                                             children: <Widget>[
-                                                              item.item_stock_quantity ==
+                                                              displayableItemQuantity
+                                                                          .item_stock_quantity ==
                                                                       0
                                                                   ? Container(
-                                                                      height: 35,
+                                                                      height:
+                                                                          35,
                                                                       child:
                                                                           Center(
                                                                         child:
@@ -325,8 +348,7 @@ class _ItemsListState extends State<ItemsList> {
                                                                           overflow:
                                                                               TextOverflow.ellipsis,
                                                                           style: style.itemPriceText.copyWith(
-                                                                              color:
-                                                                                  MikroMartColors.colorPrimary,
+                                                                              color: MikroMartColors.colorPrimary,
                                                                               fontWeight: FontWeight.bold),
                                                                         ),
                                                                       ),
@@ -343,7 +365,8 @@ class _ItemsListState extends State<ItemsList> {
                                                                         true,
                                                                     tag: item
                                                                         .item_name,
-                                                                    child: Image(
+                                                                    child:
+                                                                        Image(
                                                                       image: NetworkImage(
                                                                           item.item_image_path),
                                                                       fit: BoxFit
@@ -353,7 +376,8 @@ class _ItemsListState extends State<ItemsList> {
                                                                 ),
                                                               ),
                                                               Expanded(
-                                                                child: Container(
+                                                                child:
+                                                                    Container(
                                                                   color: MikroMartColors
                                                                       .errorRed
                                                                       .withOpacity(
@@ -369,31 +393,36 @@ class _ItemsListState extends State<ItemsList> {
                                                                                 TextOverflow.ellipsis,
                                                                             maxLines:
                                                                                 1,
-                                                                            style: style.itemnNameText.copyWith(
-                                                                                fontSize: 14,
-                                                                                color: Colors.white),
+                                                                            style:
+                                                                                style.itemnNameText.copyWith(fontSize: 14, color: Colors.white),
                                                                           )
                                                                         : Container(),
                                                                   ),
                                                                 ),
                                                               ),
-                                                              item.item_stock_quantity !=
+                                                              displayableItemQuantity
+                                                                          .item_stock_quantity !=
                                                                       0
                                                                   ? Container(
-                                                                      height: 35,
+                                                                      height:
+                                                                          35,
                                                                     )
                                                                   : Container(),
                                                             ],
                                                           )),
                                                     ),
                                                   ),
-                                                  item.item_mrp != null
+                                                  displayableItemQuantity
+                                                              .item_mrp !=
+                                                          null
                                                       ? calculatePercentage(
-                                                                  item.item_price,
-                                                                  item
+                                                                  displayableItemQuantity
+                                                                      .item_price,
+                                                                  displayableItemQuantity
                                                                       .item_mrp) !=
                                                               0
-                                                          ? item.item_stock_quantity !=
+                                                          ? displayableItemQuantity
+                                                                      .item_stock_quantity !=
                                                                   0
                                                               ? Align(
                                                                   alignment:
@@ -407,27 +436,23 @@ class _ItemsListState extends State<ItemsList> {
                                                                           .green,
                                                                       borderRadius:
                                                                           BorderRadius.only(
-                                                                              topRight:
-                                                                                  Radius.circular(6)),
+                                                                              topRight: Radius.circular(6)),
                                                                     ),
                                                                     padding:
                                                                         EdgeInsets
-                                                                            .all(
-                                                                                8),
+                                                                            .all(8),
                                                                     child: Text(
-                                                                      calculatePercentage(item.item_price,
-                                                                                  item.item_mrp)
+                                                                      calculatePercentage(displayableItemQuantity.item_price, displayableItemQuantity.item_mrp)
                                                                               .toString() +
                                                                           '% OFF',
                                                                       overflow:
                                                                           TextOverflow
                                                                               .ellipsis,
-                                                                      style: style
-                                                                          .itemPriceText
-                                                                          .copyWith(
-                                                                              color:
-                                                                                  MikroMartColors.white,
-                                                                              fontWeight: FontWeight.bold),
+                                                                      style: style.itemPriceText.copyWith(
+                                                                          color: MikroMartColors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
                                                                     ),
                                                                   ),
                                                                 )
@@ -452,33 +477,35 @@ class _ItemsListState extends State<ItemsList> {
                                                         alignment:
                                                             Alignment.topLeft,
                                                         child: Text(
-                                                            //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
-                                                            item.item_name +
-                                                                ' - ' +
-                                                                item.item_quantity,
-                                                            overflow: TextOverflow
-                                                                .ellipsis,
-                                                            maxLines: 2,
-                                                            style: style
-                                                                .itemnNameText
-                                                                .copyWith(
-                                                                    fontSize: 15),
-                                                          ),
-
+                                                          //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
+                                                          item.item_name +
+                                                              ' - ' +
+                                                              displayableItemQuantity
+                                                                  .item_quantity,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 2,
+                                                          style: style
+                                                              .itemnNameText
+                                                              .copyWith(
+                                                                  fontSize: 15),
+                                                        ),
                                                       ),
                                                     ),
                                                     Flexible(
                                                       child: Align(
-                                                        alignment:
-                                                            Alignment.centerLeft,
+                                                        alignment: Alignment
+                                                            .centerLeft,
                                                         child: Text(
                                                           '₹ ' +
-                                                              item.item_price
+                                                              displayableItemQuantity
+                                                                  .item_price
                                                                   .toStringAsFixed(
                                                                       2),
-                                                          overflow:
-                                                              TextOverflow.ellipsis,
-                                                          style: style.itemPriceText
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: style
+                                                              .itemPriceText
                                                               .copyWith(
                                                                   fontSize: 15,
                                                                   color:
@@ -490,38 +517,38 @@ class _ItemsListState extends State<ItemsList> {
                                                         ),
                                                       ),
                                                     ),
-                                                    item.item_mrp != null
+                                                    displayableItemQuantity
+                                                                .item_mrp !=
+                                                            null
                                                         ? Flexible(
-                                                          child: Align(
+                                                            child: Align(
                                                               alignment: Alignment
                                                                   .centerLeft,
                                                               child: Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
-                                                                children: <Widget>[
-                                                                  item.item_mrp !=
-                                                                          item.item_price
+                                                                children: <
+                                                                    Widget>[
+                                                                  displayableItemQuantity
+                                                                              .item_mrp !=
+                                                                          displayableItemQuantity
+                                                                              .item_price
                                                                       ? Text(
                                                                           'MRP: ₹' +
-                                                                              item.item_mrp
-                                                                                  .toStringAsFixed(2),
+                                                                              displayableItemQuantity.item_mrp.toStringAsFixed(2),
                                                                           overflow:
-                                                                              TextOverflow
-                                                                                  .ellipsis,
+                                                                              TextOverflow.ellipsis,
                                                                           style: style.itemPriceText.copyWith(
-                                                                              decoration: TextDecoration
-                                                                                  .lineThrough,
-                                                                              fontSize:
-                                                                                  14,
-                                                                              color:
-                                                                                  MikroMartColors.ErroColor),
+                                                                              decoration: TextDecoration.lineThrough,
+                                                                              fontSize: 14,
+                                                                              color: MikroMartColors.ErroColor),
                                                                         )
                                                                       : Spacer(),
                                                                 ],
                                                               ),
                                                             ),
-                                                        )
+                                                          )
                                                         : Spacer(),
                                                   ],
                                                 ),

@@ -315,16 +315,26 @@ class AuthService {
       if (datasnapshot.exists) {
         Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
 
-        if (item.item_stock_quantity == 0) {
-          cartMessage = '${item.item_name} is out of stock';
-          break;
-        } else if (cartItem.cartQuantity <= item.item_stock_quantity) {
-          cartMessage = CART_VALID;
-        } else {
-          cartMessage =
-              'There are currently on ${item.item_stock_quantity}  ${item.item_name}s in stock';
-          break;
+        for (var i = 0; i < item.item_quantity_list.length; i++) {
+          for (var j = 0; j < cartItems.length; j++) {
+            if (item.item_quantity_list[i].item_quantity ==
+                cartItems[j].itemQuantity) {
+
+
+              if (item.item_quantity_list[i] .item_stock_quantity== 0) {
+                cartMessage = '${item.item_name} is out of stock';
+                break;
+              } else if (cartItem.cartQuantity <= item.item_quantity_list[i].item_stock_quantity) {
+                cartMessage = CART_VALID;
+              } else {
+                cartMessage =
+                'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
+                break;
+              }
+            }
+          }
         }
+
       } else {
         cartMessage = '${cartItem.itemName} is no longer available';
         break;
@@ -345,6 +355,7 @@ class AuthService {
         'cart_item_id': cartItem.itemId,
         'cart_item_name': cartItem.itemName,
         'cart_item_quantity': cartItem.cartQuantity,
+        'item_quantity': cartItem.itemQuantity,
         'item_price': cartItem.itemPrice,
         'item_image': cartItem.itemImage,
       });

@@ -23,6 +23,8 @@ class Users extends Table {
 class CartItems extends Table {
   TextColumn get itemId => text()();
 
+  TextColumn get cartItemId => text()();
+
   TextColumn get itemName => text()();
 
   TextColumn get itemImage => text()();
@@ -42,7 +44,7 @@ class CartItems extends Table {
   IntColumn get maxQuantity => integer()();
 
   @override
-  Set<Column> get primaryKey => {itemId};
+  Set<Column> get primaryKey => {cartItemId};
 }
 
 @UseMoor(tables: [CartItems])

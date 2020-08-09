@@ -202,7 +202,7 @@ class _OrderDetailState extends State<OrderDetail> {
                                                       12, 6, 0, 12),
                                                   child: Text(
                                                     "Price : ₹ " +
-                                                        item.item_price.toString(),
+                                                        item.order_item_price.toString(),
                                                     style: style
                                                         .mediumTextSubtitle,
                                                   ),

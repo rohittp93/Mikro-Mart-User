@@ -9,6 +9,7 @@ part of 'moor_database.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class CartItem extends DataClass implements Insertable<CartItem> {
   final String itemId;
+  final String cartItemId;
   final String itemName;
   final String itemImage;
   final String itemQuantity;
@@ -20,6 +21,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
   final int maxQuantity;
   CartItem(
       {@required this.itemId,
+      @required this.cartItemId,
       @required this.itemName,
       @required this.itemImage,
       @required this.itemQuantity,
@@ -38,6 +40,8 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     return CartItem(
       itemId:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}item_id']),
+      cartItemId: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}cart_item_id']),
       itemName: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}item_name']),
       itemImage: stringType
@@ -63,6 +67,9 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     final map = <String, Expression>{};
     if (!nullToAbsent || itemId != null) {
       map['item_id'] = Variable<String>(itemId);
+    }
+    if (!nullToAbsent || cartItemId != null) {
+      map['cart_item_id'] = Variable<String>(cartItemId);
     }
     if (!nullToAbsent || itemName != null) {
       map['item_name'] = Variable<String>(itemName);
@@ -98,6 +105,9 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     return CartItemsCompanion(
       itemId:
           itemId == null && nullToAbsent ? const Value.absent() : Value(itemId),
+      cartItemId: cartItemId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cartItemId),
       itemName: itemName == null && nullToAbsent
           ? const Value.absent()
           : Value(itemName),
@@ -133,6 +143,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return CartItem(
       itemId: serializer.fromJson<String>(json['itemId']),
+      cartItemId: serializer.fromJson<String>(json['cartItemId']),
       itemName: serializer.fromJson<String>(json['itemName']),
       itemImage: serializer.fromJson<String>(json['itemImage']),
       itemQuantity: serializer.fromJson<String>(json['itemQuantity']),
@@ -149,6 +160,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'itemId': serializer.toJson<String>(itemId),
+      'cartItemId': serializer.toJson<String>(cartItemId),
       'itemName': serializer.toJson<String>(itemName),
       'itemImage': serializer.toJson<String>(itemImage),
       'itemQuantity': serializer.toJson<String>(itemQuantity),
@@ -163,6 +175,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
 
   CartItem copyWith(
           {String itemId,
+          String cartItemId,
           String itemName,
           String itemImage,
           String itemQuantity,
@@ -174,6 +187,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
           int maxQuantity}) =>
       CartItem(
         itemId: itemId ?? this.itemId,
+        cartItemId: cartItemId ?? this.cartItemId,
         itemName: itemName ?? this.itemName,
         itemImage: itemImage ?? this.itemImage,
         itemQuantity: itemQuantity ?? this.itemQuantity,
@@ -188,6 +202,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
   String toString() {
     return (StringBuffer('CartItem(')
           ..write('itemId: $itemId, ')
+          ..write('cartItemId: $cartItemId, ')
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
           ..write('itemQuantity: $itemQuantity, ')
@@ -205,26 +220,29 @@ class CartItem extends DataClass implements Insertable<CartItem> {
   int get hashCode => $mrjf($mrjc(
       itemId.hashCode,
       $mrjc(
-          itemName.hashCode,
+          cartItemId.hashCode,
           $mrjc(
-              itemImage.hashCode,
+              itemName.hashCode,
               $mrjc(
-                  itemQuantity.hashCode,
+                  itemImage.hashCode,
                   $mrjc(
-                      outletId.hashCode,
+                      itemQuantity.hashCode,
                       $mrjc(
-                          itemPrice.hashCode,
+                          outletId.hashCode,
                           $mrjc(
-                              cartPrice.hashCode,
+                              itemPrice.hashCode,
                               $mrjc(
-                                  cartQuantity.hashCode,
-                                  $mrjc(quantityInStock.hashCode,
-                                      maxQuantity.hashCode))))))))));
+                                  cartPrice.hashCode,
+                                  $mrjc(
+                                      cartQuantity.hashCode,
+                                      $mrjc(quantityInStock.hashCode,
+                                          maxQuantity.hashCode)))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is CartItem &&
           other.itemId == this.itemId &&
+          other.cartItemId == this.cartItemId &&
           other.itemName == this.itemName &&
           other.itemImage == this.itemImage &&
           other.itemQuantity == this.itemQuantity &&
@@ -238,6 +256,7 @@ class CartItem extends DataClass implements Insertable<CartItem> {
 
 class CartItemsCompanion extends UpdateCompanion<CartItem> {
   final Value<String> itemId;
+  final Value<String> cartItemId;
   final Value<String> itemName;
   final Value<String> itemImage;
   final Value<String> itemQuantity;
@@ -249,6 +268,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
   final Value<int> maxQuantity;
   const CartItemsCompanion({
     this.itemId = const Value.absent(),
+    this.cartItemId = const Value.absent(),
     this.itemName = const Value.absent(),
     this.itemImage = const Value.absent(),
     this.itemQuantity = const Value.absent(),
@@ -261,6 +281,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
   });
   CartItemsCompanion.insert({
     @required String itemId,
+    @required String cartItemId,
     @required String itemName,
     @required String itemImage,
     @required String itemQuantity,
@@ -271,6 +292,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     @required int quantityInStock,
     @required int maxQuantity,
   })  : itemId = Value(itemId),
+        cartItemId = Value(cartItemId),
         itemName = Value(itemName),
         itemImage = Value(itemImage),
         itemQuantity = Value(itemQuantity),
@@ -282,6 +304,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
         maxQuantity = Value(maxQuantity);
   static Insertable<CartItem> custom({
     Expression<String> itemId,
+    Expression<String> cartItemId,
     Expression<String> itemName,
     Expression<String> itemImage,
     Expression<String> itemQuantity,
@@ -294,6 +317,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
   }) {
     return RawValuesInsertable({
       if (itemId != null) 'item_id': itemId,
+      if (cartItemId != null) 'cart_item_id': cartItemId,
       if (itemName != null) 'item_name': itemName,
       if (itemImage != null) 'item_image': itemImage,
       if (itemQuantity != null) 'item_quantity': itemQuantity,
@@ -308,6 +332,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
 
   CartItemsCompanion copyWith(
       {Value<String> itemId,
+      Value<String> cartItemId,
       Value<String> itemName,
       Value<String> itemImage,
       Value<String> itemQuantity,
@@ -319,6 +344,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
       Value<int> maxQuantity}) {
     return CartItemsCompanion(
       itemId: itemId ?? this.itemId,
+      cartItemId: cartItemId ?? this.cartItemId,
       itemName: itemName ?? this.itemName,
       itemImage: itemImage ?? this.itemImage,
       itemQuantity: itemQuantity ?? this.itemQuantity,
@@ -336,6 +362,9 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
     final map = <String, Expression>{};
     if (itemId.present) {
       map['item_id'] = Variable<String>(itemId.value);
+    }
+    if (cartItemId.present) {
+      map['cart_item_id'] = Variable<String>(cartItemId.value);
     }
     if (itemName.present) {
       map['item_name'] = Variable<String>(itemName.value);
@@ -371,6 +400,7 @@ class CartItemsCompanion extends UpdateCompanion<CartItem> {
   String toString() {
     return (StringBuffer('CartItemsCompanion(')
           ..write('itemId: $itemId, ')
+          ..write('cartItemId: $cartItemId, ')
           ..write('itemName: $itemName, ')
           ..write('itemImage: $itemImage, ')
           ..write('itemQuantity: $itemQuantity, ')
@@ -397,6 +427,18 @@ class $CartItemsTable extends CartItems
   GeneratedTextColumn _constructItemId() {
     return GeneratedTextColumn(
       'item_id',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _cartItemIdMeta = const VerificationMeta('cartItemId');
+  GeneratedTextColumn _cartItemId;
+  @override
+  GeneratedTextColumn get cartItemId => _cartItemId ??= _constructCartItemId();
+  GeneratedTextColumn _constructCartItemId() {
+    return GeneratedTextColumn(
+      'cart_item_id',
       $tableName,
       false,
     );
@@ -521,6 +563,7 @@ class $CartItemsTable extends CartItems
   @override
   List<GeneratedColumn> get $columns => [
         itemId,
+        cartItemId,
         itemName,
         itemImage,
         itemQuantity,
@@ -547,6 +590,14 @@ class $CartItemsTable extends CartItems
           itemId.isAcceptableOrUnknown(data['item_id'], _itemIdMeta));
     } else if (isInserting) {
       context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('cart_item_id')) {
+      context.handle(
+          _cartItemIdMeta,
+          cartItemId.isAcceptableOrUnknown(
+              data['cart_item_id'], _cartItemIdMeta));
+    } else if (isInserting) {
+      context.missing(_cartItemIdMeta);
     }
     if (data.containsKey('item_name')) {
       context.handle(_itemNameMeta,
@@ -614,7 +665,7 @@ class $CartItemsTable extends CartItems
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {itemId};
+  Set<GeneratedColumn> get $primaryKey => {cartItemId};
   @override
   CartItem map(Map<String, dynamic> data, {String tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;

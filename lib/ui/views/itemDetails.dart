@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
@@ -42,15 +43,54 @@ class _LayoutStartsState extends State<LayoutStarts> {
   int _itemQuantity = 0;
   CartItem _cartItem;
   Flushbar _outletChangeFlushbar;
+  ItemQuantity displayableItemQuantity = new ItemQuantity();
+  List<DropdownMenuItem<ItemQuantity>> _dropdownMenuItems;
+
+  @override
+  void initState() {
+    super.initState();
+    print('IQTAG: initstate called');
+    _dropdownMenuItems = buildDropDownMenuItems(widget.item.item_quantity_list);
+
+    for (var i = 0; i < widget.item.item_quantity_list.length; i++) {
+      if (widget.item.item_quantity_list[i].display_quantity) {
+        displayableItemQuantity = widget.item.item_quantity_list[i];
+        break;
+      }
+    }
+  }
+
+  List<DropdownMenuItem<ItemQuantity>> buildDropDownMenuItems(List listItems) {
+    List<DropdownMenuItem<ItemQuantity>> items = List();
+    for (ItemQuantity listItem in listItems) {
+      items.add(
+        DropdownMenuItem(
+          child: Text(listItem.item_quantity),
+          value: listItem,
+        ),
+      );
+    }
+    return items;
+  }
 
   @override
   Widget build(BuildContext context) {
     AppDatabase db = Provider.of<AppDatabase>(context);
     _cartItems = Provider.of<List<CartItem>>(context);
+    print('IQTAG: Cart Rebuilt displayableItemQuantity ' + displayableItemQuantity.item_quantity);
+    /*ItemQuantity displayableItemQuantity = new ItemQuantity();
+
+    for (var i = 0; i < widget.item.item_quantity_list.length; i++) {
+      if (widget.item.item_quantity_list[i].display_quantity) {
+        displayableItemQuantity = widget.item.item_quantity_list[i];
+        break;
+      }
+    }*/
 
     if (_cartItems != null && _cartItems.length > 0) {
-      int position = _cartItems
-          .indexWhere((cartItem) => cartItem.itemId == widget.item.id);
+      int position = _cartItems.indexWhere((cartItem) {
+        return (cartItem.itemId == widget.item.id) && (displayableItemQuantity.item_quantity == cartItem.itemQuantity);
+      });
 
       if (position >= 0) {
         setState(() {
@@ -71,16 +111,26 @@ class _LayoutStartsState extends State<LayoutStarts> {
       });
     }
 
-    print('ITEMDETAIL : ${widget.item.id}');
-
     return Stack(
       children: <Widget>[
         CarDetailsAnimation(data: widget.item),
-        CustomBottomSheet(context: context, data: widget.item),
+        CustomBottomSheet(
+          context: context,
+          data: widget.item,
+          displayableItem: displayableItemQuantity,
+          onItemQuantityChanged: (ItemQuantity value) {
+            print('IQTAG: Cart Rebuilt ${value.item_quantity}');
+            setState(() {
+              displayableItemQuantity = value;
+            });
+          },
+          dropDownItems: _dropdownMenuItems,
+        ),
         itemAdded
             ? ItemQuantityWidget(
                 item: widget.item,
                 cartItem: _cartItem,
+                displayableItemQuantity: displayableItemQuantity,
                 itemQuantity: _itemQuantity,
                 itemQuantityChanged: (itemQuantity) {
                   if (itemQuantity == 0) {
@@ -92,11 +142,9 @@ class _LayoutStartsState extends State<LayoutStarts> {
               )
             : AddToCartButton(
                 itemAdded: () {
-                  //TODO : Check if item is from the same outlet. If not, show flushbar with info to clear existing cart and continue
-                  //outOfStockBottomSheet();
                   bool isFromSameOutlet = true;
 
-                  if (widget.item.item_stock_quantity == 0) {
+                  if (displayableItemQuantity.item_stock_quantity == 0) {
                     outOfStockBottomSheet(widget.item);
                   } else {
                     for (CartItem cartItem in _cartItems) {
@@ -107,12 +155,11 @@ class _LayoutStartsState extends State<LayoutStarts> {
                     }
 
                     if (isFromSameOutlet) {
-                      addToCart(db);
+                      addToCart(db, displayableItemQuantity);
                     } else {
                       outletChangeErrorSheet(_cartItems[0], widget.item, () {
-                        db
-                            .deleteAllCartItems()
-                            .then((value) => {addToCart(db)});
+                        db.deleteAllCartItems().then((value) =>
+                            {addToCart(db, displayableItemQuantity)});
                       });
                     }
                   }
@@ -250,18 +297,19 @@ class _LayoutStartsState extends State<LayoutStarts> {
     )..show(context);
   }
 
-  void addToCart(AppDatabase db) {
+  void addToCart(AppDatabase db, ItemQuantity displayableItemQuantity) {
     CartItem cartItem = new CartItem(
         itemId: widget.item.id,
         itemImage: widget.item.item_image_path,
-        itemQuantity: widget.item.item_quantity,
+        itemQuantity: displayableItemQuantity.item_quantity,
         cartQuantity: 1,
         itemName: widget.item.item_name,
+        cartItemId: widget.item.id + displayableItemQuantity.item_quantity,
         outletId: widget.item.outlet_id,
-        itemPrice: widget.item.item_price,
+        itemPrice: displayableItemQuantity.item_price,
         maxQuantity: widget.item.max_cart_threshold,
-        quantityInStock: widget.item.item_stock_quantity,
-        cartPrice: widget.item.item_price);
+        quantityInStock: displayableItemQuantity.item_stock_quantity,
+        cartPrice: displayableItemQuantity.item_price);
 
     _auth.addCartItem(cartItem, db);
   }
@@ -303,7 +351,7 @@ class ItemQuantityWidget extends StatefulWidget {
   final Function(int) itemQuantityChanged;
   final Item item;
   final int itemQuantity;
-
+  final ItemQuantity displayableItemQuantity;
   final CartItem cartItem;
 
   const ItemQuantityWidget(
@@ -311,6 +359,7 @@ class ItemQuantityWidget extends StatefulWidget {
       @required this.itemQuantityChanged,
       @required this.item,
       @required this.itemQuantity,
+      @required this.displayableItemQuantity,
       this.cartItem})
       : super(key: key);
 
@@ -392,13 +441,15 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                     width: 0.8, //width of the border
                   ),
                   onPressed: () {
-                    if (validateCartCount(widget.item, widget.itemQuantity)) {
+                    if (validateCartCount(widget.item, widget.itemQuantity,
+                        widget.displayableItemQuantity)) {
                       int quantity = widget.itemQuantity + 1;
                       updateCartItemQuantity(widget.cartItem, quantity, db);
 
                       widget.itemQuantityChanged(quantity);
                     } else {
-                      showErrorBottomSheet(widget.item, widget.itemQuantity);
+                      showErrorBottomSheet(widget.item, widget.itemQuantity,
+                          widget.displayableItemQuantity);
                     }
                   },
                 ),
@@ -410,7 +461,8 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
     );
   }
 
-  showErrorBottomSheet(Item item, int itemQuantity) {
+  showErrorBottomSheet(
+      Item item, int itemQuantity, ItemQuantity displayableItemQuantity) {
     _cartItemQuantityFlushbar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
       flushbarStyle: FlushbarStyle.GROUNDED,
@@ -426,13 +478,14 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child: ((itemQuantity + 1) <= item.item_stock_quantity)
+              child: ((itemQuantity + 1) <=
+                      displayableItemQuantity.item_stock_quantity)
                   ? Text(
                       'You can add only upto ${item.max_cart_threshold} ${item.item_name} in a single order',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     )
                   : Text(
-                      'There are only ${item.item_stock_quantity} ${item.item_name}s in stock. Please add within this limit',
+                      'There are only ${displayableItemQuantity.item_stock_quantity} ${item.item_name}s in stock. Please add within this limit',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
             ),
@@ -481,9 +534,10 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
     _auth.deleteCartItem(cartItem, db);
   }
 
-  bool validateCartCount(Item item, int itemQuantity) {
+  bool validateCartCount(
+      Item item, int itemQuantity, ItemQuantity displayableItemQuantity) {
     return (itemQuantity + 1) <= item.max_cart_threshold &&
-        (itemQuantity + 1) <= item.item_stock_quantity;
+        (itemQuantity + 1) <= displayableItemQuantity.item_stock_quantity;
   }
 }
 
@@ -593,7 +647,7 @@ class DishDetails extends StatelessWidget {
     ));
   }
 
-  _carTitle(context) {
+/*_carTitle(context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -628,7 +682,7 @@ class DishDetails extends StatelessWidget {
         ),
       ],
     );
-  }
+  }*/
 }
 
 class CarCarousel extends StatefulWidget {
@@ -700,8 +754,16 @@ class _CarCarouselState extends State<CarCarousel> {
 class CustomBottomSheet extends StatefulWidget {
   BuildContext context;
   final Item data;
+  final ItemQuantity displayableItem;
+  final Function onItemQuantityChanged;
+  final List<DropdownMenuItem<ItemQuantity>> dropDownItems;
 
-  CustomBottomSheet({this.context, this.data});
+  CustomBottomSheet(
+      {this.context,
+      this.data,
+      this.displayableItem,
+      this.onItemQuantityChanged,
+      this.dropDownItems});
 
   @override
   _CustomBottomSheetState createState() => _CustomBottomSheetState();
@@ -767,7 +829,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
             return;
           }
         },
-        child: SheetContainer(data: widget.data),
+        child: SheetContainer(
+            data: widget.data,
+            displayableItem: widget.displayableItem,
+            itemQuantityChanged: widget.onItemQuantityChanged,
+            dropDownItems: widget.dropDownItems),
       ),
     );
   }
@@ -775,8 +841,15 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
 
 class SheetContainer extends StatelessWidget {
   final Item data;
+  final ItemQuantity displayableItem;
+  final Function itemQuantityChanged;
+  final List<DropdownMenuItem<ItemQuantity>> dropDownItems;
 
-  SheetContainer({this.data});
+  SheetContainer(
+      {this.data,
+      this.displayableItem,
+      this.itemQuantityChanged,
+      this.dropDownItems});
 
   @override
   Widget build(BuildContext context) {
@@ -802,11 +875,10 @@ class SheetContainer extends StatelessWidget {
                     Flexible(
                       flex: 2,
                       child: Text(
-                        data.item_name + ' - ' + data.item_quantity,
+                        data.item_name + ' - ' + displayableItem.item_quantity,
                         style: style.itemDetailHeader,
                       ),
                     ),
-
                     Flexible(
                       flex: 1,
                       child: Column(
@@ -815,105 +887,91 @@ class SheetContainer extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
                             child: Text(
-                              '${'₹ ' + data.item_price.toStringAsFixed(2)}',
+                              '${'₹ ' + displayableItem.item_price.toStringAsFixed(2)}',
                               style: style.itemDetailHeader.copyWith(
                                   color: MikroMartColors.colorPrimary),
                             ),
                           ),
-                          data.item_mrp != null
-                              ? Padding(
-                            padding:
-                            const EdgeInsets.fromLTRB(0, 5, 15, 0),
-                            child: data.item_mrp != data.item_price ? Text(
-                              'MRP: ₹' + data.item_mrp.toStringAsFixed(2),
-                              overflow: TextOverflow.ellipsis,
-                              style: style.itemPriceText.copyWith(
-                                  decoration: TextDecoration.lineThrough,
-                                  fontSize: 16,
-                                  color: MikroMartColors.ErroColor),
-                            ): Container(),
-                          )
-                              : Container(),
-
-                          (data.item_mrp!=null && data.item_mrp != data.item_price) ? Padding(
-                            padding:
-                            const EdgeInsets.fromLTRB(0, 10, 15, 0),
-                            child: Container(
-                              color: Colors
-                                  .green,
-                              padding:
-                              EdgeInsets
-                                  .all(
-                                  8),
-                              child: Text(
-                                calculatePercentage(data.item_price,
-                                    data.item_mrp)
-                                    .toString() +
-                                    '% OFF',
-                                overflow:
-                                TextOverflow
-                                    .ellipsis,
-                                style: style
-                                    .itemPriceText
-                                    .copyWith(
-                                    color:
-                                    MikroMartColors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ) : Container(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 0,
-                ),
-              /*  Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Flexible(
-                      flex: 2,
-                      child: Text(
-                        data.item_quantity,
-                        style: style.textTheme,
-                      ),
-                    ),
-                   *//* Flexible(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 0, 15, 0),
-                            child: Text(
-                              '${'₹ ' + data.item_price.toString()}',
-                              style: style.itemDetailHeader.copyWith(
-                                  color: MikroMartColors.colorPrimary),
-                            ),
-                          ),
-                          data.item_mrp != null
+                          displayableItem.item_mrp != null
                               ? Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 15, 0),
-                                  child: Text(
-                                    'MRP: ₹' + data.item_mrp.toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: style.itemPriceText.copyWith(
-                                        decoration: TextDecoration.lineThrough,
-                                        fontSize: 16,
-                                        color: MikroMartColors.ErroColor),
+                                      const EdgeInsets.fromLTRB(0, 5, 15, 0),
+                                  child: displayableItem.item_mrp !=
+                                          displayableItem.item_price
+                                      ? Text(
+                                          'MRP: ₹' +
+                                              displayableItem.item_mrp
+                                                  .toStringAsFixed(2),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: style.itemPriceText.copyWith(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontSize: 16,
+                                              color: MikroMartColors.ErroColor),
+                                        )
+                                      : Container(),
+                                )
+                              : Container(),
+                          (displayableItem.item_mrp != null &&
+                                  displayableItem.item_mrp !=
+                                      displayableItem.item_price)
+                              ? Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 10, 15, 0),
+                                  child: Container(
+                                    color: Colors.green,
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                      calculatePercentage(
+                                                  displayableItem.item_price,
+                                                  displayableItem.item_mrp)
+                                              .toString() +
+                                          '% OFF',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: style.itemPriceText.copyWith(
+                                          color: MikroMartColors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 )
                               : Container(),
                         ],
                       ),
-                    ),*//*
+                    ),
                   ],
-                ),*/
+                ),
                 SizedBox(
-                  height: 30,
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'Item Quantity',
+                      style: style.itemDetailHeader,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.0),
+                            color: MikroMartColors.white,
+                            border: Border.all()),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<ItemQuantity>(
+                              value: displayableItem,
+                              items: dropDownItems,
+                              onChanged: (value) {
+                                itemQuantityChanged(value);
+                              }),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
                 ),
                 Text(
                   'Product Description',

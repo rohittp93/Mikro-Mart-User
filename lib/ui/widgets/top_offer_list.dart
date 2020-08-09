@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
@@ -28,6 +29,15 @@ class _TopOfferListState extends State<TopOfferList> {
     final double blur = active ? 18 : 0;
     final double offset = active ? 10 : 0;
     //_top = active ? 10 : 10;
+
+    ItemQuantity displayableItemQuantity = new ItemQuantity();
+
+    for (var i = 0; i < data.item_quantity_list.length; i++) {
+      if(data.item_quantity_list[i].display_quantity){
+        displayableItemQuantity = data.item_quantity_list[i];
+        break;
+      }
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -68,7 +78,7 @@ class _TopOfferListState extends State<TopOfferList> {
                             offset: Offset(offset, offset))
                       ]),
                 ),
-                data.item_mrp != null
+                displayableItemQuantity.item_mrp != null
                     ? Align(
                         alignment: Alignment.topRight,
                         child: Padding(
@@ -84,7 +94,7 @@ class _TopOfferListState extends State<TopOfferList> {
                             padding: EdgeInsets.all(12),
                             child: Text(
                               calculatePercentage(
-                                          data.item_price, data.item_mrp)
+                                  displayableItemQuantity.item_price, displayableItemQuantity.item_mrp)
                                       .toString() +
                                   '% OFF',
                               overflow: TextOverflow.ellipsis,
@@ -134,7 +144,7 @@ class _TopOfferListState extends State<TopOfferList> {
                         padding:
                             EdgeInsets.symmetric(vertical: 12, horizontal: 7),
                         child: Text(
-                          '\₹ ' + data.item_price.toString(),
+                          '\₹ ' + displayableItemQuantity.item_price.toString(),
                           style: style.cardPriceStyle.copyWith(
                             color: Colors.white,
                           ),
@@ -142,7 +152,7 @@ class _TopOfferListState extends State<TopOfferList> {
                       ),
                     ),
                   ),
-                  data.item_mrp != null
+                  displayableItemQuantity.item_mrp != null
                       ? Padding(
                           padding: EdgeInsets.fromLTRB(
                             0,
@@ -157,7 +167,7 @@ class _TopOfferListState extends State<TopOfferList> {
                             padding: EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 7),
                             child: Text(
-                              'MRP \₹ ' + data.item_mrp.toString(),
+                              'MRP \₹ ' + displayableItemQuantity.item_mrp.toString(),
                               style: style.cardPriceStyle.copyWith(
                                 fontSize: 14,
                                 decoration: TextDecoration.lineThrough,

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/helpers/algolia.dart';
 import 'package:userapp/core/models/item.dart';
+import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
@@ -775,6 +776,16 @@ class _SearchPanelState extends State<SearchPanel> {
 
   Widget getBuilder(BuildContext context, int index) {
     Item item = _searchedProducts[index];
+
+    ItemQuantity displayableItemQuantity = new ItemQuantity();
+
+    for (var i = 0; i < item.item_quantity_list.length; i++) {
+      if(item.item_quantity_list[i].display_quantity){
+        displayableItemQuantity = item.item_quantity_list[i];
+        break;
+      }
+    }
+
     return Card(
       elevation: 2,
       child: InkWell(
@@ -802,7 +813,7 @@ class _SearchPanelState extends State<SearchPanel> {
                       child: Container(
                           child: Column(
                         children: <Widget>[
-                          item.item_stock_quantity == 0
+                          displayableItemQuantity.item_stock_quantity == 0
                               ? Container(
                                   height: 35,
                                   child: Center(
@@ -847,7 +858,7 @@ class _SearchPanelState extends State<SearchPanel> {
                               ),
                             ),
                           ),
-                          item.item_stock_quantity != 0
+                          displayableItemQuantity.item_stock_quantity != 0
                               ? Container(
                                   height: 35,
                                 )
@@ -856,9 +867,9 @@ class _SearchPanelState extends State<SearchPanel> {
                       )),
                     ),
                   ),
-                  item.item_mrp != null
-                      ? calculatePercentage(item.item_price, item.item_mrp) != 0
-                          ? item.item_stock_quantity != 0
+                  displayableItemQuantity.item_mrp != null
+                      ? calculatePercentage(displayableItemQuantity.item_price, displayableItemQuantity.item_mrp) != 0
+                          ? displayableItemQuantity.item_stock_quantity != 0
                               ? Align(
                                   alignment: Alignment.topRight,
                                   child: Container(
@@ -869,8 +880,8 @@ class _SearchPanelState extends State<SearchPanel> {
                                     ),
                                     padding: EdgeInsets.all(8),
                                     child: Text(
-                                      calculatePercentage(item.item_price,
-                                                  item.item_mrp)
+                                      calculatePercentage(displayableItemQuantity.item_price,
+                                          displayableItemQuantity.item_mrp)
                                               .toString() +
                                           '% OFF',
                                       overflow: TextOverflow.ellipsis,
@@ -897,7 +908,7 @@ class _SearchPanelState extends State<SearchPanel> {
                         alignment: Alignment.topLeft,
                         child: Text(
                           //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
-                          item.item_name + ' - ' + item.item_quantity,
+                          item.item_name + ' - ' + displayableItemQuantity.item_quantity,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: style.itemnNameText.copyWith(fontSize: 15),
@@ -907,7 +918,7 @@ class _SearchPanelState extends State<SearchPanel> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '₹ ' + item.item_price.toStringAsFixed(2),
+                        '₹ ' + displayableItemQuantity.item_price.toStringAsFixed(2),
                         overflow: TextOverflow.ellipsis,
                         style: style.itemPriceText.copyWith(
                             fontSize: 15,
@@ -915,16 +926,16 @@ class _SearchPanelState extends State<SearchPanel> {
                             fontWeight: FontWeight.bold),
                       ),
                     ),
-                    item.item_mrp != null
+                    displayableItemQuantity.item_mrp != null
                         ? Align(
                             alignment: Alignment.centerLeft,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
-                                item.item_mrp != item.item_price
+                                displayableItemQuantity.item_mrp != displayableItemQuantity.item_price
                                     ? Text(
                                         'MRP: ₹' +
-                                            item.item_mrp.toStringAsFixed(2),
+                                            displayableItemQuantity.item_mrp.toStringAsFixed(2),
                                         overflow: TextOverflow.ellipsis,
                                         style: style.itemPriceText.copyWith(
                                             decoration:
