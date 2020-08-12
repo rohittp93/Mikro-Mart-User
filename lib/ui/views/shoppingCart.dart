@@ -67,55 +67,60 @@ class _ShoppingCartState extends State<ShoppingCart> {
                             children: <Widget>[
                               Text(
                                 'Total: ',
-                                style: style.cardTitleStyle,
+                                style: style.cardTitleStyle.copyWith(fontSize: 18),
                               ),
                               Text(
                                 _calculateTotalPrice(_cartItems),
-                                style: style.cardTitleStyle.copyWith(
+                                style: style.cardTitleStyle.copyWith(fontSize: 20,
                                     color: MikroMartColors.colorPrimary),
                               ),
                               Text(
                                 'Delivery charge of \₹6/Km will be added to your bill total',
+                                maxLines: 2,
                                 style: TextStyle(fontSize: 13),
                               )
                             ],
                           ),
                         ),
                         SizedBox(width: 10.0),
-                        Container(
-                          height: 75,
-                          padding: const EdgeInsets.all(8.0),
-                          child: RaisedButton(
-                            onPressed: () async {
-                              //showBottomSheetDialog();
-                              showBottomSheet(
-                                  '', MikroMartColors.greenEndColor, () {
-                                /* print(
-                              'Confirmed. Proceed with order');*/
-                                confirmOrder(db);
-                              }, false, true);
-                            },
-                            elevation: 0.5,
-                            color: MikroMartColors.colorPrimary,
-                            child: Row(
-                              children: <Widget>[
-                                Center(
-                                  child: Text(
-                                    _orderingState == PROCESSING_ORDER
-                                        ? 'Processing order'
-                                        : 'Place Order',
+                        Flexible(
+                          child: Container(
+                            height: 75,
+                            padding: const EdgeInsets.all(8.0),
+                            child: RaisedButton(
+                              onPressed: () async {
+                                //showBottomSheetDialog();
+                                showBottomSheet(
+                                    '', MikroMartColors.greenEndColor, () {
+                                  confirmOrder(db);
+                                }, false, true);
+                              },
+                              elevation: 0.5,
+                              color: MikroMartColors.colorPrimary,
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Center(
+                                      child: Text(
+                                        _orderingState == PROCESSING_ORDER
+                                            ? 'Please wait'
+                                            : 'Place Order',
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                _orderingState == PROCESSING_ORDER
-                                    ? Container(
-                                        padding:
-                                            EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                        child:
-                                            SpinKitCircle(color: Colors.white))
-                                    : Container(),
-                              ],
+                                  _orderingState == PROCESSING_ORDER
+                                      ? Flexible(
+                                        child: Container(
+                                            padding:
+                                                EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                            child:
+                                                SpinKitCircle(color: Colors.white)),
+                                      )
+                                      : Container(),
+                                ],
+                              ),
+                              textColor: Colors.white,
                             ),
-                            textColor: Colors.white,
                           ),
                         )
                       ],
@@ -132,7 +137,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             CustomAppBar(
-              title: 'Shopping Cart',
+              title: 'SHOPPING CART',
             ),
             Container(
               child: Expanded(
@@ -663,7 +668,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
           setState(() {
             _orderingState = ORDER_FAILED;
           });
-          showBottomSheet('Something went wrong. Please try again later',
+          showBottomSheet('Something went wrong. Please try again after logging out & logging in',
               MikroMartColors.colorPrimary, null, true, false);
         }
       } else {

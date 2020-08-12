@@ -38,13 +38,13 @@ class _HomeCategoriesState extends State<HomeCategories> {
     return Column(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(bottom: 16, top: 0),
+          padding: EdgeInsets.only(bottom: 12, top: 0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Expanded(
                 child: Text(
-                  "Categories",
+                  "STORES",
                   style: style.headerStyle2,
                 ),
               ),
@@ -62,6 +62,10 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
   var size = MediaQuery.of(context).size;
   final double itemHeight = (size.height) / 2;
   //final double itemWidth = size.width / 2;
+
+  //categoriesNotifier.categoriesList.removeWhere((store) => store.category_name == 'OFFERS');
+
+  //categoriesNotifier.categoryList = categoriesList;
 
   return Container(
     child: SingleChildScrollView(
@@ -177,7 +181,7 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
                           )));
                 },
                 child: Card(
-                  elevation: 4,
+                  elevation: 2,
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
@@ -263,7 +267,7 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
                                     TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: MikroMartColors.colorPrimary,
-                                      fontSize: 17,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textAlign: TextAlign.start,

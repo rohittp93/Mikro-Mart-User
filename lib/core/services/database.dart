@@ -79,7 +79,7 @@ class DatabaseService {
   Future updateFCMToken(String uid, String fcmToken) async {
     return await userCollection
         .document(uid)
-        .setData({'device_token': fcmToken});
+        .updateData({'device_token': fcmToken});
   }
 
   Future fetchUserData(String doc_id) async {

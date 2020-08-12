@@ -57,10 +57,10 @@ class SplashScreen extends StatelessWidget {
       backgroundColor: MikroMartColors.colorPrimary,
       body: new Center(
         child: Container(
-          height: 150,
-          width: 150,
+          height: 250,
+          width: 250,
           child: new Image.asset(
-            'assets/logo.png',
+            'assets/white_logo.png',
             color: Colors.white,
             width: MediaQuery
                 .of(context)

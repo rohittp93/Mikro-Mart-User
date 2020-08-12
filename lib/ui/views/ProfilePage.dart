@@ -89,40 +89,43 @@ class _ProfilePageState extends State<ProfilePage> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 20.0),
                                       child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.45,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Text('Email',
-                                                    style: style.mediumTextTitle
-                                                        .copyWith(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w800),
-                                                    textAlign:
-                                                        TextAlign.center),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                    (_user != null &&
-                                                            _user.email != null)
-                                                        ? _user.email
-                                                        : '',
-                                                    style: TextStyle(
-                                                      fontSize: 15.0,
-                                                    ),
-                                                    textAlign:
-                                                        TextAlign.center),
-                                              ],
+                                          Flexible(
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.45,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Text('Email',
+                                                      style: style.mediumTextTitle
+                                                          .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w800),
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Text(
+                                                      (_user != null &&
+                                                              _user.email != null)
+                                                          ? _user.email
+                                                          : '',
+                                                      style: TextStyle(
+                                                        fontSize: 15.0,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                           Container(
@@ -131,35 +134,37 @@ class _ProfilePageState extends State<ProfilePage> {
                                             width: 1.0,
                                             height: 40.0,
                                           ),
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.45,
-                                            child: Column(
-                                              children: <Widget>[
-                                                Text('Phone',
-                                                    style: style.mediumTextTitle
-                                                        .copyWith(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w800),
-                                                    textAlign:
-                                                        TextAlign.center),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                  (_user != null &&
-                                                          _user.phone != null)
-                                                      ? _user.phone
-                                                      : '',
-                                                  style: TextStyle(
-                                                    fontSize: 15.0,
+                                          Flexible(
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.45,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text('Phone',
+                                                      style: style.mediumTextTitle
+                                                          .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w800),
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                  SizedBox(
+                                                    height: 5,
                                                   ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
+                                                  Text(
+                                                    (_user != null &&
+                                                            _user.phone != null)
+                                                        ? _user.phone
+                                                        : '',
+                                                    style: TextStyle(
+                                                      fontSize: 15.0,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ],

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
+import 'package:userapp/core/models/banner.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/item.dart';
@@ -176,7 +177,6 @@ class AuthService {
   // sign in with phone
   Future signInWithPhone(
       String phone, BuildContext context, AppDatabase db) async {
-    //await _auth.signOut();
     _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
@@ -189,8 +189,6 @@ class AuthService {
           } else {
             // error
           }
-
-          // This only gets called when autoRetrieval is true
         },
         verificationFailed: (AuthException authException) {
           print(authException.message);
@@ -225,32 +223,39 @@ class AuthService {
                             height: 20,
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(
-                                _descriptionText,
-                                style: TextStyle(
-                                    fontSize: 12.0,
-                                    color: _isLoading
-                                        ? MikroMartColors.purple
-                                        : MikroMartColors.errorRed,
-                                    fontStyle: FontStyle.normal),
+                              Flexible(
+                                flex:2,
+                                child: Text(
+                                  _descriptionText,
+                                  style: TextStyle(
+                                      fontSize: 12.0,
+                                      color: _isLoading
+                                          ? MikroMartColors.purple
+                                          : MikroMartColors.errorRed,
+                                      fontStyle: FontStyle.normal),
+                                ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-                                child: Container(
-                                  width: 14,
-                                  height: 14,
-                                  child: _isLoading
-                                      ? CircularProgressIndicator(
-                                          backgroundColor:
-                                              MikroMartColors.white,
-                                          valueColor:
-                                              new AlwaysStoppedAnimation<Color>(
-                                                  MikroMartColors.purple),
-                                          strokeWidth: 1,
-                                        )
-                                      : Container(),
+                              Flexible(
+                                flex:1,
+                                child: Padding(
+                                  padding:
+                                  const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                                  child: Container(
+                                    width: 14,
+                                    height: 14,
+                                    child: _isLoading
+                                        ? CircularProgressIndicator(
+                                      backgroundColor:
+                                      MikroMartColors.white,
+                                      valueColor:
+                                      new AlwaysStoppedAnimation<Color>(
+                                          MikroMartColors.purple),
+                                      strokeWidth: 1,
+                                    )
+                                        : Container(),
+                                  ),
                                 ),
                               ),
                             ],
@@ -319,22 +324,20 @@ class AuthService {
           for (var j = 0; j < cartItems.length; j++) {
             if (item.item_quantity_list[i].item_quantity ==
                 cartItems[j].itemQuantity) {
-
-
-              if (item.item_quantity_list[i] .item_stock_quantity== 0) {
+              if (item.item_quantity_list[i].item_stock_quantity == 0) {
                 cartMessage = '${item.item_name} is out of stock';
                 break;
-              } else if (cartItem.cartQuantity <= item.item_quantity_list[i].item_stock_quantity) {
+              } else if (cartItem.cartQuantity <=
+                  item.item_quantity_list[i].item_stock_quantity) {
                 cartMessage = CART_VALID;
               } else {
                 cartMessage =
-                'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
+                    'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
                 break;
               }
             }
           }
         }
-
       } else {
         cartMessage = '${cartItem.itemName} is no longer available';
         break;
@@ -362,21 +365,27 @@ class AuthService {
     }
 
     String userPhone = prefs.getString(PREF_USER_PHONE);
+    String userName = prefs.getString(PREF_USER_NAME);
     //moreItemsStr.isNotEmpty ? 'item_extra' : moreItemsStr: null
+    String orderId = '';
 
-    OrderModel orderModel = new OrderModel(
-        order_status: ORDER_PLACED,
-        cart_items: orderItems,
-        total_amount: totalAmount,
-        outlet_name: cartItems[0].outletId,
-        user_name: prefs.getString(PREF_USER_NAME),
-        user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
-        extra_item: moreItemsStr.isNotEmpty ? moreItemsStr : null,
-        user_location: new GeoPoint(
-            prefs.getDouble(PREF_USER_LAT), prefs.getDouble(PREF_USER_LNG)));
+    if (userName != null && userName.isNotEmpty) {
+      OrderModel orderModel = new OrderModel(
+          order_status: ORDER_PLACED,
+          cart_items: orderItems,
+          total_amount: totalAmount,
+          outlet_name: cartItems[0].outletId,
+          user_name: userName,
+          user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
+          extra_item: moreItemsStr.isNotEmpty ? moreItemsStr : null,
+          user_location: new GeoPoint(
+              prefs.getDouble(PREF_USER_LAT), prefs.getDouble(PREF_USER_LNG)));
 
-    String orderId = await DatabaseService(uid: user.uid)
-        .addOrder(user.uid, orderModel, userPhone);
+      orderId = await DatabaseService(uid: user.uid)
+          .addOrder(user.uid, orderModel, userPhone);
+    } else {
+      return null;
+    }
 
     return orderId;
   }
@@ -443,7 +452,7 @@ class AuthService {
         String fcmToken = await _fcm.getToken();
 
         prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
-        DatabaseService(uid: user.uid).updateUserData(
+        await DatabaseService(uid: user.uid).updateUserData(
             prefs.getString(PREF_USER_NAME),
             user.email,
             true,
@@ -497,6 +506,9 @@ class AuthService {
             lng: location.longitude,
             house_name: userDoc.data['building_name']);
 
+        String fcmToken = await _fcm.getToken();
+        await updateFCMToken(firebaseUser.uid, fcmToken);
+
         return phoneValidated;
       } else {
         return null;
@@ -549,6 +561,8 @@ class AuthService {
         }
 
         // db.insertUser(userModel);
+        String fcmToken = await _fcm.getToken();
+        await updateFCMToken(user.uid, fcmToken);
 
         return _userFromFirebaseUser(user, true, phoneValidated);
       } else {
@@ -643,6 +657,21 @@ getItemOffers(ItemNotifier notifier) async {
   }*/
 
   notifier.offerList = _itemList;
+  //notifier.offerList = [];
+}
+
+Future<List<BannerImage>> getBanners() async {
+  QuerySnapshot snapshot =
+      await Firestore.instance.collection('banners').getDocuments();
+
+  List<BannerImage> _bannerList = [];
+
+  snapshot.documents.forEach((document) {
+    BannerImage banner = BannerImage.fromMap(document.data);
+    _bannerList.add(banner);
+  });
+
+  return _bannerList;
 }
 
 getCategories(CategoriesNotifier notifier) async {
@@ -655,6 +684,8 @@ getCategories(CategoriesNotifier notifier) async {
     Category category = Category.fromMap(document.data, document.documentID);
     _categories.add(category);
   });
+
+  _categories.removeWhere((store) => store.category_name == 'OFFERS');
 
   notifier.categoryList = _categories;
 }
@@ -737,14 +768,14 @@ Future<List<DocumentSnapshot>> getMoreOrders(
 }
 
 Future<List<DocumentSnapshot>> getMoreItems(
-    String categoryId, int _per_page, DocumentSnapshot lastDocument) async {
+    String categoryId, int perPage, DocumentSnapshot lastDocument) async {
   QuerySnapshot snapshot;
   try {
     snapshot = await Firestore.instance
         .collection('items')
         .orderBy('item_name')
         .startAfterDocument(lastDocument)
-        .limit(_per_page)
+        .limit(perPage)
         .where('category_id', isEqualTo: categoryId)
         .getDocuments();
   } catch (e) {

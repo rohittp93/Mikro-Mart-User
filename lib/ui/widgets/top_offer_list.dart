@@ -161,9 +161,6 @@ class _TopOfferListState extends State<TopOfferList> {
                             0,
                           ),
                           child: Container(
-                            /*decoration: BoxDecoration(
-                color: MikroMartColors.colorPrimary,
-                borderRadius: BorderRadius.circular(10)),*/
                             padding: EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 7),
                             child: Text(

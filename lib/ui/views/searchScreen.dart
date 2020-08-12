@@ -131,7 +131,7 @@ class _SearchPanelState extends State<SearchPanel> {
                         child: Align(
                           alignment: AlignmentDirectional.centerStart,
                           child: Text(
-                            "or navigate by category",
+                            "or navigate by store",
                             style: style.subHeaderStyle
                                 .copyWith(color: MikroMartColors.colorPrimary),
                           ),
@@ -140,7 +140,7 @@ class _SearchPanelState extends State<SearchPanel> {
                       SizedBox(
                         height: 5,
                       ),
-                      Divider(color: MikroMartColors.transparentGray),
+                      Divider(color: MikroMartColors.dividerGray),
                       Expanded(
                         child: Stack(
                           children: <Widget>[
@@ -684,7 +684,7 @@ class _SearchPanelState extends State<SearchPanel> {
                                             (BuildContext context, int index) {
                                           return Divider(
                                               color: MikroMartColors
-                                                  .transparentGray);
+                                                  .dividerGray);
                                         },
                                       ),
                           ],

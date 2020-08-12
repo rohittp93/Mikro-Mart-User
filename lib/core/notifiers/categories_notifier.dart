@@ -8,7 +8,7 @@ class CategoriesNotifier with ChangeNotifier {
   List<Category> _categoriesList = [];
   Category _currentCategory;
 
-  UnmodifiableListView<Category> get categoriesList => UnmodifiableListView(_categoriesList);
+  List<Category> get categoriesList => _categoriesList;
 
   Category get currentCategory=> _currentCategory;
 

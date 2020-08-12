@@ -38,21 +38,6 @@ class _AppPushsState extends State<AppPushs> {
       onMessage: (Map<String, dynamic> message) {
         print('AppPushs onMessage : $message');
         pushNotificationReceived(message['notification']['body']);
-        /*showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: ListTile(
-              title: Text(message['notification']['title']),
-              subtitle: Text(message['notification']['body']),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );*/
         return;
       },
       onBackgroundMessage: Platform.isIOS ? null : myBackgroundMessageHandler,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/ui/widgets/CusTomAppBar.dart';
+import 'package:userapp/ui/widgets/banners_list.dart';
+import 'package:userapp/ui/widgets/offers_list.dart';
 import '../widgets/top_offer_list.dart';
 import 'package:provider/provider.dart';
 import '../../locator.dart';
@@ -16,15 +18,29 @@ class LandingPage extends StatelessWidget {
     return ChangeNotifierProvider<FoodList>(
       create: (context) => locator<FoodList>(),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12),
         child: ListView(
           children: <Widget>[
-            CustomAppBar(title: 'Mikro Mart',),
-            TopOfferList(),
-            HomeCategories(onViewMoreClicked: onViewMoreClicked),
+            CustomAppBar(icon: Container(
+              width: 180,
+              child: new Image.asset(
+                'assets/logo_banner.png',
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                fit: BoxFit.contain,
+              ),
+            ), title: 'Mikro Mart',),
+            //TopOfferList(),
+            BannersList(),
+            OffersList(),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: HomeCategories(onViewMoreClicked: onViewMoreClicked),
+            ),
             //DishCategories(),
             //PopularItems()
-            Container(padding: EdgeInsets.only(bottom: 100))
+            Container(padding: EdgeInsets.only(bottom: 60))
           ],
         ),
       ),

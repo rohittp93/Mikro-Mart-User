@@ -130,7 +130,7 @@ class _ItemsListState extends State<ItemsList> {
       return;
     }
 
-    print('ITEMLOADMORE : Get more products called');
+    print('ITEMLOADMORE : Get more products called ');
 
     _gettingMoreProducts = true;
 
@@ -139,7 +139,7 @@ class _ItemsListState extends State<ItemsList> {
 
     if (items != null && items.length < _per_page) {
       _moreProductsAvailable = false;
-
+    }
       _productSnapshots.addAll(items);
       _lastDocument = _productSnapshots[_productSnapshots.length - 1];
 
@@ -149,7 +149,7 @@ class _ItemsListState extends State<ItemsList> {
       });
 
       setState(() {});
-    }
+
     _gettingMoreProducts = false;
   }
 
@@ -339,7 +339,7 @@ class _ItemsListState extends State<ItemsList> {
                                                                       0
                                                                   ? Container(
                                                                       height:
-                                                                          35,
+                                                                          25,
                                                                       child:
                                                                           Center(
                                                                         child:
@@ -387,15 +387,18 @@ class _ItemsListState extends State<ItemsList> {
                                                                                 null &&
                                                                             item.outlet_id !=
                                                                                 null)
-                                                                        ? Text(
-                                                                            item.outlet_id,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                            maxLines:
-                                                                                1,
-                                                                            style:
-                                                                                style.itemnNameText.copyWith(fontSize: 14, color: Colors.white),
-                                                                          )
+                                                                        ? Padding(
+                                                                          padding: const EdgeInsets.only(left: 2.0, right:2.0),
+                                                                          child: Text(
+                                                                              item.outlet_id,
+                                                                              overflow:
+                                                                                  TextOverflow.ellipsis,
+                                                                              maxLines:
+                                                                                  2,
+                                                                              style:
+                                                                                  style.itemnNameText.copyWith(fontSize: 14, color: Colors.white),
+                                                                            ),
+                                                                        )
                                                                         : Container(),
                                                                   ),
                                                                 ),
@@ -403,10 +406,12 @@ class _ItemsListState extends State<ItemsList> {
                                                               displayableItemQuantity
                                                                           .item_stock_quantity !=
                                                                       0
-                                                                  ? Container(
-                                                                      height:
-                                                                          35,
-                                                                    )
+                                                                  ? Flexible(
+                                                                    child: Container(
+                                                                        height:
+                                                                            25,
+                                                                      ),
+                                                                  )
                                                                   : Container(),
                                                             ],
                                                           )),

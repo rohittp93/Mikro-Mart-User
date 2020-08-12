@@ -326,7 +326,7 @@ class AddToCartButton extends StatelessWidget {
       alignment: Alignment.bottomRight,
       child: SizedBox(
         child: Container(
-          width: 200,
+          width: 180,
           child: FlatButton(
             onPressed: () {
               itemAdded();
@@ -336,7 +336,7 @@ class AddToCartButton extends StatelessWidget {
               style: style.arialTheme,
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(12)),
             ),
             color: MikroMartColors.colorPrimary,
             padding: EdgeInsets.fromLTRB(0, 25, 0, 25),
@@ -383,75 +383,123 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
         child: Container(
           decoration: BoxDecoration(
               color: MikroMartColors.purple,
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(12)),
               border: Border.all(
                   width: 3,
                   color: MikroMartColors.purple,
                   style: BorderStyle.solid)),
-          width: 200,
+          width: 180,
           padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              ButtonTheme(
-                minWidth: 40,
-                height: 40,
-                child: OutlineButton(
-                  child: new Icon(
-                    Icons.remove,
-                    color: Colors.white,
-                  ),
-                  borderSide: BorderSide(
-                    color: Colors.white, //Color of the border
-                    style: BorderStyle.solid, //Style of the border
-                    width: 0.8, //width of the border
-                  ),
-                  onPressed: () {
-                    if (widget.itemQuantity != 0) {
-                      int quantity = widget.itemQuantity - 1;
-                      widget.itemQuantityChanged(quantity);
+              Flexible(
+                child: /*ButtonTheme(
+                  minWidth: 40,
+                  height: 40,
+                  child: OutlineButton(
+                    child: new Icon(
+                      Icons.remove,
+                      color: Colors.white,
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.white, //Color of the border
+                      style: BorderStyle.solid, //Style of the border
+                      width: 0.8, //width of the border
+                    ),
+                    onPressed: () {
+                      if (widget.itemQuantity != 0) {
+                        int quantity = widget.itemQuantity - 1;
+                        widget.itemQuantityChanged(quantity);
 
-                      if (quantity == 0) {
-                        deleteCartItem(widget.cartItem, db);
-                      } else {
-                        updateCartItemQuantity(widget.cartItem, quantity, db);
-                      }
-                    } else {}
-                  },
+                        if (quantity == 0) {
+                          deleteCartItem(widget.cartItem, db);
+                        } else {
+                          updateCartItemQuantity(widget.cartItem, quantity, db);
+                        }
+                      } else {}
+                    },
+                  ),
+                ),*/
+
+                Stack(
+                  children: <Widget>[
+                    InkWell(
+                      child: Container(
+                        width: 48,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white,
+                          ),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Center(
+                          child: new Icon(
+                            Icons.remove,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        if (widget.itemQuantity != 0) {
+                          int quantity = widget.itemQuantity - 1;
+                          widget.itemQuantityChanged(quantity);
+
+                          if (quantity == 0) {
+                            deleteCartItem(widget.cartItem, db);
+                          } else {
+                            updateCartItemQuantity(widget.cartItem, quantity, db);
+                          }
+                        } else {}
+                      },
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
-                child: Text(
-                  widget.itemQuantity.toString(),
-                  style: style.arialTheme,
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                  child: Text(
+                    widget.itemQuantity.toString(),
+                    style: style.arialTheme,
+                  ),
                 ),
               ),
-              ButtonTheme(
-                minWidth: 40,
-                height: 40,
-                child: OutlineButton(
-                  child: new Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-                  borderSide: BorderSide(
-                    color: Colors.white, //Color of the border
-                    style: BorderStyle.solid, //Style of the border
-                    width: 0.8, //width of the border
-                  ),
-                  onPressed: () {
-                    if (validateCartCount(widget.item, widget.itemQuantity,
-                        widget.displayableItemQuantity)) {
-                      int quantity = widget.itemQuantity + 1;
-                      updateCartItemQuantity(widget.cartItem, quantity, db);
+              Flexible(
+                child: Stack(
+                  children: <Widget>[
+                    InkWell(
+                      child: Container(
+                        width: 48,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white,
+                          ),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Center(
+                          child: new Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        if (validateCartCount(widget.item, widget.itemQuantity,
+                            widget.displayableItemQuantity)) {
+                          int quantity = widget.itemQuantity + 1;
+                          updateCartItemQuantity(widget.cartItem, quantity, db);
 
-                      widget.itemQuantityChanged(quantity);
-                    } else {
-                      showErrorBottomSheet(widget.item, widget.itemQuantity,
-                          widget.displayableItemQuantity);
-                    }
-                  },
+                          widget.itemQuantityChanged(quantity);
+                        } else {
+                          showErrorBottomSheet(widget.item, widget.itemQuantity,
+                              widget.displayableItemQuantity);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -919,7 +967,10 @@ class SheetContainer extends StatelessWidget {
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 10, 15, 0),
                                   child: Container(
-                                    color: Colors.green,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      borderRadius: BorderRadius.circular(4.0),
+                                    ),
                                     padding: EdgeInsets.all(8),
                                     child: Text(
                                       calculatePercentage(
@@ -991,7 +1042,7 @@ class SheetContainer extends StatelessWidget {
                   height: 30,
                 ),
                 Text(
-                  'Outlet',
+                  'Store',
                   style: style.itemDetailHeader,
                 ),
                 SizedBox(

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "980292871487-qe2p28c0uovid72803r8leaic1s2cktu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mikromart.userapp",
+            "certificate_hash": "ef51100e19eff2ab50f6056fc314e023cde13977"
+          }
+        },
+        {
           "client_id": "980292871487-5abcojgjebi4aim7f3269etab7jc2ipp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

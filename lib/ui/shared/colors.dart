@@ -17,6 +17,7 @@ class MikroMartColors {
   static const purpleStart = Color(0xff9453E7);
   static const purpleEnd = Color(0xff432669);
   static const transparentGray = Color(0xDD000000);
+  static const dividerGray = Color(0xFF5F5F5F);
   static const black = Color(0xFF0E0E0C);
   static const textGray = Color(0xFF363636);
   static const subtitleGray = Color(0xFF919191);
