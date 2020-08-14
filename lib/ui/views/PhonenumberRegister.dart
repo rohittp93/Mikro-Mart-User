@@ -128,7 +128,19 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
 
                           String validationMessage = validateMobile(this.phone);
                           if (validationMessage == null) {
-                            _auth.signInWithPhone('+91' + this.phone, context, db);
+                            final result = await _auth.signInWithPhone('+91' + this.phone, context, db);
+
+                            if(result == null) {
+                             /* _scaffoldkey.currentState.showSnackBar(SnackBar(
+                                content: new Text('This number is already registered with another user'),
+                                duration: new Duration(seconds: 3),
+                              ));
+
+                              setState(() {
+                                _buttonAnimationState = 0;
+                              });*/
+                            }
+
                           } else {
                             setState(() {
                               _buttonAnimationState = 0;

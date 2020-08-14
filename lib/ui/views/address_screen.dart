@@ -4,6 +4,7 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location_permissions/location_permissions.dart';
 import 'package:userapp/core/helpers/great_circle_distance_base.dart';
 import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/ui/shared/colors.dart';
@@ -40,6 +41,10 @@ class _AddressScreenState extends State<AddressScreen> {
 
   var _isFetchingCurrentLocation = true;
 
+  PermissionStatus _permissionStatus = PermissionStatus.unknown;
+
+  Position _position;
+
   void _setCircles() {
     _circles.add(
       Circle(
@@ -53,31 +58,89 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Future getCurrentLocation() async {
     print('Initstate called');
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    print(position.latitude);
+    //Geolocator geolocator = Geolocator()..forceAndroidLocationManager = true;
 
-    GeolocationStatus geolocationStatus  = await Geolocator().checkGeolocationPermissionStatus();
+    if (!(await Geolocator().isLocationServiceEnabled())) {
+      PermissionStatus permissionRequestResult =
+          await LocationPermissions().requestPermissions();
+      setState(() {
+        _permissionStatus = permissionRequestResult;
+        print(_permissionStatus);
+      });
 
-    if(geolocationStatus == GeolocationStatus.denied || geolocationStatus == GeolocationStatus.disabled) {
+      switch (_permissionStatus) {
+        case PermissionStatus.denied:
+          showSnackBar(
+              'Location permission denied. Please enable device location');
+          break;
+        case PermissionStatus.granted:
+          getCurrentLocationAndDrawMarker();
+          break;
+        default:
+          break;
+      }
+    } else {
+      getCurrentLocationAndDrawMarker();
+    }
+  }
+
+  getCurrentLocationAndDrawMarker() async {
+    try {
+      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+          .timeout(new Duration(seconds: 10));
+
+      print('Current location ${position.latitude}');
+      setState(() {
+        _position = position;
+        _locationAddress = new LatLng(position.latitude, position.longitude);
+      });
+      displayMarker();
+    } catch (e) {
+      print('Error: ${e.toString()}');
+
+      showSnackBar(
+          'Could not fetch location. Please turn on your device location');
+
+      setState(() {
+        _isFetchingCurrentLocation = false;
+      });
+      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _position = position;
+      });
+      displayMarker();
+    }
+
+
+  }
+
+  displayMarker() async {
+    final geoLocator = Geolocator();
+
+    GeolocationStatus geolocationStatus =
+        await geoLocator.checkGeolocationPermissionStatus();
+
+    if (geolocationStatus == GeolocationStatus.denied ||
+        geolocationStatus == GeolocationStatus.disabled) {
       setState(() {
         _isFetchingCurrentLocation = false;
       });
     }
 
-    await Geolocator()
-        .placemarkFromCoordinates(position.latitude, position.longitude);
-
-
-
+    await geoLocator
+        .placemarkFromCoordinates(_position.latitude, _position.longitude);
 
     setState(() {
-      _latlong = new LatLng(position.latitude, position.longitude);
+      _latlong = new LatLng(_position.latitude, _position.longitude);
       _isFetchingCurrentLocation = false;
     });
     var _cameraPosition = CameraPosition(target: _latlong, zoom: 18.0);
     _mapController
         .animateCamera(CameraUpdate.newCameraPosition(_cameraPosition));
+
+    if (_markers.length > 0) {
+      _markers.clear();
+    }
 
     _markers.add(Marker(
       markerId: MarkerId(_latlong.toString()),
@@ -212,76 +275,6 @@ class _AddressScreenState extends State<AddressScreen> {
       });
   }
 
-/*  showFlatNameBottomSheet() {
-    Dialog errorDialog = Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      //this right here
-      child: Container(
-        height: 200.0,
-        width: 300.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 10),
-                child: TextField(),
-              ),
-            ),
-            FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Reselect location',
-                  style: TextStyle(
-                      color: MikroMartColors.colorPrimary, fontSize: 18.0),
-                ))
-          ],
-        ),
-      ),
-    );
-    showDialog(
-        context: context, builder: (BuildContext context) => errorDialog);
-  }*/
-
-/*  showErrorDialog() {
-    Dialog errorDialog = Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      //this right here
-      child: Container(
-        height: 200.0,
-        width: 300.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 10),
-                child: Text(
-                  'We do not provide delivery to this location yet. Please select an area within the circular region',
-                  style: TextStyle(color: MikroMartColors.purple),
-                ),
-              ),
-            ),
-            FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Reselect location',
-                  style: TextStyle(
-                      color: MikroMartColors.colorPrimary, fontSize: 18.0),
-                ))
-          ],
-        ),
-      ),
-    );
-    showDialog(
-        context: context, builder: (BuildContext context) => errorDialog);
-  }*/
-
-
   showErrorDialog() {
     _errorFlushBar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
@@ -297,7 +290,7 @@ class _AddressScreenState extends State<AddressScreen> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child:  Text(
+              child: Text(
                 'We do not provide delivery to this location yet. Please select an area within the circular region',
                 style: TextStyle(color: MikroMartColors.white),
               ),
@@ -375,32 +368,35 @@ class _AddressScreenState extends State<AddressScreen> {
                 markers: _markers,
               ),
             ),
-            _isFetchingCurrentLocation ? Container(
-                width: MediaQuery.of(context).size.width,
-                height: 40,
-                color: Colors.white.withOpacity(0.7),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                        child: Text(
-                      'Fetching Current Location',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: 15,
-                        width: 15,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          value: null,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+            _isFetchingCurrentLocation
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    color: Colors.white.withOpacity(0.7),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Center(
+                            child: Text(
+                          'Fetching Current Location',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            height: 15,
+                            width: 15,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              value: null,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                )): Container(),
+                      ],
+                    ))
+                : Container(),
             Align(
               alignment: Alignment.bottomCenter,
               child: GestureDetector(
@@ -447,5 +443,93 @@ class _AddressScreenState extends State<AddressScreen> {
           .closed
           .then((value) => _isSnackbarActive = false);
     }
+  }
+}
+
+class PermissionWidget extends StatefulWidget {
+  const PermissionWidget(this._permissionLevel);
+
+  final LocationPermissionLevel _permissionLevel;
+
+  @override
+  _PermissionState createState() => _PermissionState(_permissionLevel);
+}
+
+class _PermissionState extends State<PermissionWidget> {
+  _PermissionState(this._permissionLevel);
+
+  final LocationPermissionLevel _permissionLevel;
+  PermissionStatus _permissionStatus = PermissionStatus.unknown;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _listenForPermissionStatus();
+  }
+
+  void _listenForPermissionStatus() {
+    final Future<PermissionStatus> statusFuture =
+        LocationPermissions().checkPermissionStatus();
+
+    statusFuture.then((PermissionStatus status) {
+      setState(() {
+        _permissionStatus = status;
+      });
+    });
+  }
+
+  Color getPermissionColor() {
+    switch (_permissionStatus) {
+      case PermissionStatus.denied:
+        return Colors.red;
+      case PermissionStatus.granted:
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(_permissionLevel.toString()),
+      subtitle: Text(
+        _permissionStatus.toString(),
+        style: TextStyle(color: getPermissionColor()),
+      ),
+      trailing: IconButton(
+          icon: const Icon(Icons.info),
+          onPressed: () {
+            checkServiceStatus(context, _permissionLevel);
+          }),
+      onTap: () {
+        requestPermission(_permissionLevel);
+      },
+    );
+  }
+
+  void checkServiceStatus(
+      BuildContext context, LocationPermissionLevel permissionLevel) {
+    LocationPermissions()
+        .checkServiceStatus()
+        .then((ServiceStatus serviceStatus) {
+      final SnackBar snackBar =
+          SnackBar(content: Text(serviceStatus.toString()));
+
+      Scaffold.of(context).showSnackBar(snackBar);
+    });
+  }
+
+  Future<void> requestPermission(
+      LocationPermissionLevel permissionLevel) async {
+    final PermissionStatus permissionRequestResult = await LocationPermissions()
+        .requestPermissions(permissionLevel: permissionLevel);
+
+    setState(() {
+      print(permissionRequestResult);
+      _permissionStatus = permissionRequestResult;
+      print(_permissionStatus);
+    });
   }
 }

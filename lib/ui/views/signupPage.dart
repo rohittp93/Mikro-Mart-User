@@ -348,7 +348,9 @@ class _SignUpPageState extends State<SignUpPage> {
                           context,
                           new MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                new AddressScreen(isDismissable: true,),
+                                new AddressScreen(
+                              isDismissable: true,
+                            ),
                             fullscreenDialog: true,
                           ));
 
@@ -359,7 +361,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 18.0, 0.0, 18.0),
                       child: Text(
-                        _userAddress!=null ?_userAddress.appartmentName : 'Address',
+                        _userAddress != null
+                            ? _userAddress.appartmentName
+                            : 'Address',
                         style: _userAddress == null
                             ? TextStyle(
                                 color: MikroMartColors.subtitleGray,
@@ -412,18 +416,24 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (this.password.length != 0 &&
                             this.password.length > 6) {
                           if (this.password == this.confirmPassword) {
-                            if(_userAddress!=null) {
+                            if (_userAddress != null &&
+                                _userAddress.location != null) {
                               setState(() {
                                 _buttonAnimationState = 1;
                               });
 
                               dynamic result =
-                              await _auth.registerWithEmailAndPassword(
-                                  this.name, this.email, this.password, this._userAddress, db);
+                                  await _auth.registerWithEmailAndPassword(
+                                      context,
+                                      this.name,
+                                      this.email,
+                                      this.password,
+                                      this._userAddress,
+                                      db);
 
                               if (result == null) {
-                                showSnackBar(
-                                    'Something has gone wrong. Please try again');
+                               /* showSnackBar(
+                                    'Something has gone wrong. Please try again');*/
                                 setState(() {
                                   _buttonAnimationState = 0;
                                 });
@@ -435,7 +445,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       dartz.cast<FirebaseUserModel>(result));
                                 });
                               }
-                            }else{
+                            } else {
                               showSnackBar('Select addreess');
                             }
                           } else {

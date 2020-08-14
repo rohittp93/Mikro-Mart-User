@@ -71,20 +71,24 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
 
 
   checkIfAddressAdded() async {
-    User user = await _auth.fetchUserDetails();
-    if (user.houseName == null ||
-        user.houseName.isEmpty) {
-      AddressModel addressModel = await Navigator.push(
-          context,
-          new MaterialPageRoute(
-            builder: (BuildContext context) =>
-            new AddressScreen(
-              isDismissable: false,
-            ),
-            fullscreenDialog: true,
-          ));
-      await _auth.updateAddressInFirestore(
-          addressModel);
+    String userHouseName = await _auth.getUserBuildingName();
+
+    if(userHouseName == null || userHouseName.isEmpty) {
+      User user = await _auth.fetchUserDetails();
+      if (user.houseName == null ||
+          user.houseName.isEmpty) {
+        AddressModel addressModel = await Navigator.push(
+            context,
+            new MaterialPageRoute(
+              builder: (BuildContext context) =>
+              new AddressScreen(
+                isDismissable: false,
+              ),
+              fullscreenDialog: true,
+            ));
+        await _auth.updateAddressInFirestore(
+            addressModel);
+      }
     }
   }
 

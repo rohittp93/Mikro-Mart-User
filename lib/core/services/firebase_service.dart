@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -84,14 +85,15 @@ class AuthService {
   }
 
 // register with email & pw
-  Future registerWithEmailAndPassword(String name, String email,
+  Future registerWithEmailAndPassword(
+      BuildContext context, String name, String email,
       String password, AddressModel userAddress, AppDatabase db) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       final prefs = await SharedPreferences.getInstance();
 
-      prefs.setString(PREF_USER_NAME, name);
+      await prefs.setString(PREF_USER_NAME, name);
 
       FirebaseUser user = result.user;
       // create a new document with uid & twofactorenabled as false
@@ -109,7 +111,7 @@ class AuthService {
           addressLocation,
           userAddress.appartmentName,
           false);
-      prefs.setBool(PREF_IS_SIGNED_IN, true);
+      await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
       saveUserCreds(
           id: user.uid,
@@ -122,9 +124,48 @@ class AuthService {
 
       return _userFromFirebaseUser(user, true, false);
     } catch (e) {
-      print(e.toString());
+      print('ERROR SIGNING IN WITH EMAIL PW : ${e.toString()}');
+
+      showErrorBottomSheet(context, e.message);
       return null;
     }
+  }
+
+  showErrorBottomSheet(BuildContext context, String message) {
+    new Flushbar<List<String>>(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      flushbarStyle: FlushbarStyle.GROUNDED,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.easeOutCubic,
+      animationDuration: Duration(milliseconds: 600),
+      duration: Duration(seconds: 10),
+      backgroundColor: MikroMartColors.purpleStart,
+      userInputForm: Form(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              child: Text(message,
+                style: TextStyle(color: Colors.white, fontSize: 16),
+            )
+            ),],
+        ),
+      ),
+      boxShadows: [
+        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
+      ],
+      backgroundGradient: LinearGradient(colors: [
+        MikroMartColors.colorPrimaryDark,
+        MikroMartColors.colorPrimary
+      ]),
+      isDismissible: true,
+      icon: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
+    )..show(context);
   }
 
   updateAddressInFirestore(AddressModel userAddress) async {
@@ -136,6 +177,7 @@ class AuthService {
         userAddress.location.latitude, userAddress.location.longitude);
     await DatabaseService(uid: uId)
         .updateUserAddress(addressLocation, userAddress.appartmentName);
+
     await updateUserAddressInSharedPrefs(userAddress);
   }
 
@@ -143,13 +185,13 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
 
     if (addressModel.location.latitude != null) {
-      prefs.setDouble(PREF_USER_LAT, addressModel.location.latitude);
+      await prefs.setDouble(PREF_USER_LAT, addressModel.location.latitude);
     }
     if (addressModel.location.longitude != null) {
-      prefs.setDouble(PREF_USER_LNG, addressModel.location.longitude);
+      await prefs.setDouble(PREF_USER_LNG, addressModel.location.longitude);
     }
     if (addressModel.appartmentName != null) {
-      prefs.setString(PREF_USER_HOUSE_NAME, addressModel.appartmentName);
+      await  prefs.setString(PREF_USER_HOUSE_NAME, addressModel.appartmentName);
     }
   }
 
@@ -160,6 +202,14 @@ class AuthService {
     double lng = prefs.getDouble(PREF_USER_LNG);
 
     return new GeoPoint(lat, lng);
+  }
+
+  Future<String> getUserBuildingName()  async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String houseName = prefs.getString(PREF_USER_HOUSE_NAME);
+
+    return houseName;
   }
 
 // signout
@@ -174,7 +224,7 @@ class AuthService {
 
   final _codeController = TextEditingController();
 
-  // sign in with phone
+
   Future signInWithPhone(
       String phone, BuildContext context, AppDatabase db) async {
     _auth.verifyPhoneNumber(
@@ -188,10 +238,12 @@ class AuthService {
             savePhoneAndCheckAddress(phone, context);
           } else {
             // error
+            return null;
           }
         },
         verificationFailed: (AuthException authException) {
           print(authException.message);
+          showErrorBottomSheet(context, authException.message);
           return null;
         },
         codeSent: (String verificationId, [int forcedResendingToken]) {
@@ -401,25 +453,25 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
 
     if (id != null) {
-      prefs.setString(PREF_USER_ID, id);
+      await  prefs.setString(PREF_USER_ID, id);
     }
     if (name != null) {
-      prefs.setString(PREF_USER_NAME, name);
+      await  prefs.setString(PREF_USER_NAME, name);
     }
     if (email != null) {
-      prefs.setString(PREF_USER_EMAIL, email);
+      await  prefs.setString(PREF_USER_EMAIL, email);
     }
     if (phone != null) {
-      prefs.setString(PREF_USER_PHONE, phone);
+      await  prefs.setString(PREF_USER_PHONE, phone);
     }
     if (lat != null) {
-      prefs.setDouble(PREF_USER_LAT, lat);
+      await  prefs.setDouble(PREF_USER_LAT, lat);
     }
     if (lng != null) {
-      prefs.setDouble(PREF_USER_LNG, lng);
+      await  prefs.setDouble(PREF_USER_LNG, lng);
     }
     if (house_name != null) {
-      prefs.setString(PREF_USER_HOUSE_NAME, house_name);
+      await  prefs.setString(PREF_USER_HOUSE_NAME, house_name);
     }
   }
 
@@ -451,7 +503,7 @@ class AuthService {
       if (authResult != null) {
         String fcmToken = await _fcm.getToken();
 
-        prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        await  prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         await DatabaseService(uid: user.uid).updateUserData(
             prefs.getString(PREF_USER_NAME),
             user.email,
@@ -482,7 +534,7 @@ class AuthService {
       FirebaseUser firebaseUser = result.user;
       if (firebaseUser != null) {
         final prefs = await SharedPreferences.getInstance();
-        prefs.setBool(PREF_IS_SIGNED_IN, true);
+        await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         DocumentSnapshot userDoc = await DatabaseService(uid: firebaseUser.uid)
             .fetchUserData(result.user.uid);
@@ -490,9 +542,9 @@ class AuthService {
         bool phoneValidated = userDoc.data["two_factor_enabled"];
 
         if (phoneValidated) {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+          await prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         } else {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
+          await prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
         }
 
         GeoPoint location = userDoc.data["location"];
@@ -536,7 +588,7 @@ class AuthService {
 
       final FirebaseUser user = authResult.user;
       final prefs = await SharedPreferences.getInstance();
-      prefs.setBool(PREF_IS_SIGNED_IN, true);
+      await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
       DocumentSnapshot userDoc =
           await DatabaseService(uid: user.uid).fetchUserData(user.uid);
@@ -555,9 +607,9 @@ class AuthService {
             house_name: userDoc.data['building_name']);
 
         if (phoneValidated) {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+          await prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         } else {
-          prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
+          await prefs.setBool(PREF_PHONE_AUTHENTICATED, false);
         }
 
         // db.insertUser(userModel);
@@ -569,7 +621,7 @@ class AuthService {
         String fcmToken = await _fcm.getToken();
         await DatabaseService(uid: user.uid).updateUserData(user.email,
             user.email, false, '', user.uid, fcmToken, null, null, true);
-        prefs.setBool(PREF_IS_SIGNED_IN, true);
+        await  prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         saveUserCreds(
             id: user.uid,
@@ -686,6 +738,13 @@ getCategories(CategoriesNotifier notifier) async {
   });
 
   _categories.removeWhere((store) => store.category_name == 'OFFERS');
+
+  _categories.removeWhere((store) => store.outlet_open == false);
+
+
+
+
+
 
   notifier.categoryList = _categories;
 }

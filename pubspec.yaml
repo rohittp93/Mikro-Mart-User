@@ -43,7 +43,7 @@ dependencies:
   algolia: 0.1.7
   flutter_spinkit:
   flutter_staggered_grid_view:
-
+  location_permissions: ^3.0.0
 
   flushbar: 1.10.4
 
