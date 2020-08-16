@@ -13,6 +13,7 @@
     <application
         android:name=".Application"
         android:label="Mikro Mart"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
