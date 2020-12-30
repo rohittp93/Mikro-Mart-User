@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/ui/views/CurvedPage.dart';
 import 'package:userapp/ui/views/OtpPage.dart';
 import 'package:userapp/ui/views/PhonenumberRegister.dart';
 import 'package:userapp/ui/views/address_screen.dart';
@@ -25,7 +26,7 @@ class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => HomePage());
+        return MaterialPageRoute(builder: (_) => SplashScreen());
       case '/phoneNumberRegister':
         return MaterialPageRoute(builder: (_) => PhoneNumberRegister());
       /*     case '/otpPage':
@@ -41,16 +42,19 @@ class Router {
         return MaterialPageRoute(builder: (_) => CardType());
       case '/paymentPage':
         return MaterialPageRoute(builder: (_) => PaymentPage());
-      case '/splashScreen':
-        final splash =  new SplashScreen();
+      case '/home':
+        final splash = new HomePage();
         return MaterialPageRoute(builder: (_) => splash);
       case '/profilePage':
-        final profile =  new ProfilePage();
+        final profile = new ProfilePage();
         return MaterialPageRoute(builder: (_) => profile);
       case '/favoritePage':
         return MaterialPageRoute(builder: (_) => FavoriteList());
       case '/mainHome':
-        final home =  MainHome();
+        final home = MainHome();
+        return MaterialPageRoute(builder: (_) => home);
+      case '/curvedDesignPage':
+        final home = CurvedPage();
         return MaterialPageRoute(builder: (_) => home);
       case '/notification':
         final page = NotificationPage();
@@ -64,8 +68,7 @@ class Router {
       case '/itemList':
         Category data = settings.arguments;
         final itemsListRoute = ItemsList(argument: data);
-        return MaterialPageRoute(
-            builder: (context) => itemsListRoute);
+        return MaterialPageRoute(builder: (context) => itemsListRoute);
 
       default:
         return MaterialPageRoute(

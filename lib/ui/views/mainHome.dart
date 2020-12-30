@@ -86,8 +86,8 @@ class _MainHomeState extends State<MainHome> with TickerProviderStateMixin {
               ),
               fullscreenDialog: true,
             ));
-        await _auth.updateAddressInFirestore(
-            addressModel);
+        /*await _auth.updateAddressInFirestore(
+            addressModel);*/
       }
     }
   }

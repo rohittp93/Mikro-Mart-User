@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/helpers/great_circle_distance_base.dart';
+import 'package:userapp/core/models/cart_validation_response.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
@@ -67,11 +68,13 @@ class _ShoppingCartState extends State<ShoppingCart> {
                             children: <Widget>[
                               Text(
                                 'Total: ',
-                                style: style.cardTitleStyle.copyWith(fontSize: 18),
+                                style:
+                                    style.cardTitleStyle.copyWith(fontSize: 18),
                               ),
                               Text(
                                 _calculateTotalPrice(_cartItems),
-                                style: style.cardTitleStyle.copyWith(fontSize: 20,
+                                style: style.cardTitleStyle.copyWith(
+                                    fontSize: 20,
                                     color: MikroMartColors.colorPrimary),
                               ),
                               Text(
@@ -110,12 +113,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                   ),
                                   _orderingState == PROCESSING_ORDER
                                       ? Flexible(
-                                        child: Container(
-                                            padding:
-                                                EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                            child:
-                                                SpinKitCircle(color: Colors.white)),
-                                      )
+                                          child: Container(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  10, 0, 0, 0),
+                                              child: SpinKitCircle(
+                                                  color: Colors.white)),
+                                        )
                                       : Container(),
                                 ],
                               ),
@@ -304,12 +307,13 @@ class _ShoppingCartState extends State<ShoppingCart> {
                         SizedBox(
                           height: 8,
                         ),
-                        Text('\₹ ' + _cartItems[index].cartPrice.toStringAsFixed(2),
-                              style: TextStyle(
-                                  color: MikroMartColors.textGray,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600)),
-
+                        Text(
+                            '\₹ ' +
+                                _cartItems[index].cartPrice.toStringAsFixed(2),
+                            style: TextStyle(
+                                color: MikroMartColors.textGray,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -338,7 +342,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
                             ),
                             onPressed: () {
                               if (_cartItems[index].cartQuantity != 0) {
-                                int quantity = _cartItems[index].cartQuantity - 1;
+                                int quantity =
+                                    _cartItems[index].cartQuantity - 1;
 
                                 if (quantity == 0) {
                                   setState(() {
@@ -381,7 +386,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
                               onPressed: () {
                                 if (validateCartCount(_cartItems[index],
                                     _cartItems[index].cartQuantity)) {
-                                  int quantity = _cartItems[index].cartQuantity + 1;
+                                  int quantity =
+                                      _cartItems[index].cartQuantity + 1;
                                   updateCartItemQuantity(
                                       _cartItems[index], quantity, db);
                                 } else {
@@ -470,8 +476,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
       });
   }
 
-  showBottomSheet(String error, Color color, Function action,
-      bool dismissable, bool showCancel) {
+  showBottomSheet(String error, Color color, Function action, bool dismissable,
+      bool showCancel) {
     _addressNameFlushBar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
       flushbarStyle: FlushbarStyle.GROUNDED,
@@ -487,24 +493,34 @@ class _ShoppingCartState extends State<ShoppingCart> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-              child: !dismissable ? RichText(
-                text: new TextSpan(
-                  // Note: Styles for TextSpans must be explicitly defined.
-                  // Child text spans will inherit styles from parent
-                  style: new TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.white,
-                  ),
-                  children: <TextSpan>[
-                    new TextSpan(text: 'Your order total is \₹ ',),
-                    new TextSpan(text: '${_totalAmount}\n', style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    new TextSpan(text: 'Once confirmed, we will process your order and deliver within 3 to 4 hours',),
-                  ],
-                ),
-              ): Text(
-                error,
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              child: !dismissable
+                  ? RichText(
+                      text: new TextSpan(
+                        // Note: Styles for TextSpans must be explicitly defined.
+                        // Child text spans will inherit styles from parent
+                        style: new TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                        ),
+                        children: <TextSpan>[
+                          new TextSpan(
+                            text: 'Your order total is \₹ ',
+                          ),
+                          new TextSpan(
+                              text: '${_totalAmount}\n',
+                              style: new TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18)),
+                          new TextSpan(
+                            text:
+                                'Once confirmed, we will process your order and deliver within 3 to 4 hours',
+                          ),
+                        ],
+                      ),
+                    )
+                  : Text(
+                      error,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
             ),
             !dismissable ? textFormField() : Container(),
             Container(
@@ -555,7 +571,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
       ),
       boxShadows: [
         BoxShadow(
-            color: MikroMartColors.subtitleGray, offset: Offset(0.0, 0.2), blurRadius: 5.0)
+            color: MikroMartColors.subtitleGray,
+            offset: Offset(0.0, 0.2),
+            blurRadius: 5.0)
       ],
       borderRadius: 8.0,
       backgroundGradient:
@@ -568,10 +586,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
     )..show(context);
   }
 
-
   textFormField() {
     return Container(
-      padding: EdgeInsets.only(top: 20,left: 8.0, right: 8.0),
+      padding: EdgeInsets.only(top: 20, left: 8.0, right: 8.0),
       child: Column(
         children: <Widget>[
           Text(
@@ -598,7 +615,6 @@ class _ShoppingCartState extends State<ShoppingCart> {
       ),
     );
   }
-
 
   bool validateCartCount(CartItem cartItem, int itemQuantity) {
     return (itemQuantity + 1) <= cartItem.maxQuantity;
@@ -649,35 +665,105 @@ class _ShoppingCartState extends State<ShoppingCart> {
         _orderingState = PROCESSING_ORDER;
       });
 
-      String cartItemsValid = await _auth.validateCartItems(_cartItems);
+      CartValidationResponse cartValidationResponse =
+          await _auth.validateCartItems(_cartItems, db);
 
-      if (cartItemsValid == 'cart_valid') {
-        print('CART ITEMS ARE VALID. PROCEED WITH CHECKOUT');
-        String moreItemsStr = '';
-        if (_textEditingController.text.length > 0) {
-          moreItemsStr = _textEditingController.text;
-        }
-        String result = await _auth.placeOrder(_cartItems, _totalAmount, db, moreItemsStr);
-        if (result != null) {
-          setState(() {
-            _orderId = result;
-            db.deleteAllCartItems();
-            _orderingState = ORDER_PLACED_SUCCESSFULLY;
-          });
-        } else {
+      switch (cartValidationResponse.status) {
+        case CartResponseEnum.OUT_OF_STOCK:
+          showBottomSheet(
+              '${cartValidationResponse.currentItem.item_name} is out of stock',
+              MikroMartColors.colorPrimary,
+              null,
+              true,
+              false);
+
           setState(() {
             _orderingState = ORDER_FAILED;
           });
-          showBottomSheet('Something went wrong. Please try again after logging out & logging in',
-              MikroMartColors.colorPrimary, null, true, false);
-        }
-      } else {
-        print('CART ITEMS ARE INVALID. CANNOT PROCEED');
-        showBottomSheet(
-            cartItemsValid, MikroMartColors.colorPrimary, null, true, false);
-        setState(() {
-          _orderingState = ORDER_FAILED;
-        });
+          break;
+
+        case CartResponseEnum.PRICE_UPDATED:
+          showBottomSheet(
+              'Price of ${cartValidationResponse.currentItem.item_name} is updated and hence your cart total has changed. Please confirm before continuing',
+              MikroMartColors.colorPrimary,
+              null,
+              true,
+              false);
+
+          setState(() {
+            _orderingState = ORDER_FAILED;
+          });
+          break;
+
+        case CartResponseEnum.CART_QUANTITY_MORE:
+          var availableCount = 0;
+          for (var i = 0;
+              i < cartValidationResponse.currentItem.item_quantity_list.length;
+              i++) {
+            for (var j = 0; j < _cartItems.length; j++) {
+              if (cartValidationResponse
+                      .currentItem.item_quantity_list[i].item_quantity ==
+                  _cartItems[j].itemQuantity) {
+                availableCount = cartValidationResponse
+                    .currentItem.item_quantity_list[i].item_stock_quantity;
+              }
+            }
+          }
+          showBottomSheet(
+              'There are currently on ${availableCount} ${cartValidationResponse.currentItem.item_name}s in stock',
+              MikroMartColors.colorPrimary,
+              null,
+              true,
+              false);
+
+          setState(() {
+            _orderingState = ORDER_FAILED;
+          });
+          break;
+
+        case CartResponseEnum.UNAVAILABLE:
+
+          showBottomSheet(
+              '${cartValidationResponse.currentItem.item_name} is currently unavailable. Please check after some time',
+              MikroMartColors.colorPrimary,
+              null,
+              true,
+              false);
+
+
+          setState(() {
+            _orderingState = ORDER_FAILED;
+          });
+          break;
+
+        case CartResponseEnum.VALID:
+          String moreItemsStr = '';
+
+          if (_textEditingController.text.length > 0) {
+            moreItemsStr = _textEditingController.text;
+          }
+
+          String result = await _auth.placeOrder(
+              _cartItems, _totalAmount, db, moreItemsStr);
+          if (result != null) {
+            setState(() {
+              _orderId = result;
+              db.deleteAllCartItems();
+              _orderingState = ORDER_PLACED_SUCCESSFULLY;
+            });
+          } else {
+            setState(() {
+              _orderingState = ORDER_FAILED;
+            });
+            showBottomSheet(
+                'Something went wrong. Please try again after logging out & logging in',
+                MikroMartColors.colorPrimary,
+                null,
+                true,
+                false);
+          }
+
+          break;
       }
     }
   }

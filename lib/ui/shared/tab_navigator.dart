@@ -5,7 +5,6 @@ import 'package:userapp/ui/views/searchScreen.dart';
 import 'package:userapp/ui/views/shoppingCart.dart';
 
 class TabNavigatorRoutes {
-  static const String root = '/';
   static const String detail = '/detail';
 }
 

@@ -77,19 +77,13 @@ class _LayoutStartsState extends State<LayoutStarts> {
   Widget build(BuildContext context) {
     AppDatabase db = Provider.of<AppDatabase>(context);
     _cartItems = Provider.of<List<CartItem>>(context);
-    print('IQTAG: Cart Rebuilt displayableItemQuantity ' + displayableItemQuantity.item_quantity);
-    /*ItemQuantity displayableItemQuantity = new ItemQuantity();
-
-    for (var i = 0; i < widget.item.item_quantity_list.length; i++) {
-      if (widget.item.item_quantity_list[i].display_quantity) {
-        displayableItemQuantity = widget.item.item_quantity_list[i];
-        break;
-      }
-    }*/
+    print('IQTAG: Cart Rebuilt displayableItemQuantity ' +
+        displayableItemQuantity.item_quantity);
 
     if (_cartItems != null && _cartItems.length > 0) {
       int position = _cartItems.indexWhere((cartItem) {
-        return (cartItem.itemId == widget.item.id) && (displayableItemQuantity.item_quantity == cartItem.itemQuantity);
+        return (cartItem.itemId == widget.item.id) &&
+            (displayableItemQuantity.item_quantity == cartItem.itemQuantity);
       });
 
       if (position >= 0) {
@@ -394,35 +388,7 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Flexible(
-                child: /*ButtonTheme(
-                  minWidth: 40,
-                  height: 40,
-                  child: OutlineButton(
-                    child: new Icon(
-                      Icons.remove,
-                      color: Colors.white,
-                    ),
-                    borderSide: BorderSide(
-                      color: Colors.white, //Color of the border
-                      style: BorderStyle.solid, //Style of the border
-                      width: 0.8, //width of the border
-                    ),
-                    onPressed: () {
-                      if (widget.itemQuantity != 0) {
-                        int quantity = widget.itemQuantity - 1;
-                        widget.itemQuantityChanged(quantity);
-
-                        if (quantity == 0) {
-                          deleteCartItem(widget.cartItem, db);
-                        } else {
-                          updateCartItemQuantity(widget.cartItem, quantity, db);
-                        }
-                      } else {}
-                    },
-                  ),
-                ),*/
-
-                Stack(
+                child: Stack(
                   children: <Widget>[
                     InkWell(
                       child: Container(
@@ -449,7 +415,8 @@ class _ItemQuantityWidgetState extends State<ItemQuantityWidget> {
                           if (quantity == 0) {
                             deleteCartItem(widget.cartItem, db);
                           } else {
-                            updateCartItemQuantity(widget.cartItem, quantity, db);
+                            updateCartItemQuantity(
+                                widget.cartItem, quantity, db);
                           }
                         } else {}
                       },
@@ -694,43 +661,6 @@ class DishDetails extends StatelessWidget {
       ],
     ));
   }
-
-/*_carTitle(context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        RichText(
-          text: TextSpan(
-              style: style.headerStyle.copyWith(
-                fontSize: 62,
-              ),
-              children: [
-                TextSpan(text: data.item_name),
-                TextSpan(text: "\n"),
-                //TextSpan(text: data['cuisine'], style: style.subcardTitleStyle),
-              ]),
-        ),
-        SizedBox(height: 10),
-        RichText(
-          text: TextSpan(style: TextStyle(fontSize: 16), children: [
-            TextSpan(
-                text: data.item_price.toString(),
-                style: TextStyle(
-                    color: MikroMartColors.colorPrimary,
-                    fontSize: 48,
-                    fontWeight: FontWeight.w900)),
-            TextSpan(
-              text: " \₹",
-              style: TextStyle(
-                  color: MikroMartColors.colorPrimary,
-                  fontSize: 48,
-                  fontWeight: FontWeight.w900),
-            )
-          ]),
-        ),
-      ],
-    );
-  }*/
 }
 
 class CarCarousel extends StatefulWidget {
@@ -761,20 +691,6 @@ class _CarCarouselState extends State<CarCarousel> {
 
   @override
   void initState() {
-    //imgList = widget.data["imgList"];
-    /*childe = _map<Widget>(imgList, (index, String assetName) {
-      return Container(
-          decoration: BoxDecoration(),
-          child: Hero(
-            tag: widget.dish['id'],
-            child: Image.asset(
-              assetName,
-              fit: BoxFit.cover,
-              color: Colors.lightBlueAccent.withOpacity(0.2),
-              colorBlendMode: BlendMode.hardLight,
-            ),
-          ));
-    }).toList();*/
     super.initState();
   }
 
@@ -865,7 +781,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
         onTap: () {
           controller.isCompleted ? reverseAnimation() : forwardAnimation();
         },
+       /* onPanUpdate: (pan) {
+          print('PanUpdated called');
+        },*/
         onVerticalDragEnd: (DragEndDetails dragEndDetails) {
+          print('DragEnd called');
           //upward drag
           if (dragEndDetails.primaryVelocity < 0.0 && !controller.isCompleted) {
             forwardAnimation();
@@ -877,11 +797,13 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>
             return;
           }
         },
-        child: SheetContainer(
-            data: widget.data,
-            displayableItem: widget.displayableItem,
-            itemQuantityChanged: widget.onItemQuantityChanged,
-            dropDownItems: widget.dropDownItems),
+        child: SingleChildScrollView(
+          child: SheetContainer(
+              data: widget.data,
+              displayableItem: widget.displayableItem,
+              itemQuantityChanged: widget.onItemQuantityChanged,
+              dropDownItems: widget.dropDownItems),
+        ),
       ),
     );
   }

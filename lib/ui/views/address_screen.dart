@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location_permissions/location_permissions.dart';
 import 'package:userapp/core/helpers/great_circle_distance_base.dart';
 import 'package:userapp/core/models/address_model.dart';
+import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
 
@@ -24,6 +25,8 @@ class _AddressScreenState extends State<AddressScreen> {
   Set<Marker> _markers = HashSet<Marker>();
   Set<Circle> _circles = HashSet<Circle>();
   var _mapController;
+  final AuthService _auth = AuthService();
+
   Flushbar<List<String>> _addressNameFlushBar;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Form _userInputForm;
@@ -86,8 +89,8 @@ class _AddressScreenState extends State<AddressScreen> {
 
   getCurrentLocationAndDrawMarker() async {
     try {
-      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-          .timeout(new Duration(seconds: 10));
+      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+          .timeout(new Duration(seconds: 15));
 
       print('Current location ${position.latitude}');
       setState(() {
@@ -99,7 +102,7 @@ class _AddressScreenState extends State<AddressScreen> {
       print('Error: ${e.toString()}');
 
       showSnackBar(
-          'Could not fetch location. Please turn on your device location');
+          'Could not fetch location. Please toggle your device location & try again');
 
       setState(() {
         _isFetchingCurrentLocation = false;
@@ -110,8 +113,6 @@ class _AddressScreenState extends State<AddressScreen> {
       });
       displayMarker();
     }
-
-
   }
 
   displayMarker() async {
@@ -238,7 +239,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   color: Colors.white,
                   textColor: MikroMartColors.purpleEnd,
                   padding: EdgeInsets.all(6),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_textEditingController.text.length > 0) {
                       _addressNameFlushBar
                           .dismiss([_textEditingController.text]);
@@ -247,6 +248,9 @@ class _AddressScreenState extends State<AddressScreen> {
                       AddressModel addressModel = AddressModel(
                           location: _locationAddress,
                           appartmentName: _textEditingController.text);
+
+                      await _auth.updateAddressInFirestore(
+                          addressModel);
 
                       Navigator.pop(context, addressModel);
                     }

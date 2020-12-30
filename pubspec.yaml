@@ -11,7 +11,7 @@ description: Mikro mart user application
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+16
+version: 1.0.1+23
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -44,14 +44,15 @@ dependencies:
   flutter_spinkit:
   flutter_staggered_grid_view:
   location_permissions: ^3.0.0
+  launch_review: ^1.0.1
 
   flushbar: 1.10.4
-
+  package_info: 0.4.3
 
   # Address
   google_maps_flutter: 0.5.28+1
 
-  geolocator: 5.3.2+2
+  geolocator: ^5.3.2+2
 
   # Moor
   moor_flutter:

@@ -10,11 +10,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/banner.dart';
+import 'package:userapp/core/models/cart_validation_response.dart';
 import 'package:userapp/core/models/categories.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/orders.dart';
 import 'package:userapp/core/models/user.dart';
+import 'package:userapp/core/models/version_check.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/database.dart';
@@ -86,8 +88,12 @@ class AuthService {
 
 // register with email & pw
   Future registerWithEmailAndPassword(
-      BuildContext context, String name, String email,
-      String password, AddressModel userAddress, AppDatabase db) async {
+      BuildContext context,
+      String name,
+      String email,
+      String password,
+      AddressModel userAddress,
+      AppDatabase db) async {
     try {
       AuthResult result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -146,11 +152,12 @@ class AuthService {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-              child: Text(message,
-                style: TextStyle(color: Colors.white, fontSize: 16),
-            )
-            ),],
+                padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+                child: Text(
+                  message,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                )),
+          ],
         ),
       ),
       boxShadows: [
@@ -175,7 +182,8 @@ class AuthService {
 
     GeoPoint addressLocation = new GeoPoint(
         userAddress.location.latitude, userAddress.location.longitude);
-    await DatabaseService(uid: uId)
+    /*await*/
+    DatabaseService(uid: uId)
         .updateUserAddress(addressLocation, userAddress.appartmentName);
 
     await updateUserAddressInSharedPrefs(userAddress);
@@ -191,7 +199,7 @@ class AuthService {
       await prefs.setDouble(PREF_USER_LNG, addressModel.location.longitude);
     }
     if (addressModel.appartmentName != null) {
-      await  prefs.setString(PREF_USER_HOUSE_NAME, addressModel.appartmentName);
+      await prefs.setString(PREF_USER_HOUSE_NAME, addressModel.appartmentName);
     }
   }
 
@@ -204,7 +212,7 @@ class AuthService {
     return new GeoPoint(lat, lng);
   }
 
-  Future<String> getUserBuildingName()  async {
+  Future<String> getUserBuildingName() async {
     final prefs = await SharedPreferences.getInstance();
 
     String houseName = prefs.getString(PREF_USER_HOUSE_NAME);
@@ -223,7 +231,6 @@ class AuthService {
   }
 
   final _codeController = TextEditingController();
-
 
   Future signInWithPhone(
       String phone, BuildContext context, AppDatabase db) async {
@@ -278,7 +285,7 @@ class AuthService {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Flexible(
-                                flex:2,
+                                flex: 2,
                                 child: Text(
                                   _descriptionText,
                                   style: TextStyle(
@@ -290,22 +297,23 @@ class AuthService {
                                 ),
                               ),
                               Flexible(
-                                flex:1,
+                                flex: 1,
                                 child: Padding(
-                                  padding:
-                                  const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16.0, 0, 16.0, 0),
                                   child: Container(
                                     width: 14,
                                     height: 14,
                                     child: _isLoading
                                         ? CircularProgressIndicator(
-                                      backgroundColor:
-                                      MikroMartColors.white,
-                                      valueColor:
-                                      new AlwaysStoppedAnimation<Color>(
-                                          MikroMartColors.purple),
-                                      strokeWidth: 1,
-                                    )
+                                            backgroundColor:
+                                                MikroMartColors.white,
+                                            valueColor:
+                                                new AlwaysStoppedAnimation<
+                                                        Color>(
+                                                    MikroMartColors.purple),
+                                            strokeWidth: 1,
+                                          )
                                         : Container(),
                                   ),
                                 ),
@@ -359,7 +367,7 @@ class AuthService {
         codeAutoRetrievalTimeout: null);
   }
 
-  validateCartItems(List<CartItem> cartItems) async {
+  /*validateCartItems(List<CartItem> cartItems) async {
     String cartMessage = CART_VALID;
 
     for (CartItem cartItem in cartItems) {
@@ -372,23 +380,36 @@ class AuthService {
       if (datasnapshot.exists) {
         Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
 
-        for (var i = 0; i < item.item_quantity_list.length; i++) {
-          for (var j = 0; j < cartItems.length; j++) {
-            if (item.item_quantity_list[i].item_quantity ==
-                cartItems[j].itemQuantity) {
-              if (item.item_quantity_list[i].item_stock_quantity == 0) {
-                cartMessage = '${item.item_name} is out of stock';
-                break;
-              } else if (cartItem.cartQuantity <=
-                  item.item_quantity_list[i].item_stock_quantity) {
-                cartMessage = CART_VALID;
-              } else {
-                cartMessage =
-                    'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
-                break;
+        if (item.show_item) {
+          for (var i = 0; i < item.item_quantity_list.length; i++) {
+            for (var j = 0; j < cartItems.length; j++) {
+              if (item.item_quantity_list[i].item_quantity ==
+                  cartItems[j].itemQuantity) {
+                if (item.item_quantity_list[i].item_stock_quantity == 0) {
+                  cartMessage = '${item.item_name} is out of stock';
+                  break;
+                } else if (cartItem.cartQuantity <=
+                    item.item_quantity_list[i].item_stock_quantity) {
+                  if (cartItem.cartPrice ==
+                      item.item_quantity_list[i].item_price) {
+                    cartMessage = CART_VALID;
+                  } else {
+                    cartMessage =
+                    'Price of ${item.item_name} is updated and hence your cart total has changed. Please confirm before continuing';
+                    break;
+                  }
+                } else {
+                  cartMessage =
+                      'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
+                  break;
+                }
               }
             }
           }
+        } else {
+          cartMessage =
+              '${item.item_name} is currently unavailable. Please check after some time';
+          break;
         }
       } else {
         cartMessage = '${cartItem.itemName} is no longer available';
@@ -397,6 +418,120 @@ class AuthService {
     }
 
     return cartMessage;
+  }*/
+
+  validateCartItems(List<CartItem> cartItems, AppDatabase db) async {
+    //String cartMessage = CART_VALID;
+    CartValidationResponse response = CartValidationResponse(
+        status: CartResponseEnum.UNAVAILABLE,
+        cartItem: null,
+        currentItem: null);
+    ;
+
+    for (CartItem cartItem in cartItems) {
+      DocumentReference snapshot = await Firestore.instance
+          .collection('items')
+          .document(cartItem.itemId);
+
+      DocumentSnapshot datasnapshot = await snapshot.get();
+
+      if (datasnapshot.exists) {
+        Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
+
+        if (item.show_item) {
+          for (var i = 0; i < item.item_quantity_list.length; i++) {
+            for (var j = 0; j < cartItems.length; j++) {
+              if (item.item_quantity_list[i].item_quantity ==
+                  cartItems[j].itemQuantity) {
+                //item.item_quantity_list[i].item_price = 56;
+
+                if (item.item_quantity_list[i].item_stock_quantity == 0) {
+                  //cartMessage = '${item.item_name} is out of stock';
+                  response = CartValidationResponse(
+                      status: CartResponseEnum.OUT_OF_STOCK,
+                      cartItem: cartItem,
+                      currentItem: item);
+                  break;
+                } else if (cartItem.cartQuantity <=
+                    item.item_quantity_list[i].item_stock_quantity) {
+                  if (cartItem.cartPrice ==
+                      item.item_quantity_list[i].item_price) {
+                    //cartMessage = CART_VALID;
+                    response = CartValidationResponse(
+                        status: CartResponseEnum.VALID,
+                        cartItem: cartItem,
+                        currentItem: item);
+                  } else {
+                    //cartMessage =
+                    //    'Price of ${item.item_name} is updated and hence your cart total has changed. Please confirm before continuing';
+
+                    final newCartItem = cartItem.copyWith(
+                        itemPrice: item.item_quantity_list[i].item_price,
+                        cartPrice: (item.item_quantity_list[i].item_price) *
+                            cartItem.cartQuantity);
+
+                    await updateCartItem(newCartItem, db);
+
+                    response = CartValidationResponse(
+                        status: CartResponseEnum.PRICE_UPDATED,
+                        cartItem: cartItem,
+                        currentItem: item);
+
+                    break;
+                  }
+                } else {
+                  //cartMessage =
+                  //    'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
+
+                  response = CartValidationResponse(
+                      status: CartResponseEnum.OUT_OF_STOCK,
+                      cartItem: cartItem,
+                      currentItem: item);
+
+                  break;
+                }
+              }
+            }
+          }
+
+          //Check other item to see if price was updated
+          if (response.status == CartResponseEnum.PRICE_UPDATED) {
+            for (var i = 0; i < item.item_quantity_list.length; i++) {
+              for (var j = 0; j < cartItems.length; j++) {
+                if (item.item_quantity_list[i].item_quantity ==
+                    cartItems[j].itemQuantity) {
+                  if (cartItem.cartPrice !=
+                      item.item_quantity_list[i].item_price) {
+                    final newCartItem = cartItem.copyWith(
+                        itemPrice: item.item_quantity_list[i].item_price,
+                        cartPrice: (item.item_quantity_list[i].item_price) *
+                            cartItem.cartQuantity);
+
+                    await updateCartItem(newCartItem, db);
+                  }
+                }
+              }
+            }
+          }
+
+        } else {
+          //cartMessage =
+          //    '${item.item_name} is currently unavailable. Please check after some time';
+          response = CartValidationResponse(
+              status: CartResponseEnum.UNAVAILABLE,
+              cartItem: cartItem,
+              currentItem: item);
+          break;
+        }
+
+
+      } else {
+        //cartMessage = '${cartItem.itemName} is no longer available';
+        break;
+      }
+    }
+
+    return response;
   }
 
   Future<String> placeOrder(List<CartItem> cartItems, double totalAmount,
@@ -453,25 +588,25 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
 
     if (id != null) {
-      await  prefs.setString(PREF_USER_ID, id);
+      await prefs.setString(PREF_USER_ID, id);
     }
     if (name != null) {
-      await  prefs.setString(PREF_USER_NAME, name);
+      await prefs.setString(PREF_USER_NAME, name);
     }
     if (email != null) {
-      await  prefs.setString(PREF_USER_EMAIL, email);
+      await prefs.setString(PREF_USER_EMAIL, email);
     }
     if (phone != null) {
-      await  prefs.setString(PREF_USER_PHONE, phone);
+      await prefs.setString(PREF_USER_PHONE, phone);
     }
     if (lat != null) {
-      await  prefs.setDouble(PREF_USER_LAT, lat);
+      await prefs.setDouble(PREF_USER_LAT, lat);
     }
     if (lng != null) {
-      await  prefs.setDouble(PREF_USER_LNG, lng);
+      await prefs.setDouble(PREF_USER_LNG, lng);
     }
     if (house_name != null) {
-      await  prefs.setString(PREF_USER_HOUSE_NAME, house_name);
+      await prefs.setString(PREF_USER_HOUSE_NAME, house_name);
     }
   }
 
@@ -503,7 +638,7 @@ class AuthService {
       if (authResult != null) {
         String fcmToken = await _fcm.getToken();
 
-        await  prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
+        await prefs.setBool(PREF_PHONE_AUTHENTICATED, true);
         await DatabaseService(uid: user.uid).updateUserData(
             prefs.getString(PREF_USER_NAME),
             user.email,
@@ -621,7 +756,7 @@ class AuthService {
         String fcmToken = await _fcm.getToken();
         await DatabaseService(uid: user.uid).updateUserData(user.email,
             user.email, false, '', user.uid, fcmToken, null, null, true);
-        await  prefs.setBool(PREF_IS_SIGNED_IN, true);
+        await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
         saveUserCreds(
             id: user.uid,
@@ -712,6 +847,21 @@ getItemOffers(ItemNotifier notifier) async {
   //notifier.offerList = [];
 }
 
+checkAppVersion() async {
+  DocumentSnapshot versionDatasnapshot = await Firestore.instance
+      .collection('app_details')
+      .document('VERSION')
+      .get();
+
+  if (versionDatasnapshot.exists) {
+    Version version = Version.fromMap(versionDatasnapshot.data);
+
+    return version;
+  } else {
+    return null;
+  }
+}
+
 Future<List<BannerImage>> getBanners() async {
   QuerySnapshot snapshot =
       await Firestore.instance.collection('banners').getDocuments();
@@ -740,11 +890,6 @@ getCategories(CategoriesNotifier notifier) async {
   _categories.removeWhere((store) => store.category_name == 'OFFERS');
 
   _categories.removeWhere((store) => store.outlet_open == false);
-
-
-
-
-
 
   notifier.categoryList = _categories;
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import '../mainHome.dart';
+
 
 class FadeBox extends StatefulWidget {
   final Color primaryColor ;

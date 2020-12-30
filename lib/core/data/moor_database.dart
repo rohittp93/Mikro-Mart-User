@@ -3,22 +3,6 @@ import 'package:moor_flutter/moor_flutter.dart';
 part 'moor_database.g.dart';
 
 @DataClassName('CartItem')
-/*
-class Users extends Table {
-  TextColumn get uid => text()();
-
-  TextColumn get name => text()();
-
-  TextColumn get email => text()();
-
-  TextColumn get phone => text()();
-
-  BoolColumn get phoneValidated => boolean()();
-
-  @override
-  Set<Column> get primaryKey => {uid};
-}
-*/
 
 class CartItems extends Table {
   TextColumn get itemId => text()();

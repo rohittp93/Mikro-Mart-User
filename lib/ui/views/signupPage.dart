@@ -10,13 +10,16 @@ import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 import 'package:userapp/ui/views/address_screen.dart';
 
+import 'curvedpainter.dart';
+
 class SignUpPage extends StatefulWidget {
-  final VoidCallback onLoginClicked;
+  final VoidCallback onLoginClicked, onBackClicked;
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
 
-  const SignUpPage({Key key, this.onLoginClicked}) : super(key: key);
+  const SignUpPage({Key key, this.onLoginClicked, this.onBackClicked})
+      : super(key: key);
 }
 
 class _SignUpPageState extends State<SignUpPage> {
@@ -40,430 +43,363 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     //final theme = Provider.of<ThemeChanger>(context);
     AppDatabase db = Provider.of<AppDatabase>(context);
-    return Scaffold(
-      key: _scaffoldkey,
-      resizeToAvoidBottomPadding: false,
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        color: Colors.transparent,
-        child: SingleChildScrollView(
-            child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              child: Image.asset(
-                "assets/logo.png",
-                width: MediaQuery.of(context).size.width * 0.6,
-                height: MediaQuery.of(context).size.width * 0.6,
-              ),
-            ),
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: Text(
-                    "Name",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: MikroMartColors.colorPrimary,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                      color: MikroMartColors.colorPrimary,
-                      width: 0.5,
-                      style: BorderStyle.solid),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
+    return WillPopScope(
+      onWillPop: () {
+        widget.onBackClicked();
+        return Future.value(false);
+      },
+      child: Scaffold(
+        key: _scaffoldkey,
+        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomInset: false,
+        body: Container(
+          color: Colors.transparent,
+          child: SingleChildScrollView(
+              child: Column(
+            children: <Widget>[
+              Stack(
                 children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      obscureText: false,
-                      textAlign: TextAlign.left,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: (v) {
-                        FocusScope.of(context).requestFocus(emailFocus);
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Name',
-                        hintStyle:
-                            TextStyle(color: Theme.of(context).hintColor),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          name = val;
-                          isRegistrationFormValid = validateEmail(email) &&
-                              validatePassword(password) &&
-                              validateUserName(val);
-                        });
-                      },
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: CurvePainter(type: 1),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Divider(
-              height: MediaQuery.of(context).size.height * 0.03,
-              color: Colors.transparent,
-            ),
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: Text(
-                    "Email",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: MikroMartColors.colorPrimary,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                      color: MikroMartColors.colorPrimary,
-                      width: 0.5,
-                      style: BorderStyle.solid),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      obscureText: false,
-                      textInputAction: TextInputAction.next,
-                      focusNode: emailFocus,
-                      onSubmitted: (v) {
-                        FocusScope.of(context).requestFocus(passwordFocus);
-                      },
-                      textAlign: TextAlign.left,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Email',
-                        hintStyle:
-                            TextStyle(color: Theme.of(context).hintColor),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          email = val;
-
-                          isRegistrationFormValid = validateEmail(val) &&
-                              validatePassword(password) &&
-                              validateUserName(name);
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(
-              height: MediaQuery.of(context).size.height * 0.03,
-              color: Colors.transparent,
-            ),
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: Text(
-                    "Password",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: MikroMartColors.colorPrimary,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                      color: MikroMartColors.colorPrimary,
-                      width: 0.5,
-                      style: BorderStyle.solid),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      obscureText: true,
-                      focusNode: passwordFocus,
-                      textAlign: TextAlign.left,
-                      textInputAction: TextInputAction.next,
-                      onSubmitted: (v) {
-                        FocusScope.of(context).requestFocus(confirmForcus);
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '*********',
-                        hintStyle:
-                            TextStyle(color: Theme.of(context).hintColor),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          password = val;
-
-                          isRegistrationFormValid = validateEmail(email) &&
-                              validatePassword(val) &&
-                              validateUserName(name);
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(
-              height: MediaQuery.of(context).size.height * 0.03,
-              color: Colors.transparent,
-            ),
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: Text(
-                    "Confirm Password",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: MikroMartColors.colorPrimary,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                      color: MikroMartColors.colorPrimary,
-                      width: 0.5,
-                      style: BorderStyle.solid),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      obscureText: true,
-                      textAlign: TextAlign.left,
-                      focusNode: confirmForcus,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '*********',
-                        hintStyle:
-                            TextStyle(color: Theme.of(context).hintColor),
-                      ),
-                      onChanged: (val) {
-                        setState(() => confirmPassword = val);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(
-              height: MediaQuery.of(context).size.height * 0.03,
-              color: Colors.transparent,
-            ),
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: Text(
-                    "Address",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: MikroMartColors.colorPrimary,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                      color: MikroMartColors.colorPrimary,
-                      width: 0.5,
-                      style: BorderStyle.solid),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                      child: GestureDetector(
-                    onTap: () async {
-                      //AddressModel result = await Navigator.pushNamed(context,'/addressScreen');
-
-                      var result = await Navigator.push(
-                          context,
-                          new MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                new AddressScreen(
-                              isDismissable: true,
-                            ),
-                            fullscreenDialog: true,
-                          ));
-
-                      setState(() {
-                        _userAddress = result;
-                      });
-                    },
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    width: MediaQuery.of(context).size.width,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0.0, 18.0, 0.0, 18.0),
-                      child: Text(
-                        _userAddress != null
-                            ? _userAddress.appartmentName
-                            : 'Address',
-                        style: _userAddress == null
-                            ? TextStyle(
-                                color: MikroMartColors.subtitleGray,
-                                fontSize: 16.0)
-                            : TextStyle(color: Colors.black, fontSize: 16.0),
+                      padding: const EdgeInsets.only(left: 24.0, bottom: 80),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Getting Started",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: MikroMartColors.white,
+                              fontSize: 26.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              "Create an account to continue!",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                color: MikroMartColors.white,
+                                fontSize: 15.0,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )),
+                  ),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: FlatButton(
-                    child: Text(
-                      "Already have an account?",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: MikroMartColors.colorPrimary,
-                        fontSize: 15.0,
-                      ),
-                      textAlign: TextAlign.end,
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 0.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: false,
+                  textAlign: TextAlign.left,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: (v) {
+                    FocusScope.of(context).requestFocus(emailFocus);
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Full Name',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      name = val;
+                      isRegistrationFormValid = validateEmail(email) &&
+                          validatePassword(password) &&
+                          validateUserName(val);
+                    });
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 0.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: false,
+                  textInputAction: TextInputAction.next,
+                  focusNode: emailFocus,
+                  onSubmitted: (v) {
+                    FocusScope.of(context).requestFocus(passwordFocus);
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'E-mail Address',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      email = val;
+
+                      isRegistrationFormValid = validateEmail(val) &&
+                          validatePassword(password) &&
+                          validateUserName(name);
+                    });
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 0.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: true,
+                  focusNode: passwordFocus,
+                  textAlign: TextAlign.left,
+                  textInputAction: TextInputAction.next,
+                  onSubmitted: (v) {
+                    FocusScope.of(context).requestFocus(confirmForcus);
+                  },
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Password',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      password = val;
+
+                      isRegistrationFormValid = validateEmail(email) &&
+                          validatePassword(val) &&
+                          validateUserName(name);
+                    });
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 0.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Confirm Password',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                  obscureText: true,
+                  textAlign: TextAlign.left,
+                  focusNode: confirmForcus,
+                  onChanged: (val) {
+                    setState(() => confirmPassword = val);
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  //AddressModel result = await Navigator.pushNamed(context,'/addressScreen');
+
+                  var result = await Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                        builder: (BuildContext context) => new AddressScreen(
+                          isDismissable: true,
+                        ),
+                        fullscreenDialog: true,
+                      ));
+
+                  setState(() {
+                    _userAddress = result;
+                  });
+                },
+                child: Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  margin:
+                      const EdgeInsets.only(left: 30.0, right: 30.0, top: 0.0),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: MikroMartColors.backgroundGray,
                     ),
-                    onPressed: () => widget.onLoginClicked(),
+                    borderRadius: BorderRadius.circular(100.0),
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _userAddress != null
+                          ? _userAddress.appartmentName
+                          : 'Address',
+                      style: _userAddress == null
+                          ? TextStyle(
+                              color: MikroMartColors.subtitleGray,
+                              fontSize: 16.0)
+                          : TextStyle(color: Colors.black, fontSize: 16.0),
+                    ),
                   ),
                 ),
-              ],
-            ),
-            Divider(
-              height: MediaQuery.of(context).size.height * 0.03,
-              color: Colors.transparent,
-            ),
-            Container(
-              margin: const EdgeInsets.only(
-                  left: 40.0, right: 40.0, top: 0.0, bottom: 160.0),
-              child: RevealProgressButton(
-                  keepStack: false,
-                  isValid: this.isRegistrationFormValid,
-                  intentWidgetRoute: this._intentWidget,
-                  buttonAnimationState: this._buttonAnimationState,
-                  buttonText: 'REGISTER',
-                  onPressed: () async {
-                    FocusScope.of(context).requestFocus(FocusNode());
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              Container(
+                margin: const EdgeInsets.only(
+                  left: 40.0,
+                  right: 40.0,
+                  top: 0.0,
+                ),
+                child: RevealProgressButton(
+                    keepStack: false,
+                    isValid: this.isRegistrationFormValid,
+                    intentWidgetRoute: this._intentWidget,
+                    buttonAnimationState: this._buttonAnimationState,
+                    buttonText: 'SIGN UP',
+                    onPressed: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
 
-                    if (this.name.length != 0) {
-                      if (this.email.length != 0 || validateEmail(this.email)) {
-                        if (this.password.length != 0 &&
-                            this.password.length > 6) {
-                          if (this.password == this.confirmPassword) {
-                            if (_userAddress != null &&
-                                _userAddress.location != null) {
-                              setState(() {
-                                _buttonAnimationState = 1;
-                              });
-
-                              dynamic result =
-                                  await _auth.registerWithEmailAndPassword(
-                                      context,
-                                      this.name,
-                                      this.email,
-                                      this.password,
-                                      this._userAddress,
-                                      db);
-
-                              if (result == null) {
-                               /* showSnackBar(
-                                    'Something has gone wrong. Please try again');*/
+                      if (this.name.length != 0) {
+                        if (this.email.length != 0 ||
+                            validateEmail(this.email)) {
+                          if (this.password.length != 0 &&
+                              this.password.length > 6) {
+                            if (this.password == this.confirmPassword) {
+                              if (_userAddress != null &&
+                                  _userAddress.location != null) {
                                 setState(() {
-                                  _buttonAnimationState = 0;
+                                  _buttonAnimationState = 1;
                                 });
+
+                                dynamic result =
+                                    await _auth.registerWithEmailAndPassword(
+                                        context,
+                                        this.name,
+                                        this.email,
+                                        this.password,
+                                        this._userAddress,
+                                        db);
+
+                                if (result == null) {
+                                  /* showSnackBar(
+                                      'Something has gone wrong. Please try again');*/
+                                  setState(() {
+                                    _buttonAnimationState = 0;
+                                  });
+                                } else {
+                                  //routeWhenUserUpdates(result);
+                                  setState(() {
+                                    _buttonAnimationState = 2;
+                                    _intentWidget = routeWhenUserUpdates(
+                                        dartz.cast<FirebaseUserModel>(result));
+                                  });
+                                }
                               } else {
-                                //routeWhenUserUpdates(result);
-                                setState(() {
-                                  _buttonAnimationState = 2;
-                                  _intentWidget = routeWhenUserUpdates(
-                                      dartz.cast<FirebaseUserModel>(result));
-                                });
+                                showSnackBar('Select addreess');
                               }
                             } else {
-                              showSnackBar('Select addreess');
+                              showSnackBar('Passwords don\'t match');
                             }
                           } else {
-                            showSnackBar('Passwords don\'t match');
+                            showSnackBar('Password must be 6+ characters long');
                           }
                         } else {
-                          showSnackBar('Password must be 6+ characters long');
+                          showSnackBar('Email ID is invalid');
                         }
                       } else {
-                        showSnackBar('Email ID is invalid');
+                        showSnackBar('Enter a valid name');
                       }
-                    } else {
-                      showSnackBar('Enter a valid name');
-                    }
-                  }),
-            )
-          ],
-        )),
+                    }),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0, top:8, bottom: 160),
+                    child: FlatButton(
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: MikroMartColors.subtitleGray,
+                              fontSize: 15.0,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                          Text(
+                            " SIGN IN",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: MikroMartColors.colorPrimary,
+                              fontSize: 15.0,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ],
+                      ),
+                      onPressed: () => widget.onLoginClicked(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          )),
+        ),
       ),
     );
   }

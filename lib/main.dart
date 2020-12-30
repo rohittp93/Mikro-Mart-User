@@ -62,7 +62,7 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         onGenerateRoute: Router.generateRoute,
-        initialRoute: '/splashScreen',
+        initialRoute: '/',
         theme: theme.getTheme(),
         title: 'Restaurant Template',
       ),

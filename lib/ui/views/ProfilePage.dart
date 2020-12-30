@@ -37,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return FutureBuilder(
       future: _auth.fetchUserDetails(),
       builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+        print('ProfileTAG Rebuilt');
+
         switch (snapshot.connectionState) {
           case ConnectionState.none:
             return new Text('Press button to start');
@@ -47,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
               return new Text('Error: ${snapshot.error}');
             else {
               User _user = snapshot.data;
+              print('ProfileTAG User: ${_user.houseName}');
               return Scaffold(
                 body: SafeArea(
                   child: SingleChildScrollView(
@@ -236,9 +239,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   fullscreenDialog: true,
                                                 ));
 
-                                            AddressModel addressModel = result;
+                                        /*    AddressModel addressModel = result;
                                             _auth.updateAddressInFirestore(
-                                                addressModel);
+                                                addressModel);*/
 
                                             setState(() {});
                                           },

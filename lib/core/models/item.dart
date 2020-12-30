@@ -11,6 +11,7 @@ class Item {
       outlet_id;
   int /*item_stock_quantity,*/ max_cart_threshold;
 
+  bool show_item;
   double order_item_price;
   String order_item_quantity;
 
@@ -26,6 +27,11 @@ class Item {
     //item_stock_quantity = data['item_stock_quantity'];
     max_cart_threshold = data['max_cart_threshold'];
     created_time = data['created_time'];
+    if (data['show_item'] != null) {
+      show_item = data['show_item'];
+    } else {
+      show_item = true;
+    }
     //item_quantity_list = data['item_quantity_list'];
 
     item_quantity_list =
@@ -51,6 +57,12 @@ class Item {
     // item_stock_quantity = data['item_stock_quantity'];
     max_cart_threshold = data['max_cart_threshold'];
 
+    if (data['show_item'] != null) {
+      show_item = data['show_item'];
+    } else {
+      show_item = true;
+    }
+
     item_quantity_list =
         List<ItemQuantity>.from(data["item_quantity_list"].map((item) {
       return new ItemQuantity.fromMap(item);
@@ -73,7 +85,7 @@ class Item {
     item_image_path = data['item_image'];
     order_item_price = data['item_price'];
 
-   /* var order_items  =
+    /* var order_items  =
     List<ItemQuantity>.from(data["order_items"].map((item) {
       return new ItemQuantity.fromOrderMap(item);
     }));*/

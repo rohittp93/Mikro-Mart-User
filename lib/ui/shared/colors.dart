@@ -23,4 +23,5 @@ class MikroMartColors {
   static const subtitleGray = Color(0xFF919191);
   static const white = Color(0xFFFFFFFF);
   static const appbarcolor = Color(0xFFE7E7E7);
+  static const backgroundGray = Color(0xFFEAEAEA);
 }

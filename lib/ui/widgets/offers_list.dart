@@ -1,7 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:launch_review/launch_review.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:userapp/core/models/item_quantity.dart';
+import 'package:userapp/core/models/version_check.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 import 'package:userapp/ui/shared/colors.dart';
@@ -16,24 +20,95 @@ class OffersList extends StatefulWidget {
 class _OffersListState extends State<OffersList> {
   int _current = 0;
   bool isLoading = true;
+  bool _isDialogShowing = false;
+
+  Dialog dialog;
 
   @override
   Future<void> initState() {
-    /*ctrl.addListener(() {
-      int next = ctrl.page.round();
-
-      if (currentPage != next) {
-        setState(() {
-          currentPage = next;
-        });
-      }
-    });*/
-
     ItemNotifier itemNotifier =
         Provider.of<ItemNotifier>(context, listen: false);
     fetchItems(itemNotifier);
 
+    checkVersion(context);
+
     super.initState();
+  }
+
+  checkVersion(BuildContext context) async {
+    Version version = await firebase.checkAppVersion();
+    if (version != null) {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String versionNumber = packageInfo.version;
+      print(
+          'app version : ${versionNumber} remote version : ${version.current_verion}');
+
+      if (versionNumber != version.current_verion) {
+        print(
+            'Not the same version. Show non dismissable bottomsheet and redirect to app on playstore');
+        showErrorBottomSheet(context,
+            'You are using an older version of Mikro Mart. Please update your app');
+      } else {
+        print('Version up to date');
+        if(_isDialogShowing && dialog!=null){
+          Navigator.pop(context);
+        }
+      }
+    }
+  }
+
+  showErrorBottomSheet(BuildContext context, String message) {
+    if (!_isDialogShowing) {
+      _isDialogShowing = true;
+
+      dialog = new Dialog(
+        child: new Container(
+          height: 170.0,
+          padding: const EdgeInsets.all(20.0),
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: MikroMartColors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal),
+                ),
+              ),
+              FlatButton(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                onPressed: () {
+                  //itemAdded();
+                  LaunchReview.launch();
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+                color: MikroMartColors.colorPrimary,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'UPDATE',
+                    style: TextStyle(
+                        color: MikroMartColors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => dialog);
+    }
   }
 
   Future<void> fetchItems(ItemNotifier itemNotifier) async {
@@ -48,6 +123,10 @@ class _OffersListState extends State<OffersList> {
   Widget build(BuildContext context) {
     ItemNotifier itemNotifier = Provider.of<ItemNotifier>(context);
     var screenWidth = MediaQuery.of(context).size.width;
+
+    if(_isDialogShowing){
+      checkVersion(context);
+    }
 
     return Container(
       child: Column(
