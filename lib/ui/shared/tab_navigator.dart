@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:userapp/ui/views/LandingPage.dart';
 import 'package:userapp/ui/views/ProfilePage.dart';
 import 'package:userapp/ui/views/searchScreen.dart';
-import 'package:userapp/ui/views/shoppingCart.dart';
+import 'package:userapp/ui/views/shopping_cart_new.dart';
 
 class TabNavigatorRoutes {
   static const String detail = '/detail';

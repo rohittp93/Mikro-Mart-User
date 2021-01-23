@@ -119,7 +119,7 @@ class ProgressButtonState extends State<ProgressButton>
     if (widget.buttonAnimationState == 0) {
       return Text(
         widget.buttonText,
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.white,fontSize: 18, fontWeight: FontWeight.bold),
       );
     } else if (widget.buttonAnimationState == 1) {
       return SizedBox(

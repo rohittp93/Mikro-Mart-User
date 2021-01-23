@@ -7,6 +7,7 @@ const itemDetailHeader = TextStyle(fontSize: 18, fontWeight: FontWeight.w600, co
 const subHeaderStyle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500);
 const cardTitleStyle = TextStyle(fontSize: 22.0, fontWeight: FontWeight.w500);
 const cardPriceStyle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400);
+const strikeThroughPrice = TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal, decoration: TextDecoration.lineThrough, color: MikroMartColors.priceStrikeThrough);
 const subcardTitleStyle = TextStyle(
     fontSize: 20.0, fontWeight: FontWeight.w700);
 const headerStyle3 = TextStyle(
@@ -23,6 +24,7 @@ const lightTextTitle = TextStyle(fontSize: 17.0, fontWeight: FontWeight.w400);
 const mediumTextSubtitle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500, color: MikroMartColors.subtitleGray);
 const lightTextSubtitle = TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400, color: MikroMartColors.subtitleGray);
 const itemnNameText =  TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400);
+const outletCardNameStyle =  TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400);
 const itemPriceText = TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400, color: MikroMartColors.subtitleGray);
 
 
