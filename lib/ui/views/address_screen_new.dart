@@ -29,7 +29,6 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Flushbar<List<String>> _addressNameFlushBar;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Form _userInputForm;
   TextEditingController _textEditingController = TextEditingController();
   bool _isSnackbarActive = false;
   Flushbar _errorFlushBar;

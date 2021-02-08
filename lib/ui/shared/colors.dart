@@ -34,4 +34,5 @@ class MikroMartColors {
   static const cardShadowColor =  Color(0xFFEBEBEB);
   static const itemDetailSwipeIndicatorColor =  Color(0xFFE8E8E8);
   static const disabledPriceColor =  Color(0xFF707070);
+  static const disabledColor =  Color(0xFFC5C2C2);
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:userapp/ui/views/LandingPage.dart';
-import 'package:userapp/ui/views/ProfilePage.dart';
+import 'package:userapp/ui/views/profile_screen_new.dart';
 import 'package:userapp/ui/views/searchScreen.dart';
 import 'package:userapp/ui/views/shopping_cart_new.dart';
 
