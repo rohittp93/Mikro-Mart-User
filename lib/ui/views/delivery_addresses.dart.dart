@@ -16,15 +16,14 @@ import 'package:flare_flutter/flare_actor.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfilePage extends StatefulWidget {
+class DeliveryAddressScreen extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _DeliveryAddressScreenState createState() => _DeliveryAddressScreenState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   final AuthService _auth = AuthService();
 
-  var _userAddress = '';
 
   @override
   Future<void> initState() {
@@ -37,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return FutureBuilder(
       future: _auth.fetchUserDetails(),
-      builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<MikromartUser> snapshot) {
         print('ProfileTAG Rebuilt');
 
         switch (snapshot.connectionState) {
@@ -49,259 +48,125 @@ class _ProfilePageState extends State<ProfilePage> {
             if (snapshot.hasError)
               return new Text('Error: ${snapshot.error}');
             else {
-              User _user = snapshot.data;
+              MikromartUser _user = snapshot.data;
               print('ProfileTAG User: ${_user.houseName}');
               return Scaffold(
                 body: SafeArea(
                   child: Container(
-                    child: Stack(
+                    child: Column(
                       children: <Widget>[
                         Container(
-                          height: 50,
                           color: MikroMartColors.colorPrimary,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'My Profile',
-                                style: style.mediumTextTitle.copyWith(
+
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 50,
+                                child: FlatButton(
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(
+                                    Icons.arrow_back,
                                     color: Colors.white,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16),
+                                    size: 18,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Container(
+                                height: 50,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 0.0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Delivery Address',
+                                      style: style.mediumTextTitle.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.fromLTRB(20, 80, 20, 0),
+                          padding: const EdgeInsets.all(12.0),
                           child: Container(
-                            width: double.infinity,
-                            height: MediaQuery.of(context).size.height,
                             decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.6),
-                                    offset: Offset(0.0, 1.4), //(x,y)
-                                    blurRadius: 8.0,
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20)),
-                                color: MikroMartColors.cardBackground),
-                            child: Column(
-                              children: <Widget>[
-                                /*Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-                                  child: Container(
-                                    width: 83,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: MikroMartColors
-                                          .itemDetailSwipeIndicatorColor,
-                                    ),
-                                  ),
-                                ),*/
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-                                  child: Text(
-                                    (_user != null && _user.email != null)
-                                        ? _user.email
-                                        : '',
-                                    style: TextStyle(
-                                        fontSize: 19.0,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 5, 20, 10),
-                                  child: Text(
-                                    (_user != null && _user.phone != null)
-                                        ? _user.phone
-                                        : '',
-                                    style: TextStyle(
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.w500,
-                                        color: MikroMartColors.colorPrimary),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    print('Order history tapped');
-                                  },
-                                  child: Container(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Order History',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Container(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    print('Address tapped');
-                                  },
-                                  child: Container(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Delivery Address',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Container(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    print('TnC tapped');
-                                  },
-                                  child: Container(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Terms & Cditions',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Container(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    print('Help tapped');
-                                  },
-                                  child: Container(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Help',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Container(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    print('Logout tapped');
-                                  },
-                                  child: Container(
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(20, 5, 20, 5),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Logout',
-                                            style: TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Container(
-                                            child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  child: MySeparator(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(12.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.6),
+                                  offset: Offset(0.0, 1.4), //(x,y)
+                                  blurRadius: 3.0,
                                 ),
                               ],
+                              color: MikroMartColors.cardBackground,
                             ),
+                            child:  Container(
+                              padding: const EdgeInsets.only(left: 16.0, right:16, top: 24, bottom: 24),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                 Padding(
+                                   padding: const EdgeInsets.only( top: 4,),
+                                   child: Container(
+                                     height: 20,
+                                        child:
+                                        Image.asset(
+                                          'assets/map.png',
+                                          color: MikroMartColors.subtitleGray,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                 ),
+
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 12.0,),
+                                        child: Text(
+                                            _user.houseName
+                                                ,style: style.mediumTextSubtitle.copyWith(fontWeight: FontWeight.bold, fontSize: 15,  color: Colors.black),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () async {
+                                          var result = await Navigator.push(
+                                              context,
+                                              new MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                new AddressScreen(
+                                                  isDismissable: true,
+                                                ),
+                                                fullscreenDialog: true,
+                                              ));
+
+
+                                          setState(() {});
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 12.0, top: 22),
+                                          child: Text(
+                                            'Edit'
+                                            ,style: style.itemnNameText.copyWith(fontStyle: FontStyle.normal, fontSize: 13, color: Colors.black),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+
+                                ],
+                              ),
+                              ),
                           ),
                         ),
                       ],
@@ -313,57 +178,5 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       },
     );
-  }
-
-  final Uri _emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'mikromarts@gmail.com',
-      queryParameters: {'subject': 'Mikro Mart App'});
-
-  showLogoutAlert(AppDatabase db) {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setState) {
-            return AlertDialog(
-              title: Text("Are you sure you want to logout?"),
-              titleTextStyle: TextStyle(
-                  fontSize: 16.0,
-                  color: MikroMartColors.purple,
-                  fontStyle: FontStyle.normal),
-              actions: <Widget>[
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FlatButton(
-                      child: Text('Cancel'),
-                      textColor: MikroMartColors.colorPrimary,
-                      onPressed: () async {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FlatButton(
-                      child: Text('Confirm'),
-                      textColor: MikroMartColors.colorPrimary,
-                      onPressed: () async {
-                        FocusScope.of(context).requestFocus(FocusNode());
-                        await _auth.logoutUser(db);
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, "/", (r) => false);
-                      },
-                    ),
-                  ),
-                )
-              ],
-            );
-          });
-        });
   }
 }

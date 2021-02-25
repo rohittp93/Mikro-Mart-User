@@ -6,11 +6,13 @@ import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 
+import 'curvedpainter.dart';
+
 class LoginScreen extends StatefulWidget {
   final VoidCallback onSignUpClicked, onBackClicked;
 
-  const LoginScreen({Key key, this.onSignUpClicked, this.onBackClicked}) : super(key: key);
-
+  const LoginScreen({Key key, this.onSignUpClicked, this.onBackClicked})
+      : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -68,27 +70,59 @@ class _LoginScreenState extends State<LoginScreen>
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      child: Image.asset(
-                        "assets/logo.png",
-                        width: MediaQuery.of(context).size.width * 0.6,
-                        height: MediaQuery.of(context).size.width * 0.6,
-                      ),
-                    ),
-                    Row(
+                    Stack(
                       children: <Widget>[
-                        Expanded(
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          width: double.infinity,
+                          child: CustomPaint(
+                            painter: CurvePainter(type: 3),
+                          ),
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.width,
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 40.0),
-                            child: Text(
-                              "EMAIL",
-                              style: TextStyle(
-                                color: MikroMartColors.colorPrimary,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 15.0,
+                            padding:
+                                const EdgeInsets.only(left: 24.0, bottom: 80),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  "Let's Sign In",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Mulish',
+                                    color: MikroMartColors.white,
+                                    fontSize: 26.0,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    "Welcome back, you've been missed!",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      color: MikroMartColors.white,
+                                      fontFamily: 'Mulish',
+                                      fontSize: 15.0,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          width: double.infinity,
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Container(
+                              height: 142,
+                              child: Image(
+                                image: AssetImage('assets/dot_big.png'),
                               ),
                             ),
                           ),
@@ -96,6 +130,46 @@ class _LoginScreenState extends State<LoginScreen>
                       ],
                     ),
                     Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.only(
+                          left: 30.0, right: 30.0, top: 0.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: MikroMartColors.backgroundGray,
+                        ),
+                        borderRadius: BorderRadius.circular(100.0),
+                        color: MikroMartColors.backgroundGray,
+                      ),
+                      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                      child: TextField(
+                        obscureText: false,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontFamily: 'Mulish',
+                        ),
+                        textInputAction: TextInputAction.next,
+                        onSubmitted: (v) {
+                          FocusScope.of(context).requestFocus(passwordFocus);
+                        },
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'E-mail Address',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).hintColor,
+                            fontFamily: 'Mulish',
+                          ),
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            email = val;
+                            isLoginCredsValid = validateEmail(val) &&
+                                validatePassword(password);
+                          });
+                        },
+                      ),
+                    ),
+                    /*   Container(
                       width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.only(
                           left: 40.0, right: 40.0, top: 10.0),
@@ -139,68 +213,47 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ],
                       ),
-                    ),
+                    ),*/
                     Divider(
                       height: MediaQuery.of(context).size.height * 0.03,
                       color: Colors.transparent,
                     ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 40.0),
-                            child: Text(
-                              "PASSWORD",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: MikroMartColors.colorPrimary,
-                                fontSize: 15.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                     Container(
                       width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.only(
-                          left: 40.0, right: 40.0, top: 10.0),
+                          left: 30.0, right: 30.0, top: 0.0),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                              color: MikroMartColors.colorPrimary,
-                              width: 0.5,
-                              style: BorderStyle.solid),
+                        border: Border.all(
+                          color: MikroMartColors.backgroundGray,
                         ),
+                        borderRadius: BorderRadius.circular(100.0),
+                        color: MikroMartColors.backgroundGray,
                       ),
-                      padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              key: _passwordInputKey,
-                              obscureText: true,
-                              focusNode: passwordFocus,
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: '*********',
-                                hintStyle:
-                                    TextStyle(color: Theme.of(context).hintColor),
-                              ),
-                              onChanged: (val) {
-                                setState(() {
-                                  password = val;
-                                  isLoginCredsValid = validateEmail(email) &&
-                                      validatePassword(val);
-                                });
-                              },
-                            ),
+                      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                      child: TextField(
+                        obscureText: true,
+                        style: TextStyle(
+                          fontFamily: 'Mulish',
+                        ),
+                        focusNode: passwordFocus,
+                        textAlign: TextAlign.left,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Password',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context).hintColor,
+                            fontFamily: 'Mulish',
                           ),
-                        ],
+                        ),
+                        onChanged: (val) {
+                          setState(() {
+                            password = val;
+                            isLoginCredsValid =
+                                validateEmail(email) && validatePassword(val);
+                          });
+                        },
                       ),
                     ),
                     Column(
@@ -211,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen>
                             keepStack: false,
                             intentWidgetRoute: this._intentWidget,
                             buttonAnimationState: this._buttonAnimationState,
-                            buttonText: 'LOGIN',
+                            buttonText: 'SIGN IN',
                             onPressed: () async {
                               FocusScope.of(context).requestFocus(FocusNode());
 
@@ -254,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen>
                           margin: const EdgeInsets.only(
                               left: 30.0, right: 30.0, top: 40.0),
                         ),
-                     /*   Container(
+                        Container(
                           width: MediaQuery.of(context).size.width,
                           margin: const EdgeInsets.only(
                               left: 30.0, right: 30.0, top: 20.0),
@@ -273,91 +326,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(width: 0.25)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),*/
-                        SizedBox(
-                          height: 50,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(40),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 48,
-                              color: MikroMartColors.colorPrimary,
-                              child: InkWell(
-                                onTap: () async {
-                                  setState(() {
-                                    _signingWithGoogle = true;
-                                  });
-                                  FirebaseUserModel user =
-                                      await _auth.signInWithGoogle(db);
-
-                                  setState(() {
-                                    _signingWithGoogle = false;
-                                  });
-
-                                  if (user == null) {
-                                    _scaffoldkey.currentState
-                                        .showSnackBar(SnackBar(
-                                      content: new Text(
-                                          'There was a problem signing in. Please check your credentials'),
-                                      duration: new Duration(seconds: 3),
-                                    ));
-                                  } else {
-                                    if (user.isPhoneVerified) {
-                                      Navigator.of(context).pushNamedAndRemoveUntil(
-                                          '/mainHome', (Route<dynamic> route) => false);
-                                    } else {
-                                      Navigator.of(context).pushReplacementNamed(
-                                          '/phoneNumberRegister');
-                                    }
-                                  }
-                                },
-                                child: Center(
-                                  child: Container(
-                                    child: Text(
-                                      "SIGN IN WITH GOOGLE",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),   Container(
-                          width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.only(
-                              left: 30.0, right: 30.0, top: 20.0),
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(width: 0.25)),
-                                ),
-                              ),
-                              Text(
-                                "OR",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Mulish',
                                 ),
                               ),
                               Expanded(
@@ -371,61 +340,114 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(40),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 48,
+                          padding:
+                              const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 0),
+                          child: OutlineButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0)),
+                            color: MikroMartColors.transparentGray,
+                            highlightedBorderColor:
+                                MikroMartColors.transparentGray,
+                            textColor: MikroMartColors.colorPrimary,
+                            borderSide: BorderSide(
                               color: MikroMartColors.colorPrimary,
-                              child: InkWell(
-                                onTap: () {
-                                  widget.onSignUpClicked();
-                                 /* setState(() {
-                                    _signingWithGoogle = true;
-                                  });
-                                  FirebaseUserModel user =
-                                      await _auth.signInWithGoogle(db);
+                              //Color of the border
+                              style: BorderStyle.solid,
+                              //Style of the border
+                              width: 2.5, //width of the border
+                            ),
+                            onPressed: () async {
+                              setState(() {
+                                _signingWithGoogle = true;
+                              });
+                              FirebaseUserModel user =
+                                  await _auth.signInWithGoogle(db);
 
-                                  setState(() {
-                                    _signingWithGoogle = false;
-                                  });
+                              setState(() {
+                                _signingWithGoogle = false;
+                              });
 
-                                  if (user == null) {
-                                    _scaffoldkey.currentState
-                                        .showSnackBar(SnackBar(
-                                      content: new Text(
-                                          'There was a problem signing in. Please check your credentials'),
-                                      duration: new Duration(seconds: 3),
-                                    ));
-                                  } else {
-                                    if (user.isPhoneVerified) {
-                                      Navigator.of(context).pushNamedAndRemoveUntil(
-                                          '/mainHome', (Route<dynamic> route) => false);
-                                    } else {
-                                      Navigator.of(context).pushReplacementNamed(
-                                          '/phoneNumberRegister');
-                                    }
-                                  }*/
-                                },
-                                child: Center(
-                                  child: Container(
-                                    child: Text(
-                                      "SIGN UP",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
+                              if (user == null) {
+                                _scaffoldkey.currentState.showSnackBar(SnackBar(
+                                  content: new Text(
+                                      'There was a problem signing in. Please check your credentials'),
+                                  duration: new Duration(seconds: 3),
+                                ));
+                              } else {
+                                if (user.isPhoneVerified) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      '/mainHome',
+                                      (Route<dynamic> route) => false);
+                                } else {
+                                  Navigator.of(context).pushReplacementNamed(
+                                      '/phoneNumberRegister');
+                                }
+                              }
+                            },
+                            child: Container(
+                              height: 50,
+                              child: Center(
+                                child: Text(
+                                  "SIGN IN WITH GOOGLE",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: MikroMartColors.colorPrimary,
+                                      fontFamily: 'Mulish',
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
                           ),
                         ),
                         SizedBox(
-                          height: 50,
-                        )
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 20.0, top: 8, bottom: 30),
+                              child: FlatButton(
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      "Don't have an account ?",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: MikroMartColors.subtitleGray,
+                                        fontFamily: 'Mulish',
+                                        fontSize: 15.0,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                    Text(
+                                      " SIGN UP",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: MikroMartColors.colorPrimary,
+                                        fontFamily: 'Mulish',
+                                        fontSize: 15.0,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () => widget.onSignUpClicked(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Container(
+                            height: 110,
+                            child: Image(
+                              image: AssetImage('assets/dot_small.png'),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -441,7 +463,10 @@ class _LoginScreenState extends State<LoginScreen>
                             children: <Widget>[
                               Text(
                                 'Signing in with Google',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Mulish',
+                                ),
                               ),
                               SizedBox(
                                 height: 20,

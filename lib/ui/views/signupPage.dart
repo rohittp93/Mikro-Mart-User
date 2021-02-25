@@ -8,8 +8,8 @@ import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
-import 'package:userapp/ui/views/address_screen.dart';
 
+import 'address_screen_new.dart';
 import 'curvedpainter.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -78,8 +78,9 @@ class _SignUpPageState extends State<SignUpPage> {
                           Text(
                             "Getting Started",
                             style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              color: MikroMartColors.white,
+                              fontWeight: FontWeight.bold,
+                              color: MikroMartColors.white
+                              , fontFamily: 'Mulish',
                               fontSize: 26.0,
                             ),
                           ),
@@ -88,13 +89,28 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: Text(
                               "Create an account to continue!",
                               style: TextStyle(
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.normal
+                                , fontFamily: 'Mulish',
                                 color: MikroMartColors.white,
                                 fontSize: 15.0,
                               ),
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    width: double.infinity,
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        height: 142,
+                        child: Image(
+                          image: AssetImage('assets/dot_big.png'),
+                        ),
+
                       ),
                     ),
                   ),
@@ -116,6 +132,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: TextField(
                   obscureText: false,
                   textAlign: TextAlign.left,
+                  style: TextStyle( fontFamily: 'Mulish',),
                   textInputAction: TextInputAction.next,
                   onSubmitted: (v) {
                     FocusScope.of(context).requestFocus(emailFocus);
@@ -123,7 +140,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Full Name',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontFamily: 'Mulish',),
                   ),
                   onChanged: (val) {
                     setState(() {
@@ -154,6 +171,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: TextField(
                   obscureText: false,
                   textInputAction: TextInputAction.next,
+                  style: TextStyle( fontFamily: 'Mulish',),
                   focusNode: emailFocus,
                   onSubmitted: (v) {
                     FocusScope.of(context).requestFocus(passwordFocus);
@@ -161,7 +179,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'E-mail Address',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontFamily: 'Mulish',),
                   ),
                   onChanged: (val) {
                     setState(() {
@@ -194,6 +212,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   obscureText: true,
                   focusNode: passwordFocus,
                   textAlign: TextAlign.left,
+                  style: TextStyle( fontFamily: 'Mulish',),
                   textInputAction: TextInputAction.next,
                   onSubmitted: (v) {
                     FocusScope.of(context).requestFocus(confirmForcus);
@@ -201,7 +220,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Password',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontFamily: 'Mulish',),
                   ),
                   onChanged: (val) {
                     setState(() {
@@ -232,10 +251,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 padding: const EdgeInsets.only(left: 12.0, right: 12.0),
                 child: TextField(
                   textInputAction: TextInputAction.next,
+                  style: TextStyle( fontFamily: 'Mulish',),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Confirm Password',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor, fontFamily: 'Mulish',),
                   ),
                   obscureText: true,
                   textAlign: TextAlign.left,
@@ -287,9 +307,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           : 'Address',
                       style: _userAddress == null
                           ? TextStyle(
-                              color: MikroMartColors.subtitleGray,
+                              color: MikroMartColors.subtitleGray
+                          , fontFamily: 'Mulish',
                               fontSize: 16.0)
-                          : TextStyle(color: Colors.black, fontSize: 16.0),
+                          : TextStyle(color: Colors.black, fontSize: 16.0, fontFamily: 'Mulish',),
                     ),
                   ),
                 ),
@@ -368,7 +389,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(right: 20.0, top:8, bottom: 160),
+                    padding: const EdgeInsets.only(right: 20.0, top:8, bottom: 30),
                     child: FlatButton(
                       child: Row(
                         children: <Widget>[
@@ -376,7 +397,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             "Already have an account?",
                             style: TextStyle(
                               fontWeight: FontWeight.normal,
-                              color: MikroMartColors.subtitleGray,
+                              color: MikroMartColors.subtitleGray
+                              , fontFamily: 'Mulish',
                               fontSize: 15.0,
                             ),
                             textAlign: TextAlign.end,
@@ -385,7 +407,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             " SIGN IN",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: MikroMartColors.colorPrimary,
+                              color: MikroMartColors.colorPrimary
+                              , fontFamily: 'Mulish',
                               fontSize: 15.0,
                             ),
                             textAlign: TextAlign.end,
@@ -396,6 +419,15 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ],
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  height: 110,
+                  child: Image(
+                    image: AssetImage('assets/dot_small.png'),
+                  ),
+                ),
               ),
             ],
           )),

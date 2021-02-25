@@ -12,11 +12,14 @@ class DatabaseService {
   DatabaseService({this.uid});
 
   final CollectionReference userCollection =
-      Firestore.instance.collection('users');
+  Firestore.instance.collection('users');
+
+  final CollectionReference outletCollection =
+  Firestore.instance.collection('outlets');
 
 
   final CollectionReference orderCollection =
-      Firestore.instance.collection('orders');
+  Firestore.instance.collection('orders');
 
   Future updateUserData(
       String name,
@@ -91,8 +94,16 @@ class DatabaseService {
     }
   }
 
+  Future fetchOutletLocation(String outlet_id) async {
+    DocumentSnapshot document = await outletCollection.document(outlet_id).get();
+    if (document != null) {
+      return document;
+    } else {
+      return null;
+    }
+  }
+
   Future<String> addOrder(String userId, OrderModel order, String userPhone) async {
-    //DocumentReference orderDocRef = userCollection.document(userId).collection('orders').document();
     DocumentReference orderDocRef = orderCollection.document();
 
     await orderDocRef.setData({
@@ -107,6 +118,8 @@ class DatabaseService {
       'created_time': FieldValue.serverTimestamp(),
       'user_id': userId,
       'user_phone': userPhone,
+      'already_paid': order.already_paid,
+      'payment_id' : order.payment_id
     });
 
     return orderDocRef.documentID;

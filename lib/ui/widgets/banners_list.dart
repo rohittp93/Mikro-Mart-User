@@ -33,17 +33,18 @@ class _OffersListState extends State<BannersList> {
 
   @override
   Widget build(BuildContext context) {
-    print('Banners Rebuilt');
-    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          SizedBox(
+            height: 12,
+          ),
           CarouselSlider(
             items: _banners.map((banner) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
+                padding: const EdgeInsets.only(bottom: 0.0),
                 child: Card(
                   elevation: 2,
                   child: Container(
@@ -103,8 +104,8 @@ class _OffersListState extends State<BannersList> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _current == index
-                      ? Color.fromRGBO(0, 0, 0, 0.9)
-                      : Color.fromRGBO(0, 0, 0, 0.4),
+                      ? MikroMartColors.colorPrimary
+                      : MikroMartColors.colorPrimary.withOpacity(0.5),
                 ),
               );
             }).toList(),

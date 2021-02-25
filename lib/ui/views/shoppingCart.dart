@@ -744,7 +744,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
           }
 
           String result = await _auth.placeOrder(
-              _cartItems, _totalAmount, db, moreItemsStr);
+              _cartItems, _totalAmount, db, moreItemsStr, 0,false, "");
           if (result != null) {
             setState(() {
               _orderId = result;

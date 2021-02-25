@@ -8,11 +8,11 @@ import 'package:userapp/core/models/user.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/theme.dart';
+import 'package:userapp/ui/views/address_screen_new.dart';
 import 'package:userapp/ui/views/orders_list.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:flare_flutter/flare_actor.dart';
 
-import 'address_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -36,7 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return FutureBuilder(
       future: _auth.fetchUserDetails(),
-      builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<MikromartUser> snapshot) {
         print('ProfileTAG Rebuilt');
 
         switch (snapshot.connectionState) {
@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
             if (snapshot.hasError)
               return new Text('Error: ${snapshot.error}');
             else {
-              User _user = snapshot.data;
+              MikromartUser _user = snapshot.data;
               print('ProfileTAG User: ${_user.houseName}');
               return Scaffold(
                 body: SafeArea(
@@ -476,7 +476,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         FocusScope.of(context).requestFocus(FocusNode());
                         await _auth.logoutUser(db);
                         Navigator.pushNamedAndRemoveUntil(
-                            context, "/splashScreen", (r) => false);
+                            context, "/", (r) => false);
                       },
                     ),
                   ),

@@ -1,6 +1,8 @@
 import 'dart:collection';
 
 import 'package:flushbar/flushbar.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +12,7 @@ import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import '../shared/text_styles.dart' as style;
+import 'map_overlap.dart';
 
 class AddressScreen extends StatefulWidget {
   final bool isDismissable;
@@ -46,6 +49,10 @@ class _AddressScreenState extends State<AddressScreen> {
   PermissionStatus _permissionStatus = PermissionStatus.unknown;
 
   Position _position;
+
+  TextEditingController _floorController = TextEditingController();
+  TextEditingController _addressController = TextEditingController();
+  TextEditingController _houseNameController = TextEditingController();
 
   void _setCircles() {
     _circles.add(
@@ -88,7 +95,8 @@ class _AddressScreenState extends State<AddressScreen> {
 
   getCurrentLocationAndDrawMarker() async {
     try {
-      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
           .timeout(new Duration(seconds: 15));
 
       print('Current location ${position.latitude}');
@@ -106,7 +114,8 @@ class _AddressScreenState extends State<AddressScreen> {
       setState(() {
         _isFetchingCurrentLocation = false;
       });
-      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _position = position;
       });
@@ -127,8 +136,8 @@ class _AddressScreenState extends State<AddressScreen> {
       });
     }
 
-    await geoLocator
-        .placemarkFromCoordinates(_position.latitude, _position.longitude);
+    await geoLocator.placemarkFromCoordinates(
+        _position.latitude, _position.longitude);
 
     setState(() {
       _latlong = new LatLng(_position.latitude, _position.longitude);
@@ -212,72 +221,6 @@ class _AddressScreenState extends State<AddressScreen> {
         ));
   }
 
-  showFlatNameBottomSheet() {
-    _addressNameFlushBar = Flushbar<List<String>>(
-      flushbarPosition: FlushbarPosition.BOTTOM,
-      flushbarStyle: FlushbarStyle.GROUNDED,
-      reverseAnimationCurve: Curves.decelerate,
-      forwardAnimationCurve: Curves.fastLinearToSlowEaseIn,
-      animationDuration: Duration(seconds: 1),
-      backgroundColor: MikroMartColors.purpleStart,
-      userInputForm: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            textFormField(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: FlatButton(
-                  child: Text('DONE'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  color: Colors.white,
-                  textColor: MikroMartColors.purpleEnd,
-                  padding: EdgeInsets.all(6),
-                  onPressed: () async {
-                    if (_textEditingController.text.length > 0) {
-                      _addressNameFlushBar
-                          .dismiss([_textEditingController.text]);
-                      FocusScope.of(context).unfocus();
-
-                      AddressModel addressModel = AddressModel(
-                          location: _locationAddress,
-                          appartmentName: _textEditingController.text);
-
-                      await _auth.updateAddressInFirestore(
-                          addressModel);
-
-                      Navigator.pop(context, addressModel);
-                    }
-                  },
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      boxShadows: [
-        BoxShadow(color: Colors.blue, offset: Offset(0.0, 0.2), blurRadius: 3.0)
-      ],
-      backgroundGradient: LinearGradient(
-          colors: [MikroMartColors.purpleEnd, MikroMartColors.purpleStart]),
-      isDismissible: false,
-      icon: Icon(
-        Icons.check,
-        color: Colors.white,
-      ),
-    )..show(context).then((result) {
-        if (result != null) {
-          String address = result[0];
-          print('ADDRESS TYPED IS $address');
-        } else {}
-      });
-  }
-
   showErrorDialog() {
     _errorFlushBar = Flushbar<List<String>>(
       flushbarPosition: FlushbarPosition.BOTTOM,
@@ -350,86 +293,257 @@ class _AddressScreenState extends State<AddressScreen> {
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
                 color: MikroMartColors.white,
+                fontFamily: 'Mulish',
                 decoration: TextDecoration.none),
             textAlign: TextAlign.center,
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 50.0),
-              child: GoogleMap(
-                initialCameraPosition:
-                    CameraPosition(target: _outletLocation, zoom: 12),
-                circles: _circles,
-                onMapCreated: (GoogleMapController controller) {
-                  _mapController = (controller);
-                  _mapController.complete(controller);
-                  //getCurrentLocation();
-                },
-                onTap: _handleTap,
-                markers: _markers,
-              ),
-            ),
-            _isFetchingCurrentLocation
-                ? Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 40,
-                    color: Colors.white.withOpacity(0.7),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Center(
-                            child: Text(
-                          'Fetching Current Location',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 15,
-                            width: 15,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              value: null,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.black),
-                            ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  Container(
+                    height: 400,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                      child: GoogleMap(
+                        initialCameraPosition:
+                            CameraPosition(target: _outletLocation, zoom: 12),
+                        gestureRecognizers:
+                            <Factory<OneSequenceGestureRecognizer>>[
+                          new Factory<OneSequenceGestureRecognizer>(
+                            () => new EagerGestureRecognizer(),
                           ),
+                        ].toSet(),
+                        circles: _circles,
+                        onMapCreated: (GoogleMapController controller) {
+                          _mapController = (controller);
+                          _mapController.complete(controller);
+                          //getCurrentLocation();
+                        },
+                        onTap: _handleTap,
+                        markers: _markers,
+                      ),
+                    ),
+                  ),
+                  /* Container(
+                    height: 400,
+                    child: new IgnorePointer(
+                      child: new ClipPath(
+                        clipper: new InvertedCircleClipper(),
+                        child: new Container(
+                          color: new Color.fromRGBO(0, 0, 0, 0.5),
                         ),
-                      ],
-                    ))
-                : Container(),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: GestureDetector(
-                onTap: () {
-                  if (_markers.length == 1) {
-                    if (_getDistanceBetween(_latlong)) {
-                      showFlatNameBottomSheet();
-                    } else {
-                      showErrorDialog();
-                    }
-                  } else {
-                    showSnackBar('Select a location on map before continuing');
-                  }
-                },
-                child: Container(
-                  color: MikroMartColors.colorPrimary,
-                  height: 50.0,
-                  child: Center(
-                      child: Text(
-                    'DONE',
-                    style: TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w700,
-                        color: MikroMartColors.white,
-                        decoration: TextDecoration.none),
-                  )),
+                      ),
+                    ),
+                  ),*/
+
+                  _isFetchingCurrentLocation
+                      ? Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 40,
+                          color: Colors.white.withOpacity(0.7),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Center(
+                                  child: Text(
+                                'Fetching Current Location',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Mulish',
+                                ),
+                              )),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value: null,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ))
+                      : Container(),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 38.0, left: 37),
+                child: Text(
+                  "Enter Email Details",
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: MikroMartColors.black
+                      , fontFamily: 'Mulish',
+                      decoration: TextDecoration.none),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            )
-          ],
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 25.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: false,
+                  style: TextStyle(         fontFamily: 'Mulish',),
+                  textAlign: TextAlign.left,
+                  controller: _houseNameController,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'House/Appartment Name',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor         , fontFamily: 'Mulish',),
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 25.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: false,
+                  style: TextStyle(         fontFamily: 'Mulish',),
+                  textAlign: TextAlign.left,
+                  keyboardType: TextInputType.text,
+                  controller: _addressController,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Complete Address',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor         , fontFamily: 'Mulish',),
+                  ),
+                ),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin:
+                    const EdgeInsets.only(left: 30.0, right: 30.0, top: 25.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: MikroMartColors.backgroundGray,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: MikroMartColors.backgroundGray,
+                ),
+                padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                child: TextField(
+                  obscureText: false,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(         fontFamily: 'Mulish',),
+                  keyboardType: TextInputType.text,
+                  controller: _floorController,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Floor (Optional)',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor         , fontFamily: 'Mulish',),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 80.0, top: 30),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (_markers.length == 1) {
+                        if (_getDistanceBetween(_latlong)) {
+                          //showFlatNameBottomSheet();
+
+                          if (_houseNameController.text.length != 0) {
+                            if (_addressController.text.length != 0) {
+                              FocusScope.of(context).unfocus();
+
+                              String address = '';
+
+                              if (_floorController.text.length != 0) {
+                                address = _houseNameController.text +
+                                    ', floor: ' +
+                                    _floorController.text +
+                                    '\n' +
+                                    _addressController.text;
+                              } else {
+                                address = _houseNameController.text +
+                                    ',' +
+                                    '\n' +
+                                    _addressController.text;
+                              }
+
+                              AddressModel addressModel = AddressModel(
+                                  location: _locationAddress,
+                                  appartmentName: address);
+
+                              await _auth
+                                  .updateAddressInFirestore(addressModel);
+
+                              Navigator.pop(context, addressModel);
+                            } else {
+                              showSnackBar('Enter complete address');
+                            }
+                          } else {
+                            showSnackBar('Enter House/Appartment name');
+                          }
+                        } else {
+                          showErrorDialog();
+                        }
+                      } else {
+                        showSnackBar(
+                            'Select a location on map before continuing');
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 30.0, right: 30),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: MikroMartColors.colorPrimary,
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        height: 50.0,
+                        child: Center(
+                            child: Text(
+                          'SAVE ADDRESS',
+                          style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold
+                              , fontFamily: 'Mulish',
+                              color: MikroMartColors.white,
+                              decoration: TextDecoration.none),
+                        )),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

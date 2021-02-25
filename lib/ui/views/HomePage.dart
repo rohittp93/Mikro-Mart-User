@@ -19,189 +19,131 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget HomePage() {
     return Container(
       height: MediaQuery.of(context).size.height,
-      /*  decoration: BoxDecoration(
-        color: MikroMartColors.transparentGray,
-        image: DecorationImage(
-          colorFilter: new ColorFilter.mode(
-              Colors.deepPurple.withOpacity(0.1), BlendMode.dstATop),
-          image: AssetImage('assets/home_background.jpeg'),
-          fit: BoxFit.cover,
-        ),
-      ),*/
-
-      child: Column(
+      child: Stack(
         children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height * 0.5,
-            width: double.infinity,
-            child: CustomPaint(
-              painter: CurvePainter(type: 2),
-            ),
-          ),
-          Text(
-            "Welcome to Mikro Mart",
-            textAlign: TextAlign.center,
-            style: style.headerStyle2.copyWith(fontSize: 30),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 12),
-            child: Text(
-              "We provide door to door delivery of \ngrocery items",
-              textAlign: TextAlign.center,
-              style: style.subHeaderStyle
-                  .copyWith(fontSize: 18, color: MikroMartColors.dividerGray),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(34,24,34,8),
-            child: OutlineButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
-              color: MikroMartColors.transparentGray,
-              highlightedBorderColor: MikroMartColors.transparentGray,
-              textColor: MikroMartColors.colorPrimary,
-              borderSide: BorderSide(
-                color: MikroMartColors.colorPrimary, //Color of the border
-                style: BorderStyle.solid, //Style of the border
-                width: 2.5, //width of the border
-              ),
-              onPressed: () => gotoLogin(),
-              child: Container(
-                height: 50,
-                child:  Center(
-                  child: Text(
-                    "SIGN IN",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                        color: MikroMartColors.colorPrimary,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(34,8,34,16),
-            child: InkWell(
-              onTap: () {
-                gotoSignup();
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: MikroMartColors.colorPrimary,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                height: 50,
-                child:  Center(
-                  child: Text(
-                    "SIGN UP",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: MikroMartColors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          /*   Expanded(
-            child: Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              margin: EdgeInsets.only(
-                  left: 30.0,
-                  right: 30.0,
-                  top: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.2),
-              alignment: Alignment.center,
-              child: Row(
+          Column(
+            children: <Widget>[
+              Stack(
                 children: <Widget>[
-                  Expanded(
-                    child: OutlineButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
-                      color: MikroMartColors.transparentGray,
-                      highlightedBorderColor: MikroMartColors.transparentGray,
-                      textColor: MikroMartColors.colorPrimary,
-                      borderSide: BorderSide(
-                        color: MikroMartColors.colorPrimary, //Color of the border
-                        style: BorderStyle.solid, //Style of the border
-                        width: 0.9, //width of the border
-                      ),
-                      onPressed: () => gotoSignup(),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: CurvePainter(type: 2),
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: Align(
+                      alignment: Alignment.center,
                       child: Container(
-                        height: 48,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "SIGN UP",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: MikroMartColors.colorPrimary,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
+                        height: 250,
+                        width: 250,
+                        child: Image(
+                          image: AssetImage('assets/basket.png'),
                         ),
                       ),
                     ),
                   ),
+
+                 Container(
+                   height: MediaQuery.of(context).size.height * 0.5,
+                   width: double.infinity,
+                   child: Align(
+                     alignment: Alignment.topRight,
+                     child: Container(
+                          height: 142,
+                          child: Image(
+                            image: AssetImage('assets/dot_big.png'),
+                          ),
+
+                      ),
+                   ),
+                 ),
                 ],
               ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 30.0),
-              alignment: Alignment.center,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: FlatButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0)),
+              Text(
+                "Welcome to Mikro Mart",
+                textAlign: TextAlign.center,
+                style: style.headerStyle2.copyWith(fontSize: 30),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 12),
+                child: Text(
+                  "We provide door to door delivery of \ngrocery items",
+                  textAlign: TextAlign.center,
+                  style: style.subHeaderStyle
+                      .copyWith(fontSize: 18, color: MikroMartColors.dividerGray),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(34,24,34,8),
+                child: OutlineButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                  color: MikroMartColors.transparentGray,
+                  highlightedBorderColor: MikroMartColors.transparentGray,
+                  textColor: MikroMartColors.colorPrimary,
+                  borderSide: BorderSide(
+                    color: MikroMartColors.colorPrimary, //Color of the border
+                    style: BorderStyle.solid, //Style of the border
+                    width: 2.5, //width of the border
+                  ),
+                  onPressed: () => gotoLogin(),
+                  child: Container(
+                    height: 50,
+                    child:  Center(
+                      child: Text(
+                        "SIGN IN",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 18
+                            , fontFamily: 'Mulish',
+                            color: MikroMartColors.colorPrimary,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(34,8,34,16),
+                child: InkWell(
+                  onTap: () {
+                    gotoSignup();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: MikroMartColors.colorPrimary,
-                      splashColor: MikroMartColors.colorPrimary,
-                      //highlightColor: Colors.blue,
-                      highlightColor: MikroMartColors.colorPrimary,
-                      onPressed: () => gotoLogin(),
-                      child: Container(
-                       height: 48,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "LOGIN",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: MikroMartColors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
+                      borderRadius: BorderRadius.all(Radius.circular(30)),
+                    ),
+                    height: 50,
+                    child:  Center(
+                      child: Text(
+                        "SIGN UP",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 18
+                            , fontFamily: 'Mulish',
+                            color: MikroMartColors.white,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
-                ],
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              height: 110,
+              child: Image(
+                image: AssetImage('assets/dot_small.png'),
               ),
             ),
-          ),*/
+          ),
         ],
       ),
     );

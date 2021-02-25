@@ -10,7 +10,6 @@ import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/CurvedPage.dart';
 
-import 'address_screen.dart';
 import 'curvedpainter.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -59,8 +58,24 @@ class SplashScreen extends StatelessWidget {
             Expanded(
               child: Stack(
                 children: <Widget>[
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      child: Center(
+                        child: Container(
+                          child: new Image.asset(
+                            'assets/splash_image.png',
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Container(
-                    height: MediaQuery.of(context).size.height,
+                    height: MediaQuery.of(context).size.height*0.5,
                     width: double.infinity,
                     child: CustomPaint(
                       painter: CurvePainter(type: 1),
@@ -71,8 +86,8 @@ class SplashScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.35,
                     child: Center(
                       child: Container(
-                        height: 180,
-                        width: 180,
+                        height: 230,
+                        width: 230,
                         child: new Image.asset(
                           'assets/white_logo.png',
                           color: Colors.white,

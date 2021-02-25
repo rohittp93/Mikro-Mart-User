@@ -1,14 +1,19 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/core/models/version_check.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/shared/custom_page_view.dart';
+import 'package:userapp/ui/shared/dottedline.dart';
+import 'package:userapp/ui/views/itemDetailNew.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import '../shared/text_styles.dart' as style;
 
@@ -28,6 +33,8 @@ class _OffersListState extends State<OffersList> {
   Future<void> initState() {
     ItemNotifier itemNotifier =
         Provider.of<ItemNotifier>(context, listen: false);
+    print('OFFERS INit State Called');
+
     fetchItems(itemNotifier);
 
     checkVersion(context);
@@ -50,7 +57,7 @@ class _OffersListState extends State<OffersList> {
             'You are using an older version of Mikro Mart. Please update your app');
       } else {
         print('Version up to date');
-        if(_isDialogShowing && dialog!=null){
+        if (_isDialogShowing && dialog != null) {
           Navigator.pop(context);
         }
       }
@@ -75,6 +82,7 @@ class _OffersListState extends State<OffersList> {
                   style: TextStyle(
                       color: MikroMartColors.black,
                       fontSize: 18,
+                      fontFamily: 'Mulish',
                       fontWeight: FontWeight.normal),
                 ),
               ),
@@ -95,6 +103,7 @@ class _OffersListState extends State<OffersList> {
                     style: TextStyle(
                         color: MikroMartColors.white,
                         fontSize: 18,
+                        fontFamily: 'Mulish',
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -105,9 +114,7 @@ class _OffersListState extends State<OffersList> {
       );
 
       showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => dialog);
+          context: context, barrierDismissible: false, builder: (_) => dialog);
     }
   }
 
@@ -121,322 +128,273 @@ class _OffersListState extends State<OffersList> {
 
   @override
   Widget build(BuildContext context) {
+    print('OFFERS REFRESHED');
     ItemNotifier itemNotifier = Provider.of<ItemNotifier>(context);
     var screenWidth = MediaQuery.of(context).size.width;
 
-    if(_isDialogShowing){
+    if (_isDialogShowing) {
       checkVersion(context);
     }
 
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 12, bottom: 12),
-            child: Text(
-              "TOP OFFERS",
-              style: style.headerStyle2,
-            ),
-          ),
-          isLoading
-              ? Container(
-                  height: 150,
-                  child: Center(child: CircularProgressIndicator()))
-              : itemNotifier.offerItemList.length != 0
-                  ? CarouselSlider(
-                      items: itemNotifier.offerItemList.map((item) {
-                        ItemQuantity displayableItemQuantity =
-                            new ItemQuantity();
-
-                        for (var i = 0;
-                            i < item.item_quantity_list.length;
-                            i++) {
-                          if (item.item_quantity_list[i].display_quantity) {
-                            displayableItemQuantity =
-                                item.item_quantity_list[i];
-                            break;
-                          }
-                        }
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => ItemDetails(
-                                          data: item,
-                                        )));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Card(
-                              elevation: 2,
-                              child: Container(
-                                child: Container(
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0)),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Flexible(
-                                            child: Stack(
-                                              children: <Widget>[
-                                                Center(
-                                                  child: Image.network(
-                                                    item.item_image_path,
-                                                    fit: BoxFit.cover,
-                                                    width: screenWidth * 0.7,
-                                                  ),
-                                                ),
-                                                displayableItemQuantity
-                                                            .item_mrp !=
-                                                        null
-                                                    ? Align(
-                                                        alignment:
-                                                            Alignment.topRight,
-                                                        child: Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                            top: 0,
-                                                          ),
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.green,
-                                                              borderRadius:
-                                                                  BorderRadius.only(
-                                                                      topRight:
-                                                                          Radius.circular(
-                                                                              5)),
-                                                            ),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    12),
-                                                            child: Text(
-                                                              calculatePercentage(
-                                                                          displayableItemQuantity
-                                                                              .item_price,
-                                                                          displayableItemQuantity
-                                                                              .item_mrp)
-                                                                      .toString() +
-                                                                  '% OFF',
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              style: style
-                                                                  .itemPriceText
-                                                                  .copyWith(
-                                                                      color: MikroMartColors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : Container(),
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 80,
-                                            child: Center(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Flexible(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Flexible(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                              left: 12,
-                                                            ),
-                                                            child: Text(
-                                                              item.item_name,
-                                                              //'Some big offer name which might take two lines',
-                                                              style: TextStyle(
-                                                                color: MikroMartColors
-                                                                    .colorPrimary,
-                                                                fontSize: 16.0,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                              maxLines: 2,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        displayableItemQuantity
-                                                                    .item_mrp !=
-                                                                null
-                                                            ? Padding(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .fromLTRB(
-                                                                  0,
-                                                                  0,
-                                                                  20,
-                                                                  0,
-                                                                ),
-                                                                child:
-                                                                    Container(
-                                                                  padding: EdgeInsets
-                                                                      .only(
-                                                                          top:
-                                                                              4,
-                                                                          left:
-                                                                              12),
-                                                                  child: Text(
-                                                                    'MRP \₹ ' +
-                                                                        displayableItemQuantity
-                                                                            .item_mrp
-                                                                            .toString(),
-                                                                    style: style
-                                                                        .cardPriceStyle
-                                                                        .copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      decoration:
-                                                                          TextDecoration
-                                                                              .lineThrough,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 12, left: 6),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          color: MikroMartColors
-                                                              .colorPrimary,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(6)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 12,
-                                                              horizontal: 7),
-                                                      child: Text(
-                                                        '\₹ ' +
-                                                            displayableItemQuantity
-                                                                .item_price
-                                                                .toString(),
-                                                        style: style
-                                                            .cardPriceStyle
-                                                            .copyWith(
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                ),
+    return itemNotifier.offerItemList.length != 0
+        ? Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 12, bottom: 0),
+                  child: Stack(
+                    alignment: Alignment.centerLeft,
+                    children: <Widget>[
+                      Container(
+                        width: 113,
+                        child: Image(
+                          image: AssetImage('assets/flag_bg.png'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "TOP OFFERS",
+                          style: style.headerStyle2
+                              .copyWith(fontSize: 14, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                isLoading
+                    ? Container(
+                        height: 150,
+                        child: Center(child: CircularProgressIndicator()))
+                    : itemNotifier.offerItemList.length != 0
+                        ? Container(
+                            width: double.infinity,
+                            height: 250,
+                            child: Wrap(
+                              children: <Widget>[
+                                _buildCarousel(context, itemNotifier),
+                              ],
+                            ),
+                          )
+                        : Container(
+                            height: 150,
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              0,
+                              16,
+                              0,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'There are no offers at the moment',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: MikroMartColors.subtitleGray,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                      options: CarouselOptions(
-                          autoPlay: itemNotifier.offerItemList.length <= 1
-                              ? false
-                              : true,
-                          autoPlayInterval: Duration(milliseconds: 4000),
-                          enlargeCenterPage: true,
-                          height: (((0.7 * screenWidth) * 1.2) / 2) + 80,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _current = index;
-                            });
-                          }),
-                    )
-                  : Container(
-                      height: 150,
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        0,
-                        16,
-                        0,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'There are no offers at the moment',
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: MikroMartColors.subtitleGray,
-                              fontWeight: FontWeight.bold),
+              ],
+            ),
+          )
+        : Container();
+  }
+
+  Widget _buildCarousel(BuildContext context, ItemNotifier itemNotifier) {
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          // you may want to use an aspect ratio here for tablet support
+          child: Container(
+            height: 250,
+            child: Center(
+              child: CustomPageView(
+                viewportDirection: false,
+                controller: PageController(viewportFraction: 0.6),
+                children: _buildOfferWidgets(context, itemNotifier),
+                /* children: <Widget>[
+                Container(height: 20,color: Colors.indigoAccent,)
+              ],*/
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+_buildOfferWidgets(BuildContext context, ItemNotifier itemNotifier) {
+  List<Widget> offersList = [];
+
+  for (var i = 0; i < itemNotifier.offerItemList.length; i++) {
+    Item item = itemNotifier.offerItemList[i];
+
+    ItemQuantity displayableItemQuantity = new ItemQuantity();
+
+    for (var j = 0; j < item.item_quantity_list.length; j++) {
+      if (item.item_quantity_list[j].display_quantity) {
+        displayableItemQuantity = item.item_quantity_list[j];
+        break;
+      }
+    }
+
+    offersList.add(InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => ItemDetail(
+                      item: item,
+                    )));
+      },
+      child: Padding(
+        //padding:  EdgeInsets.fromLTRB(i == 0 ? 16 : 0, 0, i == 0? 0 : 16, 0),
+        padding: EdgeInsets.fromLTRB(
+            16, 12, i == itemNotifier.offerItemList.length - 1 ? 16 : 0, 12),
+        child: Container(
+          decoration: new BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: MikroMartColors.cardShadowColor,
+                spreadRadius: 1,
+                blurRadius: 6,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Card(
+            color: MikroMartColors.cardBG,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Stack(
+                  alignment: Alignment.bottomLeft,
+                  children: <Widget>[
+                    Hero(
+                      tag: item.item_name,
+                      child: AspectRatio(
+                        aspectRatio: 2 / 1.2,
+                        child: Container(
+                          width: (MediaQuery.of(context).size.width * 0.6) - 16,
+                          color: Colors.white,
+                          child: CachedNetworkImage(
+                            imageUrl: item.item_image_path,
+                            fit: BoxFit.fitWidth,
+                            placeholder: (context, url) => Center(
+                                child: SizedBox(
+                              height: 15.0,
+                              width: 15.0,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                    MikroMartColors.colorPrimary),
+                              ),
+                            )),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          ),
                         ),
                       ),
                     ),
-          itemNotifier.offerItemList.length != 0
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: itemNotifier.offerItemList.map((url) {
-                    int index = itemNotifier.offerItemList.indexOf(url);
-                    return Container(
-                      width: 6.0,
-                      height: 6.0,
-                      margin:
-                          EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _current == index
-                            ? Color.fromRGBO(0, 0, 0, 0.9)
-                            : Color.fromRGBO(0, 0, 0, 0.4),
+                    displayableItemQuantity.item_mrp != null
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(5)),
+                            ),
+                            padding: EdgeInsets.all(12),
+                            child: Text(
+                              calculatePercentage(
+                                          displayableItemQuantity.item_price,
+                                          displayableItemQuantity.item_mrp)
+                                      .toString() +
+                                  '% OFF',
+                              overflow: TextOverflow.ellipsis,
+                              style: style.itemPriceText.copyWith(
+                                  color: MikroMartColors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    child: Text(
+                      item.item_name,
+                      style: style.mediumTextTitle.copyWith(fontSize: 15),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 40.0),
+                        child: MySeparator(color: Colors.grey),
                       ),
-                    );
-                  }).toList(),
-                )
-              : Container(),
-        ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    child: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            '₹ ' + displayableItemQuantity.item_mrp.toString(),
+                            style: style.strikeThroughPrice,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          child: Text(
+                            '₹ ' + displayableItemQuantity.item_price.toString(),
+                            style: TextStyle(
+                                color: MikroMartColors.colorPrimary,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-    );
+    ));
   }
 
-  calculatePercentage(itemRate, mrpRate) {
-    if (itemRate != 0.0 && mrpRate != 0.0) {
-      if (itemRate == mrpRate) {
-        return 0;
+  return offersList;
+}
+
+calculatePercentage(itemRate, mrpRate) {
+  if (itemRate != 0.0 && mrpRate != 0.0) {
+    if (itemRate == mrpRate) {
+      return 0;
+    } else {
+      if (mrpRate > itemRate) {
+        double percentage = (100 - ((itemRate / mrpRate) * 100));
+        return percentage.round();
       } else {
-        if (mrpRate > itemRate) {
-          double percentage = (100 - ((itemRate / mrpRate) * 100));
-          return percentage.round();
-        } else {
-          return 0;
-        }
+        return 0;
       }
     }
   }

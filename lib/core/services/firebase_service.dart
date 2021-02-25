@@ -1,17 +1,21 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/models/address_model.dart';
 import 'package:userapp/core/models/banner.dart';
 import 'package:userapp/core/models/cart_validation_response.dart';
-import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/core/models/outlet_type.dart';
+import 'package:userapp/core/models/razorpay_order.dart';
+import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/orders.dart';
@@ -21,7 +25,7 @@ import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/database.dart';
 import 'package:userapp/ui/shared/colors.dart';
-import 'package:userapp/ui/views/address_screen.dart';
+import 'package:userapp/ui/views/address_screen_new.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -35,6 +39,11 @@ class AuthService {
   final String PREF_USER_LAT = "user_lat";
   final String PREF_USER_LNG = "user_lng";
   final String PREF_USER_HOUSE_NAME = "user_house_name";
+  final String PHONE_SAVED_ADDRESS_INVALID = "phone_saved_address_invalid";
+  final String PHONE_SAVED_ADDRESS_VALID = "phone_saved_address_valid";
+  final String PHONE_VERIFICATION_FAILED = "phone_verification_failed";
+  final String PHONE_CODE_SENT = "phone_verification_code_sent";
+  final String PHONE_VERIFICATION_COMPLETE = "phone_verification_code_sent";
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseMessaging _fcm = FirebaseMessaging();
@@ -212,6 +221,21 @@ class AuthService {
     return new GeoPoint(lat, lng);
   }
 
+  Future<LatLng> getOutletLocation(String outletId) async {
+    FirebaseUser user = await _auth.currentUser();
+
+    DocumentSnapshot outletDoc =
+        await DatabaseService(uid: user.uid).fetchOutletLocation(outletId);
+
+    Map<String, dynamic> address = outletDoc.data["address"];
+    GeoPoint location = address['location'];
+
+    print(
+        'LOCATION OF OUTLET : Lat : ${location.latitude}, Longi ${location.longitude}');
+
+    return new LatLng(location.latitude, location.longitude);
+  }
+
   Future<String> getUserBuildingName() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -220,7 +244,6 @@ class AuthService {
     return houseName;
   }
 
-// signout
   Future signOut() async {
     try {
       return await _auth.signOut();
@@ -230,203 +253,12 @@ class AuthService {
     }
   }
 
-  final _codeController = TextEditingController();
-
-  Future signInWithPhone(
-      String phone, BuildContext context, AppDatabase db) async {
-    _auth.verifyPhoneNumber(
-        phoneNumber: phone,
-        timeout: Duration(seconds: 60),
-        verificationCompleted: (AuthCredential credential) async {
-          final result =
-              await registerPhoneWithSignedInUser(phone, credential, context);
-
-          if (result != null) {
-            savePhoneAndCheckAddress(phone, context);
-          } else {
-            // error
-            return null;
-          }
-        },
-        verificationFailed: (AuthException authException) {
-          print(authException.message);
-          showErrorBottomSheet(context, authException.message);
-          return null;
-        },
-        codeSent: (String verificationId, [int forcedResendingToken]) {
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                String _descriptionText =
-                    'Trying to automatically read the OTP';
-                bool _isLoading = true;
-
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    return AlertDialog(
-                      title: Text(
-                          "Enter the OTP sent to the registered phone number"),
-                      titleTextStyle: TextStyle(
-                          fontSize: 16.0,
-                          color: MikroMartColors.colorPrimary,
-                          fontStyle: FontStyle.normal),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextField(
-                            keyboardType: TextInputType.number,
-                            controller: _codeController,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Flexible(
-                                flex: 2,
-                                child: Text(
-                                  _descriptionText,
-                                  style: TextStyle(
-                                      fontSize: 12.0,
-                                      color: _isLoading
-                                          ? MikroMartColors.purple
-                                          : MikroMartColors.errorRed,
-                                      fontStyle: FontStyle.normal),
-                                ),
-                              ),
-                              Flexible(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      16.0, 0, 16.0, 0),
-                                  child: Container(
-                                    width: 14,
-                                    height: 14,
-                                    child: _isLoading
-                                        ? CircularProgressIndicator(
-                                            backgroundColor:
-                                                MikroMartColors.white,
-                                            valueColor:
-                                                new AlwaysStoppedAnimation<
-                                                        Color>(
-                                                    MikroMartColors.purple),
-                                            strokeWidth: 1,
-                                          )
-                                        : Container(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: FlatButton(
-                              child: Text('Confirm'),
-                              textColor: MikroMartColors.colorPrimary,
-                              onPressed: () async {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                final code = _codeController.text.trim();
-                                AuthCredential credential =
-                                    PhoneAuthProvider.getCredential(
-                                        verificationId: verificationId,
-                                        smsCode: code);
-
-                                final result =
-                                    await registerPhoneWithSignedInUser(
-                                        phone, credential, context);
-
-                                if (result != null) {
-                                  savePhoneAndCheckAddress(phone, context);
-                                } else {
-                                  setState(() {
-                                    _isLoading = false;
-                                    _descriptionText =
-                                        "OTP did not match. Please try again";
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        )
-                      ],
-                    );
-                  },
-                );
-              });
-        },
-        codeAutoRetrievalTimeout: null);
-  }
-
-  /*validateCartItems(List<CartItem> cartItems) async {
-    String cartMessage = CART_VALID;
-
-    for (CartItem cartItem in cartItems) {
-      DocumentReference snapshot = await Firestore.instance
-          .collection('items')
-          .document(cartItem.itemId);
-
-      DocumentSnapshot datasnapshot = await snapshot.get();
-
-      if (datasnapshot.exists) {
-        Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
-
-        if (item.show_item) {
-          for (var i = 0; i < item.item_quantity_list.length; i++) {
-            for (var j = 0; j < cartItems.length; j++) {
-              if (item.item_quantity_list[i].item_quantity ==
-                  cartItems[j].itemQuantity) {
-                if (item.item_quantity_list[i].item_stock_quantity == 0) {
-                  cartMessage = '${item.item_name} is out of stock';
-                  break;
-                } else if (cartItem.cartQuantity <=
-                    item.item_quantity_list[i].item_stock_quantity) {
-                  if (cartItem.cartPrice ==
-                      item.item_quantity_list[i].item_price) {
-                    cartMessage = CART_VALID;
-                  } else {
-                    cartMessage =
-                    'Price of ${item.item_name} is updated and hence your cart total has changed. Please confirm before continuing';
-                    break;
-                  }
-                } else {
-                  cartMessage =
-                      'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
-                  break;
-                }
-              }
-            }
-          }
-        } else {
-          cartMessage =
-              '${item.item_name} is currently unavailable. Please check after some time';
-          break;
-        }
-      } else {
-        cartMessage = '${cartItem.itemName} is no longer available';
-        break;
-      }
-    }
-
-    return cartMessage;
-  }*/
-
   validateCartItems(List<CartItem> cartItems, AppDatabase db) async {
     //String cartMessage = CART_VALID;
     CartValidationResponse response = CartValidationResponse(
         status: CartResponseEnum.UNAVAILABLE,
         cartItem: null,
         currentItem: null);
-    ;
 
     for (CartItem cartItem in cartItems) {
       DocumentReference snapshot = await Firestore.instance
@@ -513,7 +345,6 @@ class AuthService {
               }
             }
           }
-
         } else {
           //cartMessage =
           //    '${item.item_name} is currently unavailable. Please check after some time';
@@ -523,8 +354,6 @@ class AuthService {
               currentItem: item);
           break;
         }
-
-
       } else {
         //cartMessage = '${cartItem.itemName} is no longer available';
         break;
@@ -534,8 +363,63 @@ class AuthService {
     return response;
   }
 
-  Future<String> placeOrder(List<CartItem> cartItems, double totalAmount,
-      AppDatabase db, String moreItemsStr) async {
+  Future<RazorPayOrderResponse> createRazorpayOrder(double amount) async {
+    var client = Client();
+
+    /*Map data = {'amount': amount};
+
+    var body = jsonEncode(data);*/
+
+
+    //var map = new Map<String, dynamic>();
+    //map['amount'] = amount;
+
+    //body: '''{\n  "amount": 1000.0\n}''',
+
+   // String data = "{\"amount\": $amount}";
+
+    String data = '''{\n  "amount": $amount\n}''';
+
+    String amountStr = amount.toString();
+
+    amount = num.parse(amount.toStringAsFixed(2)) * 100;
+
+    Map<String, dynamic> requestBody = <String,dynamic>{
+      'amount':amount
+    };
+
+     final response = await client.post(
+      Uri.parse('https://us-central1-mikromart-e69ba.cloudfunctions.net/app'),
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      //body: '''{\n  "amount": 1000.0\n}''', //works
+      body: '''{\n  "amount": $amount\n}''',
+      //body: jsonEncode(requestBody),
+      //encoding: Encoding.getByName("utf-8"),
+    );
+
+    print('RazorPayOrderResponse : ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      return RazorPayOrderResponse.fromMap(json.decode(response.body));
+    } else {
+      return null;
+    }
+
+
+  }
+
+  Future<String> placeOrder(
+
+      List<CartItem> cartItems,
+      double totalAmount,
+      AppDatabase db,
+      String moreItemsStr,
+      double deliveryCharge,
+      bool paymentGatewaySelected,
+      String payment_id) async {
     FirebaseUser user = await _auth.currentUser();
     List<Map<String, dynamic>> orderItems = new List();
     final prefs = await SharedPreferences.getInstance();
@@ -558,11 +442,14 @@ class AuthService {
 
     if (userName != null && userName.isNotEmpty) {
       OrderModel orderModel = new OrderModel(
+          delivery_charge: deliveryCharge,
+          already_paid: paymentGatewaySelected,
           order_status: ORDER_PLACED,
           cart_items: orderItems,
           total_amount: totalAmount,
           outlet_name: cartItems[0].outletId,
           user_name: userName,
+          payment_id: payment_id,
           user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
           extra_item: moreItemsStr.isNotEmpty ? moreItemsStr : null,
           user_location: new GeoPoint(
@@ -610,10 +497,10 @@ class AuthService {
     }
   }
 
-  Future<User> fetchUserDetails() async {
+  Future<MikromartUser> fetchUserDetails() async {
     final prefs = await SharedPreferences.getInstance();
 
-    return User(
+    return MikromartUser(
       id: prefs.getString(PREF_USER_ID),
       name: prefs.getString(PREF_USER_NAME),
       email: prefs.getString(PREF_USER_EMAIL),
@@ -625,7 +512,7 @@ class AuthService {
   }
 
   Future<String> registerPhoneWithSignedInUser(
-      String phone, AuthCredential credential, context) async {
+      String phone, AuthCredential credential) async {
     final prefs = await SharedPreferences.getInstance();
     FirebaseUser user = await _auth.currentUser();
     if (user != null) {
@@ -649,13 +536,13 @@ class AuthService {
             null,
             null,
             false);
-        return 'success';
+        return Future.value(PHONE_VERIFICATION_COMPLETE);
       } else {
-        return null;
+        return Future.value(PHONE_VERIFICATION_FAILED);
       }
     } else {
       print('Error');
-      return null;
+      return Future.value(PHONE_VERIFICATION_FAILED);
     }
   }
 
@@ -709,15 +596,18 @@ class AuthService {
   // sign in with google
   Future<FirebaseUserModel> signInWithGoogle(AppDatabase db) async {
     try {
+      print('GOOGLESIGNIN : initiated');
       GoogleSignInAccount googleUser = await _googleSignIn.signIn();
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      print('GOOGLESIGNIN : before AuthResult');
       final AuthResult authResult =
           await _auth.signInWithCredential(credential);
 
@@ -725,10 +615,14 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
+      print('GOOGLESIGNIN : before Fetching userData');
+
       DocumentSnapshot userDoc =
           await DatabaseService(uid: user.uid).fetchUserData(user.uid);
 
       if (userDoc.exists) {
+        print('GOOGLESIGNIN : user Exists');
+
         bool phoneValidated = userDoc.data["two_factor_enabled"];
         GeoPoint location = userDoc.data["location"];
 
@@ -753,12 +647,14 @@ class AuthService {
 
         return _userFromFirebaseUser(user, true, phoneValidated);
       } else {
+        print('GOOGLESIGNIN : before saving user');
+
         String fcmToken = await _fcm.getToken();
         await DatabaseService(uid: user.uid).updateUserData(user.email,
             user.email, false, '', user.uid, fcmToken, null, null, true);
         await prefs.setBool(PREF_IS_SIGNED_IN, true);
 
-        saveUserCreds(
+        await saveUserCreds(
             id: user.uid,
             name: user.email,
             email: user.email,
@@ -766,10 +662,13 @@ class AuthService {
             lat: null,
             lng: null,
             house_name: null);
+        print('GOOGLESIGNIN : user SAved');
 
         return _userFromFirebaseUser(user, true, false);
       }
     } catch (e) {
+      print('GOOGLESIGNIN : ERROR ' + e.toString());
+
       return null;
     }
   }
@@ -789,7 +688,7 @@ class AuthService {
         lng: null,
         house_name: null);
 
-    User user = await fetchUserDetails();
+    MikromartUser user = await fetchUserDetails();
     if (user.houseName == null || user.houseName.isEmpty) {
       AddressModel addressModel = await Navigator.push(
           context,
@@ -812,15 +711,28 @@ class AuthService {
       Navigator.of(context).pushNamedAndRemoveUntil(
           '/mainHome', (Route<dynamic> route) => false);
     }
-    /*Navigator.of(context).pushNamedAndRemoveUntil(
-        '/mainHome', (Route<dynamic> route) => false);*/
+  }
+
+  Future<MikromartUser> savePhoneAndCheckAddr(String phone) async {
+    saveUserCreds(
+        id: null,
+        name: null,
+        email: null,
+        phone: phone,
+        lat: null,
+        lng: null,
+        house_name: null);
+
+    MikromartUser user = await fetchUserDetails();
+
+    return user;
   }
 
   Future<void> logoutUser(AppDatabase db) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     await _auth.signOut();
-    var logoutResult = db.deleteAllCartItems();
+    var logoutResult = await db.deleteAllCartItems();
     return logoutResult;
   }
 }
@@ -829,6 +741,7 @@ getItemOffers(ItemNotifier notifier) async {
   QuerySnapshot snapshot = await Firestore.instance
       .collection('items')
       .where('category_id', isEqualTo: 'OFFERS')
+      //.where('category_id', isEqualTo: 'Oy86pXdMJeCMyuR46JRW')
       .getDocuments();
 
   List<Item> _itemList = [];
@@ -837,11 +750,6 @@ getItemOffers(ItemNotifier notifier) async {
     Item item = Item.fromMap(document.data, document.documentID);
     _itemList.add(item);
   });
-
-/*  //TODO : COMMENT
-  for (var i = 0; i < 2; i++) {
-    _itemList.add(_itemList[0]);
-  }*/
 
   notifier.offerList = _itemList;
   //notifier.offerList = [];
@@ -876,14 +784,28 @@ Future<List<BannerImage>> getBanners() async {
   return _bannerList;
 }
 
-getCategories(CategoriesNotifier notifier) async {
+getCategories() async {
+  QuerySnapshot snapshot =
+      await Firestore.instance.collection('outlet_types').getDocuments();
+
+  List<OutletType> _categories = [];
+
+  snapshot.documents.forEach((document) {
+    OutletType outletType = OutletType.fromMap(document.data, document.documentID);
+    _categories.add(outletType);
+  });
+
+  return _categories;
+}
+
+getStores(StoresNotifier notifier) async {
   QuerySnapshot snapshot =
       await Firestore.instance.collection('categories').getDocuments();
 
-  List<Category> _categories = [];
+  List<Store> _categories = [];
 
   snapshot.documents.forEach((document) {
-    Category category = Category.fromMap(document.data, document.documentID);
+    Store category = Store.fromMap(document.data, document.documentID);
     _categories.add(category);
   });
 
@@ -936,6 +858,7 @@ Future<List<DocumentSnapshot>> getItems(
 Future<List<DocumentSnapshot>> getOrders(int _per_page) async {
   final prefs = await SharedPreferences.getInstance();
   String uid = prefs.getString("user_id");
+  //String uid = prefs.getString("oOXmYoSP5Lg7mkHyUMlSZfa6rQQ2");
 
   QuerySnapshot snapshot;
   try {

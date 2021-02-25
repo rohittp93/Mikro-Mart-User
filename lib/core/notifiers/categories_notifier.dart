@@ -1,24 +1,40 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/models/item.dart';
 
-class CategoriesNotifier with ChangeNotifier {
-  List<Category> _categoriesList = [];
-  Category _currentCategory;
+class StoresNotifier with ChangeNotifier {
+  List<Store> _storesList = [];
+  Store _currentStore;
 
-  List<Category> get categoriesList => _categoriesList;
+  List<Store> get categoriesList => _storesList;
 
-  Category get currentCategory=> _currentCategory;
+  Store get currentCategory=> _currentStore;
 
-  set categoryList(List<Category> categories){
-    _categoriesList = categories;
+  set categoryList(List<Store> categories){
+    _storesList = categories;
     notifyListeners();
   }
 
-  set currentItem(Category item){
-    _currentCategory = item;
+  set currentItem(Store item){
+    _currentStore = item;
     notifyListeners();
   }
+
+
+
+  List<Store> getStoreWithCatId(String category) {
+    List<Store> _storesOdSelectedCategory = [];
+
+    for(Store store in _storesList){
+      if(store.outlet_type!=null && store.outlet_type == category){
+        _storesOdSelectedCategory.add(store);
+      }
+    }
+
+    return _storesOdSelectedCategory;
+  }
+
+
 }

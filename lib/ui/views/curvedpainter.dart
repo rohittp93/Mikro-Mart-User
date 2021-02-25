@@ -28,9 +28,6 @@ class CurvePainter extends CustomPainter {
         path.quadraticBezierTo(size.width * 0.92, size.height * 0.4,
             size.width , size.height * 0.45);
 
-        /*path.quadraticBezierTo(size.width * 0.25, size.height * 0.8,
-            size.width * 0.5, size.height * 0.7);*/
-
         break;
 
       case 2:
@@ -48,29 +45,29 @@ class CurvePainter extends CustomPainter {
         break;
 
       case 3:
-        path.moveTo(0, size.height * 0.35);
+        path.moveTo(0, size.height * 0.7);
 
-        path.quadraticBezierTo(size.width * 0.02, size.height * 0.33,
-            size.width * 0.07, size.height * 0.35);
+        path.quadraticBezierTo(size.width * 0.02, size.height * 0.56,
+            size.width * 0.19, size.height * 0.7);
 
-        path.quadraticBezierTo(size.width * 0.5, size.height * 0.50,
-            size.width * 0.85, size.height * 0.31);
+        path.quadraticBezierTo(size.width * 0.5, size.height,
+            size.width * 0.75, size.height * 0.8);
 
-        path.quadraticBezierTo(size.width * 0.93, size.height * 0.264,
-            size.width, size.height * 0.296);
+        path.quadraticBezierTo(size.width * 0.9, size.height * 0.7,
+            size.width, size.height * 0.7);
         break;
 
       case 4:
-        path.moveTo(0, size.height * 0.30);
+        path.moveTo(0, size.height * 0.70);
 
-        path.quadraticBezierTo(size.width * 0.10, size.height * 0.26,
-            size.width * 0.28, size.height * 0.35);
+        path.quadraticBezierTo(size.width * 0.10, size.height * 0.56,
+            size.width * 0.28, size.height * 0.70);
 
-        path.quadraticBezierTo(size.width * 0.55, size.height * 0.50,
-            size.width * 0.85, size.height * 0.45);
+        path.quadraticBezierTo(size.width * 0.55, size.height * 0.90,
+            size.width * 0.85, size.height * 0.70);
 
-        path.quadraticBezierTo(size.width * 0.93, size.height * 0.44,
-            size.width, size.height * 0.42);
+        path.quadraticBezierTo(size.width * 0.93, size.height * 0.64,
+            size.width, size.height * 0.58);
         break;
     }
 

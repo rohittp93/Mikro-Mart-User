@@ -3,10 +3,9 @@ import '../shared/text_styles.dart' as style;
 
 class TitleAppBar extends StatelessWidget {
   final String title;
-
   Size size;
 
-  TitleAppBar({@required this.title});
+  TitleAppBar({@required this.title, });
 
   @override
   Widget build(BuildContext context) {

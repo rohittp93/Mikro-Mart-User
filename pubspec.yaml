@@ -25,27 +25,31 @@ dependencies:
   flutter_swiper: ^1.1.6
   flip_card: ^0.2.1
   fancy_bottom_navigation: ^0.3.2
+  curved_navigation_bar:
   smooth_star_rating: ^1.0.3
   carousel_slider: 2.2.1
   flare_flutter: ^1.5.5
   dartz: ^0.8.8
+  http: ^0.12.2
   basic_utils: ^1.3.0
   url_launcher: 5.5.0
   cupertino_icons: ^0.1.2
+  cached_network_image:
   # Add the dependency for the Firebase Core Flutter SDK
-  firebase_core: ^0.4.5
-  firebase_auth: ^0.16.1
-  cloud_firestore: ^0.13.7
-  firebase_analytics: ^5.0.2
-  firebase_messaging: ^6.0.16
-  google_sign_in: 4.5.1
+  firebase_core:
+  firebase_auth:
+  cloud_firestore:
+  firebase_analytics:
+  firebase_messaging:
+  google_sign_in:
   intl: 0.16.1
   algolia: 0.1.7
+  razorpay_flutter:
   flutter_spinkit:
   flutter_staggered_grid_view:
   location_permissions: ^3.0.0
   launch_review: ^1.0.1
-
+  pin_code_fields:
   flushbar: 1.10.4
   package_info: 0.4.3
 
@@ -59,7 +63,7 @@ dependencies:
   fluro: "^1.3.1"
 
   # Local cache
-  shared_preferences: ^0.5.4+5
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
@@ -96,11 +100,27 @@ flutter:
     - family: Quicksand
       fonts:
         - asset: assets/Quicksand-Regular.ttf
+
+    - family: Mulish
+      fonts:
+         - asset: assets/mulish_bold.ttf
+         - asset: assets/mulish_semibold.ttf
+         - asset: assets/mulish_regular.ttf
+
   assets:
       - assets/home_background.jpeg
 
       - assets/logo.png
       - assets/white_logo.png
+      - assets/dot_big.png
+      - assets/dot_small.png
+      - assets/basket.png
+      - assets/flag_bg.png
+      - assets/map.png
+      - assets/item_unavailable_bg.png
+      - assets/purchase_success.png
+      - assets/splash_image.png
+      - assets/mikromart_category.jpg
 
       - assets/otp1.png
       - assets/logo_banner.png

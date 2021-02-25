@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -15,8 +14,6 @@ import 'package:userapp/ui/views/shoppingCart.dart';
 import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
-import './ProfilePage.dart';
-import 'address_screen.dart';
 import 'curvedpainter.dart';
 import 'favoritePage.dart';
 

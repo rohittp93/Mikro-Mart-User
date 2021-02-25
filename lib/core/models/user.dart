@@ -1,4 +1,4 @@
-class User {
+class MikromartUser {
   String id;
   String name;
   String email;
@@ -7,6 +7,6 @@ class User {
   double lng;
   String houseName;
 
-  User({this.id, this.name, this.email, this.phone, this.lat, this.lng, this.houseName});
+  MikromartUser({this.id, this.name, this.email, this.phone, this.lat, this.lng, this.houseName});
 
 }

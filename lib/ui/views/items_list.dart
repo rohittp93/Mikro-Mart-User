@@ -1,21 +1,23 @@
 import 'dart:async';
 
 import 'package:algolia/algolia.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:userapp/core/helpers/algolia.dart';
-import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/views/itemDetailNew.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import 'package:userapp/ui/widgets/titleAppBar.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 import '../shared/text_styles.dart' as style;
 
 class ItemsList extends StatefulWidget {
-  final Category argument;
+  final Store argument;
 
   const ItemsList({Key key, this.argument});
 
@@ -73,25 +75,6 @@ class _ItemsListState extends State<ItemsList> {
   void initState() {
     super.initState();
     _getProducts();
-
-    //WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _getSizeAndPosition());
-
-    // _controller.addListener(_onSearchChanged);
-
-    print('ITEMLOADMORE : scroll listener added');
-
-    /*_scrollController.addListener(() {
-      double maxScroll = _scrollController.position.maxScrollExtent;
-      double currentScroll = _scrollController.position.pixels;
-      double delta = MediaQuery.of(context).size.height * 0.25;
-      //print('SCROLLING');
-      //FocusScope.of(context).requestFocus(_blankFocusNode);
-      print('ITEMLOADMORE : Scrollchanged');
-      if (maxScroll - currentScroll <= delta) {
-        print('ITEMLOADMORE : Scroll reached');
-        _getMoreProducts();
-      }
-    });*/
   }
 
   @override
@@ -156,23 +139,11 @@ class _ItemsListState extends State<ItemsList> {
     _gettingMoreProducts = false;
   }
 
-  /* bool _keyboardIsVisible() {
-    return !(MediaQuery.of(context).viewInsets.bottom == 0.0);
-  }*/
-
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery
-        .of(context)
-        .size;
+    var size = MediaQuery.of(context).size;
 
     final double itemWidth = size.width / 2;
-    final double itemHeight = (itemWidth) + 100;
-
-    /* if (_keyboardIsVisible()) {
-    } else {
-      FocusScope.of(context).requestFocus(FocusNode());
-    }*/
 
     return NotificationListener(
       onNotification: (scrollNotification) {
@@ -180,12 +151,7 @@ class _ItemsListState extends State<ItemsList> {
           //_scrollController.position.pixels
           double maxScroll = _scrollController.position.maxScrollExtent;
           double currentScroll = _scrollController.position.pixels;
-          double delta = MediaQuery
-              .of(context)
-              .size
-              .height * 0.25;
-          //print('SCROLLING');
-          //FocusScope.of(context).requestFocus(_blankFocusNode);
+          double delta = MediaQuery.of(context).size.height * 0.25;
           print('ITEMLOADMORE : Scrollchanged');
           if (maxScroll - currentScroll <= delta) {
             print('ITEMLOADMORE : Scroll reached');
@@ -204,29 +170,61 @@ class _ItemsListState extends State<ItemsList> {
             FocusScope.of(context).requestFocus(_blankFocusNode);
           },
           child: Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             color: MikroMartColors.white,
             child: Align(
               alignment: Alignment.topCenter,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  TitleAppBar(
-                      title: widget.argument == null
-                          ? ''
-                          : widget.argument.category_name),
                   Container(
-                    padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 10.0),
+                    color: MikroMartColors.colorPrimary,
+                    padding: EdgeInsets.only(
+                        left: 0.0, top: 8, bottom: 8, right: 18.0),
+                    child: SafeArea(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Container(
+                            width: 70,
+                            child: FlatButton(
+                              splashColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 0.0, top: 8, bottom: 8),
+                              child: Text(
+                                widget.argument == null
+                                    ? ''
+                                    : widget.argument.category_name,
+                                style: style.appBarTextTheme
+                                    .copyWith(color: Colors.white),
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    color: MikroMartColors.colorPrimary,
+                    padding: EdgeInsets.fromLTRB(18.0, 0.0, 18.0, 18.0),
                     child: Material(
                       elevation: 2.0,
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(50.0),
                       child: TextField(
                         autofocus: false,
                         controller: _controller,
@@ -247,650 +245,593 @@ class _ItemsListState extends State<ItemsList> {
                             border: InputBorder.none,
                             prefixIcon: _searchString.isNotEmpty
                                 ? IconButton(
-                              onPressed: () {
-                                _controller.clear();
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                                setState(() {
-                                  _searchString = '';
-                                  _isSearching = false;
-                                });
-                              },
-                              icon: Icon(Icons.clear),
-                            )
+                                    onPressed: () {
+                                      _controller.clear();
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
+                                      setState(() {
+                                        _searchString = '';
+                                        _isSearching = false;
+                                      });
+                                    },
+                                    icon: Icon(Icons.clear),
+                                  )
                                 : Icon(Icons.search),
                             contentPadding: EdgeInsets.only(
                                 left: 16.0, top: 16.0, bottom: 16.0),
                             hintText: 'Search item',
                             hintStyle:
-                            TextStyle(color: Theme
-                                .of(context)
-                                .hintColor)),
+                                TextStyle(color: Theme.of(context).hintColor)),
                       ),
                     ),
                   ),
                   _isLoading
                       ? Flexible(
-                      flex: 1,
-                      child: Center(child: CircularProgressIndicator()))
+                          flex: 1,
+                          child: Center(child: CircularProgressIndicator()))
                       : (_products.length == 0
-                      ? Flexible(
-                    flex: 1,
-                    child: Center(
-                      child: Text('No items to display'),
-                    ),
-                  )
-                      : Expanded(
-                    child: SingleChildScrollView(
-                      child: GridView.builder(
-                        itemCount: _isSearching
-                            ? _searchedProducts.length
-                            : _products.length,
-                        controller: _scrollController,
-                        gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                            childAspectRatio:
-                            itemWidth / itemHeight,
-                            crossAxisCount: 2),
-                        padding: EdgeInsets.only(
-                            left: 16, right: 16, bottom: 50),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemBuilder:
-                            (BuildContext context, int index) {
-                          Item item = _isSearching
-                              ? _searchedProducts[index]
-                              : _products[index];
-
-                          ItemQuantity displayableItemQuantity =
-                          new ItemQuantity();
-
-                          for (var i = 0;
-                          i < item.item_quantity_list.length;
-                          i++) {
-                            if (item.item_quantity_list[i]
-                                .display_quantity) {
-                              displayableItemQuantity =
-                              item.item_quantity_list[i];
-                              break;
-                            }
-                          }
-
-                          return Card(
-                            elevation: 2,
-                            child: InkWell(
-                              onTap: () {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                                if (item.show_item) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              ItemDetails(
-                                                data: item,
-                                              )));
-                                } else {
-                                  showErrorDialog(item.item_name);
-                                }
-                              },
-                              child: Container(
-                                child: Column(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Stack(
-                                      children: <Widget>[
-                                        ClipRRect(
-                                          borderRadius:
-                                          BorderRadius.only(
-                                              topRight: Radius
-                                                  .circular(6),
-                                              topLeft:
-                                              Radius.circular(
-                                                  6)),
-                                          child: AspectRatio(
-                                            aspectRatio: 1,
-                                            child: Container(
-                                                width: itemWidth,
-                                                child: Column(
-                                                  children: <Widget>[
-                                                    (displayableItemQuantity
-                                                        .item_stock_quantity ==
-                                                        0 || !item.show_item)
-                                                        ? Container(
-                                                      height:
-                                                      25,
-                                                      child:
-                                                      Center(
-                                                        child:
-                                                        Text(
-                                                          displayableItemQuantity
-                                                              .item_stock_quantity ==
-                                                              0
-                                                              ? 'Item out of stock'
-                                                              : 'Item Unavailable',
-                                                          overflow:
-                                                          TextOverflow.ellipsis,
-                                                          style: style
-                                                              .itemPriceText
-                                                              .copyWith(
-                                                              color: MikroMartColors
-                                                                  .colorPrimary,
-                                                              fontWeight: FontWeight
-                                                                  .bold),
-                                                        ),
-                                                      ),
-                                                    )
-                                                        : Container(
-                                                      height: 0,
-                                                    ),
-                                                    AspectRatio(
-                                                      aspectRatio:
-                                                      2 / 1.2,
-                                                      child: Center(
-                                                        child: Hero(
-                                                          transitionOnUserGestures:
-                                                          true,
-                                                          tag: item
-                                                              .item_name,
-                                                          child:
-                                                          Image(
-                                                            image: NetworkImage(
-                                                                item
-                                                                    .item_image_path),
-                                                            fit: BoxFit
-                                                                .cover,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child:
-                                                      Container(
-                                                        color: MikroMartColors
-                                                            .errorRed
-                                                            .withOpacity(
-                                                            0.8),
-                                                        child: Center(
-                                                          child: (item !=
-                                                              null &&
-                                                              item.outlet_id !=
-                                                                  null)
-                                                              ? Padding(
-                                                            padding: const EdgeInsets
-                                                                .only(left: 2.0,
-                                                                right: 2.0),
-                                                            child: Text(
-                                                              item.outlet_id,
-                                                              overflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                              maxLines:
-                                                              2,
-                                                              style:
-                                                              style
-                                                                  .itemnNameText
-                                                                  .copyWith(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .white),
-                                                            ),
-                                                          )
-                                                              : Container(),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    (displayableItemQuantity
-                                                        .item_stock_quantity !=
-                                                        0 || !item.show_item)
-                                                        ? Flexible(
-                                                      child: Container(
-                                                        height:
-                                                        25,
-                                                      ),
-                                                    )
-                                                        : Container(),
-                                                  ],
-                                                )),
-                                          ),
-                                        ),
-                                        displayableItemQuantity
-                                            .item_mrp !=
-                                            null
-                                            ? calculatePercentage(
-                                            displayableItemQuantity
-                                                .item_price,
-                                            displayableItemQuantity
-                                                .item_mrp) !=
-                                            0
-                                            ? displayableItemQuantity
-                                            .item_stock_quantity !=
-                                            0
-                                            ? Align(
-                                          alignment:
-                                          Alignment
-                                              .topRight,
-                                          child:
-                                          Container(
-                                            decoration:
-                                            BoxDecoration(
-                                              color: Colors
-                                                  .green,
-                                              borderRadius:
-                                              BorderRadius.only(
-                                                  topRight: Radius.circular(6)),
-                                            ),
-                                            padding:
-                                            EdgeInsets
-                                                .all(8),
-                                            child: Text(
-                                              calculatePercentage(
-                                                  displayableItemQuantity
-                                                      .item_price,
-                                                  displayableItemQuantity
-                                                      .item_mrp)
-                                                  .toString() +
-                                                  '% OFF',
-                                              overflow:
-                                              TextOverflow
-                                                  .ellipsis,
-                                              style: style.itemPriceText
-                                                  .copyWith(
-                                                  color: MikroMartColors
-                                                      .white,
-                                                  fontWeight:
-                                                  FontWeight.bold),
-                                            ),
-                                          ),
-                                        )
-                                            : Container()
-                                            : Container()
-                                            : Container(),
-                                      ],
-                                    ),
-                                    Container(
-                                      height: 90,
-                                      padding: EdgeInsets.fromLTRB(
-                                          6.0, 0.0, 6.0, 4.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding:
-                                            const EdgeInsets.only(
-                                                top: 3.0),
-                                            child: Align(
-                                              alignment:
-                                              Alignment.topLeft,
-                                              child: Text(
-                                                //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
-                                                item.item_name +
-                                                    ' - ' +
-                                                    displayableItemQuantity
-                                                        .item_quantity,
-                                                overflow: TextOverflow
-                                                    .ellipsis,
-                                                maxLines: 2,
-                                                style: style
-                                                    .itemnNameText
-                                                    .copyWith(
-                                                    fontSize: 15),
-                                              ),
-                                            ),
-                                          ),
-                                          Flexible(
-                                            child: Align(
-                                              alignment: Alignment
-                                                  .centerLeft,
-                                              child: Text(
-                                                '₹ ' +
-                                                    displayableItemQuantity
-                                                        .item_price
-                                                        .toStringAsFixed(
-                                                        2),
-                                                overflow: TextOverflow
-                                                    .ellipsis,
-                                                style: style
-                                                    .itemPriceText
-                                                    .copyWith(
-                                                    fontSize: 15,
-                                                    color:
-                                                    MikroMartColors
-                                                        .black,
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold),
-                                              ),
-                                            ),
-                                          ),
-                                          displayableItemQuantity
-                                              .item_mrp !=
-                                              null
-                                              ? Flexible(
-                                            child: Align(
-                                              alignment: Alignment
-                                                  .centerLeft,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
-                                                children: <
-                                                    Widget>[
-                                                  displayableItemQuantity
-                                                      .item_mrp !=
-                                                      displayableItemQuantity
-                                                          .item_price
-                                                      ? Text(
-                                                    'MRP: ₹' +
-                                                        displayableItemQuantity
-                                                            .item_mrp
-                                                            .toStringAsFixed(2),
-                                                    overflow:
-                                                    TextOverflow.ellipsis,
-                                                    style: style.itemPriceText
-                                                        .copyWith(
-                                                        decoration: TextDecoration
-                                                            .lineThrough,
-                                                        fontSize: 14,
-                                                        color: MikroMartColors
-                                                            .ErroColor),
-                                                  )
-                                                      : Spacer(),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                              : Spacer(),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
+                          ? Flexible(
+                              flex: 1,
+                              child: Center(
+                                child: Text('No items to display'),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            )
+                          : Expanded(
+                              child: SingleChildScrollView(
+                                child: GridView.builder(
+                                  itemCount: _isSearching
+                                      ? _searchedProducts.length
+                                      : _products.length,
+                                  controller: _scrollController,
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                          /* childAspectRatio:
+                                              itemWidth / itemHeight,*/
+                                          childAspectRatio: 158 / 163,
+                                          crossAxisCount: 2),
+                                  padding: EdgeInsets.only(
+                                      left: 16, right: 16, bottom: 100),
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    Item item = _isSearching
+                                        ? _searchedProducts[index]
+                                        : _products[index];
 
-                      /*
-                              GridView.count(
-                                controller: _scrollController,
-                                childAspectRatio: itemWidth / itemHeight,
-                                crossAxisCount: 2,
-                                padding: EdgeInsets.only(
-                                    left: 16, right: 16, bottom: 50),
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                children: List.generate(
-                                    _isSearching
-                                        ? _searchedProducts.length
-                                        : _products.length, (index) {
-                                  Item item = _isSearching
-                                      ? _searchedProducts[index]
-                                      : _products[index];
-                                  return Wrap(
-                                    children: <Widget>[
-                                      Card(
-                                        elevation: 2,
-                                        child: InkWell(
-                                          onTap: () {
-                                            Navigator.push(
+                                    ItemQuantity displayableItemQuantity =
+                                        new ItemQuantity();
+
+                                    for (var i = 0;
+                                        i < item.item_quantity_list.length;
+                                        i++) {
+                                      if (item.item_quantity_list[i]
+                                          .display_quantity) {
+                                        displayableItemQuantity =
+                                            item.item_quantity_list[i];
+                                        break;
+                                      }
+                                    }
+
+                                    bool itemUnavailable =
+                                        (displayableItemQuantity
+                                                    .item_stock_quantity ==
+                                                0 ||
+                                            !item.show_item);
+
+                                    bool itemOnOffer =
+                                        displayableItemQuantity.item_price <
+                                            displayableItemQuantity.item_mrp;
+
+                                    return InkWell(
+                                      onTap: () {
+                                        FocusScope.of(context)
+                                            .requestFocus(FocusNode());
+                                        if (item.show_item) {
+                                          /*Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        ItemDetails(
-                                                          data: item,
-                                                        )));
-                                          },
-                                          child: Container(
+                                                    builder: (_) => ItemDetail(
+                                                      item: item,
+                                                    )));*/
+                                          Navigator.of(context)
+                                              .push(_createRoute(item));
+                                        } else {
+                                          showErrorDialog(item.item_name);
+                                        }
+                                      },
+                                      child: Padding(
+                                        //padding:  EdgeInsets.fromLTRB(i == 0 ? 16 : 0, 0, i == 0? 0 : 16, 0),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Container(
+                                          child: Card(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 8),
+                                            color: MikroMartColors.cardBG,
+                                            clipBehavior:
+                                                Clip.antiAliasWithSaveLayer,
+                                            elevation: 2,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
                                             child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                                  MainAxisAlignment.start,
                                               children: <Widget>[
                                                 Stack(
+                                                  alignment:
+                                                      Alignment.bottomLeft,
                                                   children: <Widget>[
-                                                    ClipRRect(
-                                                      borderRadius: BorderRadius.circular(6.0),
-                                                      child: AspectRatio(
-                                                        aspectRatio: 1,
-                                                        child: Container(
-                                                            width: itemWidth,
-                                                            child: Column(
-                                                              children: <Widget>[
-                                                                item.item_stock_quantity ==
-                                                                    0
-                                                                    ? Container(
-                                                                  height:
-                                                                  35,
-                                                                  child:
-                                                                  Center(
+                                                    AspectRatio(
+                                                      aspectRatio: 2 / 1.2,
+                                                      child: Container(
+                                                        width: (MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.6) -
+                                                            16,
+                                                        color: Colors.white,
+                                                        child: Hero(
+                                                          tag: item.item_name,
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl: item
+                                                                .item_image_path,
+                                                            fit: BoxFit.cover,
+                                                            placeholder: (context,
+                                                                    url) =>
+                                                                Center(
                                                                     child:
-                                                                    Text(
-                                                                      'Item out of stock',
-                                                                      overflow:
-                                                                      TextOverflow.ellipsis,
-                                                                      style: style
-                                                                          .itemPriceText
-                                                                          .copyWith(color: MikroMartColors.colorPrimary, fontWeight: FontWeight.bold),
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                                    : Container(height:
-                                                                0,),
-                                                                AspectRatio(
-                                                                  aspectRatio:
-                                                                  2 / 1.2,
-                                                                  child: Center(
-                                                                    child: Hero(
-                                                                      transitionOnUserGestures:
-                                                                      true,
-                                                                      tag: item
-                                                                          .item_name,
-                                                                      child:
-                                                                      Image(
-                                                                        image: NetworkImage(
-                                                                            item.item_image_path),
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Expanded(
-                                                                  child:
-                                                                  Container(
-                                                                    color: MikroMartColors
-                                                                        .errorRed
-                                                                        .withOpacity(
-                                                                        0.8),
-                                                                    child: Center(
-                                                                      child: (item !=
-                                                                          null &&
-                                                                          item.outlet_id !=
-                                                                              null)
-                                                                          ? Text(
-                                                                        item.outlet_id,
-                                                                        overflow:
-                                                                        TextOverflow.ellipsis,
-                                                                        maxLines:
-                                                                        1,
-                                                                        style:
-                                                                        style.itemnNameText.copyWith(fontSize: 14, color: Colors.white),
-                                                                      )
-                                                                          : Container(),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                item.item_stock_quantity !=
-                                                                    0
-                                                                    ? Container(
-                                                                  height: 35,
-                                                                ): Container(),
-                                                              ],
+                                                                        SizedBox(
+                                                              height: 15.0,
+                                                              width: 15.0,
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                strokeWidth: 2,
+                                                                valueColor: new AlwaysStoppedAnimation<
+                                                                        Color>(
+                                                                    MikroMartColors
+                                                                        .colorPrimary),
+                                                              ),
                                                             )),
-                                                      ),
-                                                    ),
-                                                    item.item_mrp != null
-                                                        ? calculatePercentage(
-                                                        item.item_price,
-                                                        item.item_mrp) !=
-                                                        0
-                                                        ? item.item_stock_quantity !=
-                                                        0
-                                                        ? Align(
-                                                      alignment:
-                                                      Alignment
-                                                          .topRight,
-                                                      child:
-                                                      Container(
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.green,
-                                                          borderRadius: BorderRadius.only(
-                                                              topRight: Radius.circular(6)),
-                                                        ),
-                                                        padding:
-                                                        EdgeInsets
-                                                            .all(
-                                                            8),
-                                                        child: Text(
-                                                          calculatePercentage(item.item_price,
-                                                              item.item_mrp)
-                                                              .toString() +
-                                                              '% OFF',
-                                                          overflow:
-                                                          TextOverflow
-                                                              .ellipsis,
-                                                          style: style
-                                                              .itemPriceText
-                                                              .copyWith(
-                                                              color:
-                                                              MikroMartColors.white,
-                                                              fontWeight: FontWeight.bold),
-                                                        ),
-                                                      ),
-                                                    ) : Container()
-                                                        : Container()
-                                                        : Container(),
-                                                  ],
-                                                ),
-                                                Container(
-                                                  height: 90,
-                                                  padding:
-                                                  EdgeInsets.fromLTRB(
-                                                      6.0,
-                                                      0.0,
-                                                      6.0,
-                                                      4.0),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .start,
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(top: 3.0),
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .topLeft,
-                                                          child: Text(
-                                                            //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
-                                                            item.item_name +
-                                                                ' - ' +
-                                                                item.item_quantity,
-                                                            overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                            maxLines: 2,
-                                                            style: style
-                                                                .itemnNameText
-                                                                .copyWith(
-                                                                fontSize:
-                                                                15),
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    Icon(Icons
+                                                                        .error),
                                                           ),
                                                         ),
                                                       ),
-                                                      Spacer(),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: Text(
-                                                          '₹ ' +
-                                                              item.item_price
-                                                                  .toStringAsFixed(
-                                                                  2),
-                                                          overflow:
-                                                          TextOverflow
-                                                              .ellipsis,
-                                                          style: style
-                                                              .itemPriceText
-                                                              .copyWith(
-                                                              fontSize:
-                                                              15,
-                                                              color: MikroMartColors
-                                                                  .black,
-                                                              fontWeight:
-                                                              FontWeight
-                                                                  .bold),
-                                                        ),
-                                                      ),
-                                                      */ /*item.item_stock_quantity ==
-                                                                  0
-                                                                  ? Align(
-                                                                alignment: Alignment
-                                                                    .centerLeft,
+                                                    ),
+                                                    itemUnavailable
+                                                        ? Stack(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            children: <Widget>[
+                                                              Container(
+                                                                child: Image(
+                                                                  image: AssetImage(
+                                                                      'assets/item_unavailable_bg.png'),
+                                                                ),
+                                                              ),
+                                                              Center(
                                                                 child: Text(
-                                                                  'Item out of stock',
-                                                                  overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                                  style: style.itemPriceText.copyWith(
-                                                                      fontStyle:
-                                                                      FontStyle
-                                                                          .italic,
-                                                                      color: MikroMartColors
-                                                                          .colorPrimary),
+                                                                  'Item Unavailable',
+                                                                  style: style
+                                                                      .headerStyle2
+                                                                      .copyWith(
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              Colors.white),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : itemOnOffer
+                                                            ? Container(
+                                                                width: 100,
+                                                                child: Image(
+                                                                  image: AssetImage(
+                                                                      'assets/flag_bg.png'),
+                                                                  color: MikroMartColors
+                                                                      .badgeGreen,
                                                                 ),
                                                               )
-                                                                  : */ /*
-                                                      item.item_mrp != null
-                                                          ? Align(
-                                                        alignment:
-                                                        Alignment
+                                                            : Container(),
+                                                    itemUnavailable ||
+                                                            !itemOnOffer
+                                                        ? Container()
+                                                        : Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    left: 8.0,
+                                                                    bottom:
+                                                                        6.0),
+                                                            child: Text(
+                                                              calculatePercentage(
+                                                                          displayableItemQuantity
+                                                                              .item_price,
+                                                                          displayableItemQuantity
+                                                                              .item_mrp)
+                                                                      .toString() +
+                                                                  '% OFF',
+                                                              style: style
+                                                                  .headerStyle2
+                                                                  .copyWith(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: Colors
+                                                                          .white),
+                                                            ),
+                                                          ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: <Widget>[
+                                                      Container(
+                                                        width: double.infinity,
+                                                        alignment: Alignment
                                                             .centerLeft,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  10, 0, 10, 6),
+                                                          child: Text(
+                                                            item.item_name,
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: style
+                                                                .outletCardNameStyle,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
                                                         child: Row(
-                                                          mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                          children: <
-                                                              Widget>[
-                                                            item.item_mrp !=
-                                                                item.item_price
-                                                                ? Text(
-                                                              'MRP: ₹' + item.item_mrp.toStringAsFixed(2),
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: style.itemPriceText.copyWith(decoration: TextDecoration.lineThrough, fontSize: 14, color: MikroMartColors.ErroColor),
-                                                            )
-                                                                : Spacer(),
+                                                          children: <Widget>[
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      10,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                              child: Text(
+                                                                '₹ ' +
+                                                                    displayableItemQuantity
+                                                                        .item_mrp
+                                                                        .toString(),
+                                                                style: style
+                                                                    .strikeThroughPrice,
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      0,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                              child: Text(
+                                                                '₹ ' +
+                                                                    displayableItemQuantity
+                                                                        .item_price
+                                                                        .toString(),
+                                                                style: TextStyle(
+                                                                    color: MikroMartColors
+                                                                        .colorPrimary,
+                                                                    fontFamily: 'Mulish',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      )
-                                                          : Spacer(),
-                                                      Spacer(),
+                                                      ),
                                                     ],
                                                   ),
-                                                )
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  );
-                                }),
-                              ),*/
-                    ),
-                  )),
+                                    )
+
+                                        /*Card(
+                                      elevation: 2,
+                                      child: InkWell(
+                                        onTap: () {
+                                          FocusScope.of(context)
+                                              .requestFocus(FocusNode());
+                                          if (item.show_item) {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (_) => ItemDetails(
+                                                          data: item,
+                                                        )));
+                                          } else {
+                                            showErrorDialog(item.item_name);
+                                          }
+                                        },
+                                        child: Container(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Stack(
+                                                children: <Widget>[
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                            topRight: Radius
+                                                                .circular(6),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    6)),
+                                                    child: AspectRatio(
+                                                      aspectRatio: 1,
+                                                      child: Container(
+                                                          width: itemWidth,
+                                                          child: Column(
+                                                            children: <Widget>[
+                                                              (displayableItemQuantity
+                                                                              .item_stock_quantity ==
+                                                                          0 ||
+                                                                      !item
+                                                                          .show_item)
+                                                                  ? Container(
+                                                                      height:
+                                                                          25,
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          displayableItemQuantity.item_stock_quantity == 0
+                                                                              ? 'Item out of stock'
+                                                                              : 'Item Unavailable',
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          style: style.itemPriceText.copyWith(
+                                                                              color: MikroMartColors.colorPrimary,
+                                                                              fontWeight: FontWeight.bold),
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  : Container(
+                                                                      height: 0,
+                                                                    ),
+                                                              AspectRatio(
+                                                                aspectRatio:
+                                                                    2 / 1.2,
+                                                                child: Center(
+                                                                  child: Hero(
+                                                                    transitionOnUserGestures:
+                                                                        true,
+                                                                    tag: item
+                                                                        .item_name,
+                                                                    child:
+                                                                        Image(
+                                                                      image: NetworkImage(
+                                                                          item.item_image_path),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child:
+                                                                    Container(
+                                                                  color: MikroMartColors
+                                                                      .errorRed
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                                  child: Center(
+                                                                    child: (item !=
+                                                                                null &&
+                                                                            item.outlet_id !=
+                                                                                null)
+                                                                        ? Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(left: 2.0, right: 2.0),
+                                                                            child:
+                                                                                Text(
+                                                                              item.outlet_id,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                              maxLines: 2,
+                                                                              style: style.itemnNameText.copyWith(fontSize: 14, color: Colors.white),
+                                                                            ),
+                                                                          )
+                                                                        : Container(),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              (displayableItemQuantity
+                                                                              .item_stock_quantity !=
+                                                                          0 ||
+                                                                      !item
+                                                                          .show_item)
+                                                                  ? Flexible(
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            25,
+                                                                      ),
+                                                                    )
+                                                                  : Container(),
+                                                            ],
+                                                          )),
+                                                    ),
+                                                  ),
+                                                  displayableItemQuantity
+                                                              .item_mrp !=
+                                                          null
+                                                      ? calculatePercentage(
+                                                                  displayableItemQuantity
+                                                                      .item_price,
+                                                                  displayableItemQuantity
+                                                                      .item_mrp) !=
+                                                              0
+                                                          ? displayableItemQuantity
+                                                                      .item_stock_quantity !=
+                                                                  0
+                                                              ? Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .topRight,
+                                                                  child:
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      borderRadius:
+                                                                          BorderRadius.only(
+                                                                              topRight: Radius.circular(6)),
+                                                                    ),
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .all(8),
+                                                                    child: Text(
+                                                                      calculatePercentage(displayableItemQuantity.item_price, displayableItemQuantity.item_mrp)
+                                                                              .toString() +
+                                                                          '% OFF',
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      style: style.itemPriceText.copyWith(
+                                                                          color: MikroMartColors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              : Container()
+                                                          : Container()
+                                                      : Container(),
+                                                ],
+                                              ),
+                                              Container(
+                                                height: 90,
+                                                padding: EdgeInsets.fromLTRB(
+                                                    6.0, 0.0, 6.0, 4.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 3.0),
+                                                      child: Align(
+                                                        alignment:
+                                                            Alignment.topLeft,
+                                                        child: Text(
+                                                          //'ASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDKASDDGAUSDGAJDHADJASDHAJDAGDJGASDJASHDADHAJDHASJDAJDBAJDGAJDHSKDSAKDK',
+                                                          item.item_name +
+                                                              ' - ' +
+                                                              displayableItemQuantity
+                                                                  .item_quantity,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          maxLines: 2,
+                                                          style: style
+                                                              .itemnNameText
+                                                              .copyWith(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: Text(
+                                                          '₹ ' +
+                                                              displayableItemQuantity
+                                                                  .item_price
+                                                                  .toStringAsFixed(
+                                                                      2),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: style
+                                                              .itemPriceText
+                                                              .copyWith(
+                                                                  fontSize: 15,
+                                                                  color:
+                                                                      MikroMartColors
+                                                                          .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    displayableItemQuantity
+                                                                .item_mrp !=
+                                                            null
+                                                        ? Flexible(
+                                                            child: Align(
+                                                              alignment: Alignment
+                                                                  .centerLeft,
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: <
+                                                                    Widget>[
+                                                                  displayableItemQuantity
+                                                                              .item_mrp !=
+                                                                          displayableItemQuantity
+                                                                              .item_price
+                                                                      ? Text(
+                                                                          'MRP: ₹' +
+                                                                              displayableItemQuantity.item_mrp.toStringAsFixed(2),
+                                                                          overflow:
+                                                                              TextOverflow.ellipsis,
+                                                                          style: style.itemPriceText.copyWith(
+                                                                              decoration: TextDecoration.lineThrough,
+                                                                              fontSize: 14,
+                                                                              color: MikroMartColors.ErroColor),
+                                                                        )
+                                                                      : Spacer(),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Spacer(),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )*/
+                                        ;
+                                  },
+                                ),
+                              ),
+                            )),
                 ],
               ),
             ),
@@ -915,9 +856,8 @@ class _ItemsListState extends State<ItemsList> {
     }
   }
 
-
   showErrorDialog(String itemName) {
-    if (_errorFlushBar!=null && !_errorFlushBar.isShowing()) {
+    if (_errorFlushBar != null && !_errorFlushBar.isShowing()) {
       _errorFlushBar = Flushbar<List<String>>(
         flushbarPosition: FlushbarPosition.BOTTOM,
         flushbarStyle: FlushbarStyle.GROUNDED,
@@ -974,11 +914,9 @@ class _ItemsListState extends State<ItemsList> {
           Icons.check,
           color: Colors.white,
         ),
-      )
-        ..show(context);
+      )..show(context);
     }
   }
-
 
   Future<void> _submitSearch(String val) async {
     setState(() {
@@ -992,9 +930,6 @@ class _ItemsListState extends State<ItemsList> {
       for (var i = 0; i < snapShots.length; i++) {
         AlgoliaObjectSnapshot snap = snapShots[i];
         Map<String, dynamic> data = snap.data;
-
-        print('ALGOLOA SEARCH MAP ${snap.objectID}');
-
         Item item = Item.fromSearchMap(data, snap.objectID);
         _searchedProducts.add(item);
       }
@@ -1008,5 +943,26 @@ class _ItemsListState extends State<ItemsList> {
         }
       });
     });
+  }
+
+
+  Route _createRoute(Item item) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => ItemDetail(
+        item: item,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(1, 0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
   }
 }

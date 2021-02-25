@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/items_list.dart';
@@ -10,66 +10,88 @@ import '../shared/text_styles.dart' as style;
 import 'package:provider/provider.dart';
 import 'package:userapp/core/services/firebase_service.dart' as firebase;
 
-class HomeCategories extends StatefulWidget {
-  final Function onViewMoreClicked;
+class StoresScreen extends StatefulWidget {
+  //final Function onViewMoreClicked;
+  final String categoryId;
 
-  const HomeCategories({Key key, this.onViewMoreClicked}) : super(key: key);
+  const StoresScreen({this.categoryId});
 
   @override
-  _HomeCategoriesState createState() => _HomeCategoriesState();
+  _StoresScreenState createState() => _StoresScreenState();
 }
 
-class _HomeCategoriesState extends State<HomeCategories> {
+class _StoresScreenState extends State<StoresScreen> {
   ScrollController _scrollController = ScrollController();
+  List<Store> _stores = [];
 
   @override
   void initState() {
-    CategoriesNotifier _categoriesNotifier =
-        Provider.of<CategoriesNotifier>(context, listen: false);
-
-    firebase.getCategories(_categoriesNotifier);
+    StoresNotifier _categoriesNotifier =
+        Provider.of<StoresNotifier>(context, listen: false);
+    _stores = _categoriesNotifier.getStoreWithCatId(widget.categoryId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    CategoriesNotifier _categoriesNotifier =
-        Provider.of<CategoriesNotifier>(context);
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Stack(
-            alignment: Alignment.centerLeft,
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Container(
-                width: 113,
-                child: Image(
-                  image: AssetImage('assets/flag_bg.png'),
-                ),
-              ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  "STORES",
-                  style: style.headerStyle2
-                      .copyWith(fontSize: 14, color: Colors.white),
-                ),
-              ),
+                  padding: const EdgeInsets.only(left: 0.0),
+                  child: Container(
+                    color: MikroMartColors.colorPrimary,
+                    child: Row(
+                      children: <Widget>[
+                        InkWell(
+                          customBorder: new CircleBorder(),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            height: 50,
+                            padding: EdgeInsets.only(left: 16),
+                            width: 50,
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 60,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                widget.categoryId,
+                                style: style.headerStyle2.copyWith(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+              _buildCategoriesWidget(_stores, context, _scrollController),
             ],
           ),
         ),
-        _buildCategoriesWidget(_categoriesNotifier, context, _scrollController),
-      ],
+      ),
     );
   }
 }
 
-_buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
-    BuildContext context, ScrollController scrollController) {
+_buildCategoriesWidget(List<Store> stores, BuildContext context,
+    ScrollController scrollController) {
   return Container(
     child: SingleChildScrollView(
       child: Column(
@@ -83,12 +105,11 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
             padding: EdgeInsets.only(left: 6, right: 6),
             childAspectRatio: 156 / 158,
             shrinkWrap: true,
-            children: List.generate(categoriesNotifier.categoriesList.length,
-                (index) {
-              Category cat = categoriesNotifier.categoriesList[index];
+            children: List.generate(stores.length, (index) {
+              Store cat = stores[index];
               return Padding(
-                //padding:  EdgeInsets.fromLTRB(i == 0 ? 16 : 0, 0, i == 0? 0 : 16, 0),
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                padding: EdgeInsets.only(top: index == 0 ? 16 : 0),
+                //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                 child: Container(
                   /*decoration: new BoxDecoration(
                       boxShadow: [
@@ -177,13 +198,13 @@ _buildCategoriesWidget(CategoriesNotifier categoriesNotifier,
   );
 }
 
-Route _createRoute(Category category) {
+Route _createRoute(Store category) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => ItemsList(
       argument: category,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
+      var begin = Offset(1, 0);
       var end = Offset.zero;
       var curve = Curves.ease;
 

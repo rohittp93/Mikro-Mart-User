@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:userapp/core/helpers/algolia.dart';
-import 'package:userapp/core/models/categories.dart';
+import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/orders.dart';
 import 'package:userapp/ui/shared/colors.dart';
@@ -115,72 +115,118 @@ class _OrderListState extends State<OrderList> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      body: Container(
-        color: MikroMartColors.white,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              TitleAppBar(title: 'My Orders'),
-              _isLoading
-                  ? Flexible(
-                      flex: 1,
-                      child: Center(child: CircularProgressIndicator()))
-                  : (_products.length == 0
-                      ? Expanded(
-                        child: Center(
-                            child: Text('No order history'),
-                          ),
-                      )
-                      : Expanded(
-                          child: Container(
-                            child: ListView.separated(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                OrderModel orderModel = _products[index];
+      body: SafeArea(
+        child: Container(
+          color: MikroMartColors.white,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  color: MikroMartColors.colorPrimary,
 
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        new MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                new OrderDetail(
-                                                  orderModel: orderModel,
-                                                )));
-                                  },
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(6.0, 0, 6, 3),
-                                    child: Card(
-                                      elevation: 4,
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: 50,
+                        child: FlatButton(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 0.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'My Orders',
+                              style: style.mediumTextTitle.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _isLoading
+                    ? Flexible(
+                        flex: 1,
+                        child: Center(child: CircularProgressIndicator()))
+                    : (_products.length == 0
+                        ? Expanded(
+                          child: Center(
+                              child: Text('No order history'),
+                            ),
+                        )
+                        : Expanded(
+                            child: Container(
+                              child: ListView.separated(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  OrderModel orderModel = _products[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          new MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  new OrderDetail(
+                                                    orderModel: orderModel,
+                                                  )));
+                                    },
+                                    child: Padding(
+                                      padding:
+                                           EdgeInsets.fromLTRB(12.0, index ==0 ? 12 : 0, 12, index == (_products.length-1) ? 12 : 0),
                                       child: Container(
-                                        color: Colors.white,
+                                        decoration: new BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: MikroMartColors.cardShadowColor,
+                                              spreadRadius: 1,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3), // changes position of shadow
+                                            ),
+                                          ],
+                                          color: MikroMartColors.cardBackground,
+                                        ),
                                         child: Column(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                          MainAxisAlignment.start,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 12, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  12, 12, 0, 0),
                                               child: Text(
                                                 "Order ID : " +
                                                     orderModel.order_id,
                                                 style: style.mediumTextTitle
                                                     .copyWith(
-                                                        color: MikroMartColors
-                                                            .purple),
+                                                    color: MikroMartColors
+                                                        .colorPrimaryDark),
                                               ),
                                             ),
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 6, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  12, 6, 0, 0),
                                               child: Text(
                                                 "Order Status : " +
                                                     firebase.showOrderStatus(
@@ -191,8 +237,8 @@ class _OrderListState extends State<OrderList> {
                                             ),
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 6, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  12, 6, 0, 0),
                                               child: Text(
                                                 "Ordered Time : " +
                                                     formatTimestamp((orderModel
@@ -204,8 +250,8 @@ class _OrderListState extends State<OrderList> {
                                             ),
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      12, 6, 0, 12),
+                                              const EdgeInsets.fromLTRB(
+                                                  12, 6, 0, 12),
                                               child: Text(
                                                 "Order Total : ₹ " +
                                                     orderModel.total_amount
@@ -217,18 +263,18 @@ class _OrderListState extends State<OrderList> {
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                              itemCount: _products.length,
-                              separatorBuilder:
-                                  (BuildContext context, int index) {
-                                return Divider(color: Colors.transparent);
-                              },
+                                  );
+                                },
+                                itemCount: _products.length,
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  return Divider(color: Colors.transparent);
+                                },
+                              ),
                             ),
-                          ),
-                        )),
-            ],
+                          )),
+              ],
+            ),
           ),
         ),
       ),
