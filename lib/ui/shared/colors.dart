@@ -8,6 +8,7 @@ class MikroMartColors {
   static const colorAccentDark =  Color(0xFF3DAA10);
   static const cardBackground =  Color(0xFFF6F9FE);
   static const badgeGreen =  Color(0xFF73B10A);
+  static const brightRed =  Color(0xFFE12728);
 
   static const greenEndColor =  Color(0xFF3E861A);
   static const greenShadowColor =  Color(0xFF69C819);
