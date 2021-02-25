@@ -215,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                                   child: MySeparator(color: Colors.grey),
                                 ),
-                                InkWell(
+                               /* InkWell(
                                   onTap: () {
                                     print('TnC tapped');
                                   },
@@ -249,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                                   child: MySeparator(color: Colors.grey),
-                                ),
+                                ),*/
                                 InkWell(
                                   onTap: () {
                                     showHelp(db);
