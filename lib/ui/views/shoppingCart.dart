@@ -12,11 +12,9 @@ import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/widgets/CusTomAppBar.dart';
 import '../widgets/cartItemCard.dart';
-import '../../locator.dart';
 import '../shared/text_styles.dart' as style;
 import 'package:provider/provider.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
-import '../../core/Dish_list.dart';
 
 class ShoppingCart extends StatefulWidget {
   @override

@@ -114,7 +114,7 @@ class _OrderListState extends State<OrderList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Container(
           color: MikroMartColors.white,

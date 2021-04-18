@@ -366,22 +366,6 @@ class AuthService {
   Future<RazorPayOrderResponse> createRazorpayOrder(double amount) async {
     var client = Client();
 
-    /*Map data = {'amount': amount};
-
-    var body = jsonEncode(data);*/
-
-
-    //var map = new Map<String, dynamic>();
-    //map['amount'] = amount;
-
-    //body: '''{\n  "amount": 1000.0\n}''',
-
-   // String data = "{\"amount\": $amount}";
-
-    String data = '''{\n  "amount": $amount\n}''';
-
-    String amountStr = amount.toString();
-
     amount = num.parse(amount.toStringAsFixed(2)) * 100;
 
     Map<String, dynamic> requestBody = <String,dynamic>{
@@ -394,10 +378,7 @@ class AuthService {
         "Accept": "application/json",
         "Content-Type": "application/json"
       },
-      //body: '''{\n  "amount": 1000.0\n}''', //works
       body: '''{\n  "amount": $amount\n}''',
-      //body: jsonEncode(requestBody),
-      //encoding: Encoding.getByName("utf-8"),
     );
 
     print('RazorPayOrderResponse : ${response.statusCode}');
@@ -407,8 +388,6 @@ class AuthService {
     } else {
       return null;
     }
-
-
   }
 
   Future<String> placeOrder(

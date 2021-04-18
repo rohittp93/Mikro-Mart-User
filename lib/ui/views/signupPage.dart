@@ -50,7 +50,6 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       child: Scaffold(
         key: _scaffoldkey,
-        resizeToAvoidBottomPadding: false,
         resizeToAvoidBottomInset: false,
         body: Container(
           color: Colors.transparent,

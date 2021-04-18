@@ -16,7 +16,6 @@ import 'package:userapp/ui/views/shoppingCart.dart';
 import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
-import 'favoritePage.dart';
 
 class MainHome extends StatefulWidget {
   @override

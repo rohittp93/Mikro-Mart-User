@@ -59,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen>
       },
       child: Scaffold(
         key: _scaffoldkey,
-        resizeToAvoidBottomPadding: false,
         resizeToAvoidBottomInset: false,
         body: Container(
           color: Colors.transparent,

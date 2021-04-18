@@ -163,7 +163,7 @@ class _ItemsListState extends State<ItemsList> {
         return true;
       },
       child: Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomInset: false,
         body: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (v) {

@@ -15,7 +15,6 @@ import '../widgets/CusTomAppBar.dart';
 import 'LandingPage.dart';
 import './searchScreen.dart';
 import 'curvedpainter.dart';
-import 'favoritePage.dart';
 
 class CurvedPage extends StatelessWidget {
   @override

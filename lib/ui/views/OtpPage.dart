@@ -216,7 +216,7 @@ class OtpPageState extends State<OtpPage> {
 
     return Scaffold(
       key: _scaffoldkey,
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Center(
           child: Container(

@@ -46,7 +46,7 @@ class _OrderDetailState extends State<OrderDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(

@@ -1,23 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:userapp/ui/router.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/views/appspush.dart';
 import 'package:userapp/core/models/firebase_user_model.dart';
 import 'package:userapp/core/notifiers/categories_notifier.dart';
 import 'package:userapp/core/notifiers/item_notifier.dart';
 import 'package:userapp/core/services/firebase_service.dart';
-
-import 'core/card_list_model.dart';
-import 'core/card_model.dart';
 import 'core/data/moor_database.dart';
-import 'locator.dart';
 import 'package:provider/provider.dart';
 import './ui/shared/theme.dart';
-import './ui/router.dart';
 
 void main() {
-  setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: MikroMartColors.colorPrimaryDark));
@@ -57,16 +52,13 @@ class _MaterialAppWithThemeState extends State<MaterialAppWithTheme> {
     print('FutureBuilder MaterialAppWithTheme building');
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-            create: (context) => locator<CardListModelView>()),
-        ChangeNotifierProvider(create: (context) => locator<CardModel>()),
         ChangeNotifierProvider(create: (context) => ItemNotifier()),
         ChangeNotifierProvider(create: (context) => StoresNotifier()),
         StreamProvider<List<CartItem>>.value(value: db.watchAllCartItems()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        onGenerateRoute: Router.generateRoute,
+        onGenerateRoute: MikromartRouter.generateRoute,
         initialRoute: '/',
         theme: theme.getTheme(),
         title: 'Mikro Mart',
