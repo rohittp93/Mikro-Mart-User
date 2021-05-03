@@ -286,17 +286,16 @@ class AuthService {
                   break;
                 } else if (cartItem.cartQuantity <=
                     item.item_quantity_list[i].item_stock_quantity) {
-                  if (cartItem.cartPrice ==
+
+
+                  if (cartItem.itemPrice ==
                       item.item_quantity_list[i].item_price) {
-                    //cartMessage = CART_VALID;
                     response = CartValidationResponse(
                         status: CartResponseEnum.VALID,
                         cartItem: cartItem,
                         currentItem: item);
-                  } else {
-                    //cartMessage =
-                    //    'Price of ${item.item_name} is updated and hence your cart total has changed. Please confirm before continuing';
 
+                  } else {
                     final newCartItem = cartItem.copyWith(
                         itemPrice: item.item_quantity_list[i].item_price,
                         cartPrice: (item.item_quantity_list[i].item_price) *

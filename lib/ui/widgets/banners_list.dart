@@ -26,9 +26,7 @@ class _OffersListState extends State<BannersList> {
 
   Future<List<BannerImage>> fetchBanners() async {
     _banners = await firebase.getBanners();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -41,58 +39,61 @@ class _OffersListState extends State<BannersList> {
           SizedBox(
             height: 12,
           ),
-          CarouselSlider(
-            items: _banners.map((banner) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 0.0),
-                child: Card(
-                  elevation: 2,
-                  child: Container(
-                    child: Container(
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Flexible(
-                                child: Stack(
+          (_banners != null && _banners.length != 0)
+              ? CarouselSlider(
+                  items: _banners.map((banner) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 0.0),
+                      child: Card(
+                        elevation: 2,
+                        child: Container(
+                          child: Container(
+                            child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.all(0.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            fit: BoxFit.fill,
-                                            image: NetworkImage(
-                                              banner.banner_image_path,
+                                    Flexible(
+                                      child: Stack(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.all(0.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                  fit: BoxFit.fill,
+                                                  image: NetworkImage(
+                                                    banner.banner_image_path,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
+                                          )
+                                        ],
                                       ),
-                                    )
+                                    ),
                                   ],
-                                ),
-                              ),
-                            ],
-                          )),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-            options: CarouselOptions(
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 2 / 1,
-                viewportFraction: 0.9,
-                //height: (((0.8 * screenWidth)) / 2),
-                onPageChanged: (index, reason) {
-                  setState(() {
-                    _current = index;
-                  });
-                }),
-          ),
+                                )),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  options: CarouselOptions(
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      aspectRatio: 2 / 1,
+                      viewportFraction: 0.9,
+                      //height: (((0.8 * screenWidth)) / 2),
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      }),
+                )
+              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: _banners.map((url) {

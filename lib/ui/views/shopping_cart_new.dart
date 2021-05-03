@@ -43,7 +43,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
   double _deliveryCharge = 0.0;
   double _totalAmount = 0.0;
   TextEditingController _textEditingController = TextEditingController();
-  bool paymentGatewaySelected = true;
+  bool paymentGatewaySelected = false;
 
   String _orderId = '';
 
@@ -825,7 +825,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                       fillColor: MikroMartColors.dividerGray
                                           .withOpacity(0.1)),
                                 )),
-                            Padding(
+                           /* Padding(
                               padding: const EdgeInsets.only(top: 16.0),
                               child: Text(
                                 'Pay Using',
@@ -941,7 +941,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                   ),
                                 ],
                               ),
-                            ),
+                            ),*/
                             Padding(
                               padding: const EdgeInsets.only(top: 24.0),
                               child: Row(
