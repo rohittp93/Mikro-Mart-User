@@ -23,11 +23,19 @@ class StoresScreen extends StatefulWidget {
 class _StoresScreenState extends State<StoresScreen> {
   ScrollController _scrollController = ScrollController();
   List<Store> _stores = [];
+  bool isMikroMart = false;
 
   @override
   void initState() {
     StoresNotifier _categoriesNotifier =
         Provider.of<StoresNotifier>(context, listen: false);
+
+    /**
+     * Check if category is 'MIKRO MART', populate to ItemsList screen with an extra parameter(boolean: isMikroMart).
+     * This boolean will help in showing all items under mikromart in ItemsList screen. Also, Search functionality should search for all items under mikromart category
+     */
+    
+    isMikroMart = widget.categoryId == 'MIKRO MART';
     _stores = _categoriesNotifier.getStoreWithCatId(widget.categoryId);
     super.initState();
   }
@@ -38,7 +46,10 @@ class _StoresScreenState extends State<StoresScreen> {
       body: SafeArea(
         child: Container(
           color: Colors.white,
-          child: Column(
+          child: isMikroMart ? ItemsList(
+            stores: _stores,
+            store: _stores[0],
+          ) : Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -201,7 +212,7 @@ _buildCategoriesWidget(List<Store> stores, BuildContext context,
 Route _createRoute(Store category) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => ItemsList(
-      argument: category,
+      store: category,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0);

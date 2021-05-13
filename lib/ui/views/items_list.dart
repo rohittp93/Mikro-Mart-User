@@ -10,6 +10,7 @@ import 'package:userapp/core/models/store.dart';
 import 'package:userapp/core/models/item.dart';
 import 'package:userapp/core/models/item_quantity.dart';
 import 'package:userapp/ui/shared/colors.dart';
+import 'package:userapp/ui/shared/choicechip.dart';
 import 'package:userapp/ui/views/itemDetailNew.dart';
 import 'package:userapp/ui/views/itemDetails.dart';
 import 'package:userapp/ui/widgets/titleAppBar.dart';
@@ -17,9 +18,10 @@ import 'package:userapp/core/services/firebase_service.dart' as firebase;
 import '../shared/text_styles.dart' as style;
 
 class ItemsList extends StatefulWidget {
-  final Store argument;
+  final Store store;
+  final List<Store> stores;
 
-  const ItemsList({Key key, this.argument});
+  const ItemsList({Key key, this.store, this.stores});
 
   @override
   _ItemsListState createState() => _ItemsListState();
@@ -28,7 +30,7 @@ class ItemsList extends StatefulWidget {
 class _ItemsListState extends State<ItemsList> {
   List<DocumentSnapshot> _productSnapshots = [];
   List<Item> _products = [];
-  List<String> _facets = ["category_id"];
+  List<String> _storeNames = [];
   List<Item> _searchedProducts = [];
 
   //final GlobalKey itemCardKey = new GlobalKey();
@@ -52,7 +54,7 @@ class _ItemsListState extends State<ItemsList> {
   Flushbar _errorFlushBar = Flushbar();
 
   Future<List<AlgoliaObjectSnapshot>> _operation(String input) async {
-    String whereCondition = "category_id:" + widget.argument.id;
+    String whereCondition = "category_id:" + widget.store.id;
     print("Where condition: " + whereCondition);
     AlgoliaQuery query = _algoliaApp.instance
         .index("items")
@@ -75,6 +77,13 @@ class _ItemsListState extends State<ItemsList> {
   void initState() {
     super.initState();
     _getProducts();
+
+
+    if(widget.stores!= null && widget.stores.length!=0) {
+      for (int i = 0; i < widget.stores.length; i++) {
+        _storeNames.add(widget.stores[i].category_name);
+      }
+    }
   }
 
   @override
@@ -90,7 +99,7 @@ class _ItemsListState extends State<ItemsList> {
       _isLoading = true;
     });
 
-    _productSnapshots = await firebase.getItems(widget.argument.id, _per_page);
+    _productSnapshots = await firebase.getItems(widget.store.id, _per_page);
 
     _productSnapshots.forEach((document) {
       Item item = Item.fromMap(document.data, document.documentID);
@@ -121,7 +130,7 @@ class _ItemsListState extends State<ItemsList> {
     _gettingMoreProducts = true;
 
     List<DocumentSnapshot> items = await firebase.getMoreItems(
-        widget.argument.id, _per_page, _lastDocument);
+        widget.store.id, _per_page, _lastDocument);
 
     if (items != null && items.length < _per_page) {
       _moreProductsAvailable = false;
@@ -206,9 +215,9 @@ class _ItemsListState extends State<ItemsList> {
                               padding: const EdgeInsets.only(
                                   left: 0.0, top: 8, bottom: 8),
                               child: Text(
-                                widget.argument == null
+                                widget.store == null
                                     ? ''
-                                    : widget.argument.category_name,
+                                    : widget.store.category_name,
                                 style: style.appBarTextTheme
                                     .copyWith(color: Colors.white),
                                 textAlign: TextAlign.start,
@@ -263,6 +272,16 @@ class _ItemsListState extends State<ItemsList> {
                             hintStyle:
                                 TextStyle(color: Theme.of(context).hintColor)),
                       ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                    child: Wrap(
+                      spacing: 5.0,
+                      runSpacing: 3.0,
+                      children: [
+                        choiceChipWidget(_storeNames),
+                      ],
                     ),
                   ),
                   _isLoading

@@ -390,7 +390,6 @@ class AuthService {
   }
 
   Future<String> placeOrder(
-
       List<CartItem> cartItems,
       double totalAmount,
       AppDatabase db,
@@ -789,7 +788,8 @@ getStores(StoresNotifier notifier) async {
 
   _categories.removeWhere((store) => store.category_name == 'OFFERS');
 
-  _categories.removeWhere((store) => store.outlet_open == false);
+  //TODO : Uncomment below check
+ // _categories.removeWhere((store) => store.outlet_open == false);
 
   notifier.categoryList = _categories;
 }

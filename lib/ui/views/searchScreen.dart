@@ -193,7 +193,7 @@ class _SearchPanelState extends State<SearchPanel> {
                                           new MaterialPageRoute(
                                               builder: (BuildContext context) =>
                                                   new ItemsList(
-                                                    argument:
+                                                    store:
                                                         _categoriesNotifier
                                                                 .categoriesList[
                                                             index],
