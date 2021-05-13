@@ -26,6 +26,8 @@ class _ItemDetailState extends State<ItemDetail> {
   List<DropdownMenuItem<ItemQuantity>> _dropdownMenuItems = [];
   bool itemAdded = false;
   List<CartItem> _cartItems = [];
+
+  List<String> _mikromartStores = ["FISH AND MEAT HUB", "Mikro Mart", "VEGETABLE HUB"];
   int _itemQuantity = 0;
   CartItem _cartItem;
   final AuthService _auth = AuthService();
@@ -399,7 +401,7 @@ class _ItemDetailState extends State<ItemDetail> {
                                 } else {
                                   for (CartItem cartItem in _cartItems) {
                                     if (cartItem.outletId !=
-                                        widget.item.outlet_id) {
+                                        widget.item.outlet_id && !(_mikromartStores.contains(cartItem.outletId) && _mikromartStores.contains(widget.item.outlet_id))) {
                                       isFromSameOutlet = false;
                                       break;
                                     }
@@ -526,7 +528,7 @@ class _ItemDetailState extends State<ItemDetail> {
     )..show(context);
   }
 
-  void addToCart(AppDatabase db, ItemQuantity displayableItemQuantity) {
+  addToCart(AppDatabase db, ItemQuantity displayableItemQuantity) {
     CartItem cartItem = new CartItem(
         itemId: widget.item.id,
         itemImage: widget.item.item_image_path,
