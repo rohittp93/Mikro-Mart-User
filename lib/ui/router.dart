@@ -52,7 +52,7 @@ class MikromartRouter {
         return MaterialPageRoute(builder: (context) => ordersRoute);
       case '/itemList':
         Store data = settings.arguments;
-        final itemsListRoute = ItemsList(store: data);
+        final itemsListRoute = ItemsList(passedStore: data);
         return MaterialPageRoute(builder: (context) => itemsListRoute);
       case '/otpVerification':
         String mobileNumber = settings.arguments;

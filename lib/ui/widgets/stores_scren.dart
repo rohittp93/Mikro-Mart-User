@@ -48,7 +48,6 @@ class _StoresScreenState extends State<StoresScreen> {
           color: Colors.white,
           child: isMikroMart ? ItemsList(
             stores: _stores,
-            store: _stores[0],
           ) : Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +211,7 @@ _buildCategoriesWidget(List<Store> stores, BuildContext context,
 Route _createRoute(Store category) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => ItemsList(
-      store: category,
+      passedStore: category,
     ),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0);

@@ -18,10 +18,10 @@ import 'package:userapp/core/services/firebase_service.dart' as firebase;
 import '../shared/text_styles.dart' as style;
 
 class ItemsList extends StatefulWidget {
-  final Store store;
+  final Store passedStore;
   final List<Store> stores;
 
-  const ItemsList({Key key, this.store, this.stores});
+  const ItemsList({Key key, this.passedStore, this.stores});
 
   @override
   _ItemsListState createState() => _ItemsListState();
@@ -30,8 +30,8 @@ class ItemsList extends StatefulWidget {
 class _ItemsListState extends State<ItemsList> {
   List<DocumentSnapshot> _productSnapshots = [];
   List<Item> _products = [];
-  List<String> _storeNames = [];
   List<Item> _searchedProducts = [];
+  Store currentStore;
 
   //final GlobalKey itemCardKey = new GlobalKey();
   List filteredItemList = [];
@@ -54,7 +54,7 @@ class _ItemsListState extends State<ItemsList> {
   Flushbar _errorFlushBar = Flushbar();
 
   Future<List<AlgoliaObjectSnapshot>> _operation(String input) async {
-    String whereCondition = "category_id:" + widget.store.id;
+    String whereCondition = "category_id:" + currentStore.id;
     print("Where condition: " + whereCondition);
     AlgoliaQuery query = _algoliaApp.instance
         .index("items")
@@ -76,14 +76,9 @@ class _ItemsListState extends State<ItemsList> {
   @override
   void initState() {
     super.initState();
+    currentStore =
+        widget.passedStore != null ? widget.passedStore : widget.stores[0];
     _getProducts();
-
-
-    if(widget.stores!= null && widget.stores.length!=0) {
-      for (int i = 0; i < widget.stores.length; i++) {
-        _storeNames.add(widget.stores[i].category_name);
-      }
-    }
   }
 
   @override
@@ -99,7 +94,7 @@ class _ItemsListState extends State<ItemsList> {
       _isLoading = true;
     });
 
-    _productSnapshots = await firebase.getItems(widget.store.id, _per_page);
+    _productSnapshots = await firebase.getItems(currentStore.id, _per_page);
 
     _productSnapshots.forEach((document) {
       Item item = Item.fromMap(document.data, document.documentID);
@@ -112,6 +107,15 @@ class _ItemsListState extends State<ItemsList> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  _resetStoreItems() {
+    _lastDocument = null;
+    _productSnapshots = null;
+    _lastDocument = null;
+    _moreProductsAvailable = true;
+    _products = [];
+    _getProducts();
   }
 
   _getMoreProducts() async {
@@ -129,8 +133,8 @@ class _ItemsListState extends State<ItemsList> {
 
     _gettingMoreProducts = true;
 
-    List<DocumentSnapshot> items = await firebase.getMoreItems(
-        widget.store.id, _per_page, _lastDocument);
+    List<DocumentSnapshot> items =
+        await firebase.getMoreItems(currentStore.id, _per_page, _lastDocument);
 
     if (items != null && items.length < _per_page) {
       _moreProductsAvailable = false;
@@ -215,9 +219,9 @@ class _ItemsListState extends State<ItemsList> {
                               padding: const EdgeInsets.only(
                                   left: 0.0, top: 8, bottom: 8),
                               child: Text(
-                                widget.store == null
+                                currentStore == null
                                     ? ''
-                                    : widget.store.category_name,
+                                    : currentStore.category_name,
                                 style: style.appBarTextTheme
                                     .copyWith(color: Colors.white),
                                 textAlign: TextAlign.start,
@@ -274,16 +278,22 @@ class _ItemsListState extends State<ItemsList> {
                       ),
                     ),
                   ),
-                  Container(
+                  widget.stores!=null ?Container(
                     padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                     child: Wrap(
                       spacing: 5.0,
                       runSpacing: 3.0,
                       children: [
-                        choiceChipWidget(_storeNames),
+                        choiceChipWidget(
+                            storesList: widget.stores,
+                            onStoreSelected: (store) {
+                              currentStore = store;
+                              setState(() {});
+                              _resetStoreItems();
+                            }),
                       ],
                     ),
-                  ),
+                  ) : Container(),
                   _isLoading
                       ? Flexible(
                           flex: 1,
@@ -554,7 +564,8 @@ class _ItemsListState extends State<ItemsList> {
                                                                 style: TextStyle(
                                                                     color: MikroMartColors
                                                                         .colorPrimary,
-                                                                    fontFamily: 'Mulish',
+                                                                    fontFamily:
+                                                                        'Mulish',
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .bold),
@@ -964,7 +975,6 @@ class _ItemsListState extends State<ItemsList> {
     });
   }
 
-
   Route _createRoute(Item item) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => ItemDetail(
@@ -975,7 +985,8 @@ class _ItemsListState extends State<ItemsList> {
         var end = Offset.zero;
         var curve = Curves.ease;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

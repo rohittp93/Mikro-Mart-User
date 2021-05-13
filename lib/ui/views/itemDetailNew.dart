@@ -282,14 +282,17 @@ class _ItemDetailState extends State<ItemDetail> {
                                                 MikroMartColors.colorPrimary)),
                                     child: Center(
                                       child: DropdownButtonHideUnderline(
-                                        child: _dropdownMenuItems.length>0?DropdownButton<ItemQuantity>(
-                                            value: displayableItemQuantity,
-                                            items: _dropdownMenuItems,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                displayableItemQuantity = value;
-                                              });
-                                            }): Container(),
+                                        child: _dropdownMenuItems.length > 0
+                                            ? DropdownButton<ItemQuantity>(
+                                                value: displayableItemQuantity,
+                                                items: _dropdownMenuItems,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    displayableItemQuantity =
+                                                        value;
+                                                  });
+                                                })
+                                            : Container(),
                                       ),
                                     ),
                                   ),
@@ -309,7 +312,9 @@ class _ItemDetailState extends State<ItemDetail> {
                             child: Text(
                               'Product Description',
                               style: TextStyle(
-                                  fontSize: 19.0, fontFamily: 'Mulish', fontWeight: FontWeight.bold),
+                                  fontSize: 19.0,
+                                  fontFamily: 'Mulish',
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -335,7 +340,9 @@ class _ItemDetailState extends State<ItemDetail> {
                             child: Text(
                               'Store',
                               style: TextStyle(
-                                  fontSize: 19.0, fontFamily: 'Mulish', fontWeight: FontWeight.bold),
+                                  fontSize: 19.0,
+                                  fontFamily: 'Mulish',
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -477,23 +484,27 @@ class _ItemDetailState extends State<ItemDetail> {
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: Text(
                 '${item.item_name} is out of stock',
-                style: TextStyle(color: Colors.white, fontFamily: 'Mulish', fontSize: 16),
+                style: TextStyle(
+                    color: Colors.white, fontFamily: 'Mulish', fontSize: 16),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: EdgeInsets.all(20.0),
-                child: FlatButton(
-                  child: Text('OK'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  color: Colors.white,
-                  textColor: MikroMartColors.purpleEnd,
-                  padding: EdgeInsets.all(6),
-                  onPressed: () {
-                    _outletChangeFlushbar.dismiss();
-                  },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 60),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: FlatButton(
+                    child: Text('OK'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    color: Colors.white,
+                    textColor: MikroMartColors.purpleEnd,
+                    padding: EdgeInsets.all(6),
+                    onPressed: () {
+                      _outletChangeFlushbar.dismiss();
+                    },
+                  ),
                 ),
               ),
             )
@@ -549,42 +560,52 @@ class _ItemDetailState extends State<ItemDetail> {
               padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
               child: Text(
                 'Your cart contains items from ${cart_item.outletId}\n\nDo you wish to clear your cart & continue with order from ${item.outlet_id}',
-                style: TextStyle(color: Colors.white, fontFamily: 'Mulish', fontSize: 16),
+                style: TextStyle(
+                    color: Colors.white, fontFamily: 'Mulish', fontSize: 16),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: FlatButton(
-                    child: Text('Cancel', style: TextStyle(fontFamily: 'Mulish'),),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    color: Colors.white,
-                    textColor: MikroMartColors.purpleEnd,
-                    padding: EdgeInsets.all(6),
-                    onPressed: () {
-                      _outletChangeFlushbar.dismiss();
-                    },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 60),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: FlatButton(
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(fontFamily: 'Mulish'),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      color: Colors.white,
+                      textColor: MikroMartColors.purpleEnd,
+                      padding: EdgeInsets.all(6),
+                      onPressed: () {
+                        _outletChangeFlushbar.dismiss();
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: FlatButton(
-                    child: Text('Continue', style: TextStyle(fontFamily: 'Mulish'),),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    color: Colors.white,
-                    textColor: MikroMartColors.purpleEnd,
-                    padding: EdgeInsets.all(6),
-                    onPressed: () {
-                      _outletChangeFlushbar.dismiss();
-                      onContinue.call();
-                    },
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: FlatButton(
+                      child: Text(
+                        'Continue',
+                        style: TextStyle(fontFamily: 'Mulish'),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      color: Colors.white,
+                      textColor: MikroMartColors.purpleEnd,
+                      padding: EdgeInsets.all(6),
+                      onPressed: () {
+                        _outletChangeFlushbar.dismiss();
+                        onContinue.call();
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
