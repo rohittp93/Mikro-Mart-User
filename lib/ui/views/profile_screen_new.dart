@@ -422,7 +422,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         InkWell(
                           onTap: () async {
-                            const url = "tel:+9090080858";
+                            const url = "tel:+919090080858";
                             if (await canLaunch(url) != null) {
                               await launch(url);
                               Navigator.of(context, rootNavigator: true)

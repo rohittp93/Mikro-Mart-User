@@ -424,7 +424,7 @@ class AuthService {
           order_status: ORDER_PLACED,
           cart_items: orderItems,
           total_amount: totalAmount,
-          outlet_name: cartItems[0].outletId,
+          outlet_name: fetchAndShowMikroMartNameIfPresent(cartItems), //[0].outletId,
           user_name: userName,
           payment_id: payment_id,
           user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
@@ -439,6 +439,18 @@ class AuthService {
     }
 
     return orderId;
+  }
+
+  /// If any of the cart item is from mikromart, we send the outlet_name as 'Mikro Mart'
+  /// so that only the mikro mart owners gets push notification for the order
+  String fetchAndShowMikroMartNameIfPresent(List<CartItem> cartItems) {
+    for(int i = 0; i< cartItems.length; i++) {
+      if(cartItems[i].outletId == 'MIKRO MART'){
+        return cartItems[i].outletId;
+      }
+    }
+
+    return cartItems[0].outletId;
   }
 
   saveUserCreds(
@@ -789,7 +801,7 @@ getStores(StoresNotifier notifier) async {
   _categories.removeWhere((store) => store.category_name == 'OFFERS');
 
   //TODO : Uncomment below check
- // _categories.removeWhere((store) => store.outlet_open == false);
+  _categories.removeWhere((store) => store.outlet_open == false);
 
   notifier.categoryList = _categories;
 }
@@ -825,6 +837,26 @@ Future<List<DocumentSnapshot>> getItems(
         .orderBy('item_name')
         .limit(_per_page)
         .where('category_id', isEqualTo: categoryId)
+        .where('show_item', isEqualTo: true)
+        .getDocuments();
+  } catch (e) {
+    return null;
+  }
+
+  return snapshot.documents;
+}
+
+Future<List<DocumentSnapshot>> getMoreItems(
+    String categoryId, int perPage, DocumentSnapshot lastDocument) async {
+  QuerySnapshot snapshot;
+  try {
+    snapshot = await Firestore.instance
+        .collection('items')
+        .orderBy('item_name')
+        .startAfterDocument(lastDocument)
+        .limit(perPage)
+        .where('category_id', isEqualTo: categoryId)
+        .where('show_item', isEqualTo: true)
         .getDocuments();
   } catch (e) {
     return null;
@@ -872,20 +904,4 @@ Future<List<DocumentSnapshot>> getMoreOrders(
   }
 }
 
-Future<List<DocumentSnapshot>> getMoreItems(
-    String categoryId, int perPage, DocumentSnapshot lastDocument) async {
-  QuerySnapshot snapshot;
-  try {
-    snapshot = await Firestore.instance
-        .collection('items')
-        .orderBy('item_name')
-        .startAfterDocument(lastDocument)
-        .limit(perPage)
-        .where('category_id', isEqualTo: categoryId)
-        .getDocuments();
-  } catch (e) {
-    return null;
-  }
 
-  return snapshot.documents;
-}

@@ -350,7 +350,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                              ),
                                              GestureDetector(
                                                onTap: () async{
-                                                 const url = "tel:+9090080858";
+                                                 const url = "tel:+919090080858";
                                                  if (await canLaunch(url) != null) {
                                                    await launch(url);
                                                  } else {
@@ -361,7 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                  padding: EdgeInsets.fromLTRB(
                                                      20, 20, 20, 0),
                                                  child: Text(
-                                                   'Phone : 9090080858',
+                                                   'Phone : 919090080858',
                                                    style: style.lightTextSubtitle,
                                                  ),
                                                ),

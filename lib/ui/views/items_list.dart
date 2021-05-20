@@ -101,6 +101,8 @@ class _ItemsListState extends State<ItemsList> {
       _products.add(item);
     });
 
+    //_products.removeWhere((product) => product.show_item == false);
+
     if (_productSnapshots.length > 1)
       _lastDocument = _productSnapshots[_productSnapshots.length - 1];
 
@@ -147,6 +149,7 @@ class _ItemsListState extends State<ItemsList> {
       _products.add(item);
     });
 
+    //_products.removeWhere((product) => product.show_item == false);
     setState(() {});
 
     _gettingMoreProducts = false;
@@ -352,17 +355,16 @@ class _ItemsListState extends State<ItemsList> {
                                         displayableItemQuantity.item_price <
                                             displayableItemQuantity.item_mrp;
 
+
+                                    if(item.item_name == 'PREMIUM CHICKEN - CURRY CUT') {
+                                      print('found');
+                                    }
+
                                     return InkWell(
                                       onTap: () {
                                         FocusScope.of(context)
                                             .requestFocus(FocusNode());
                                         if (item.show_item) {
-                                          /*Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (_) => ItemDetail(
-                                                      item: item,
-                                                    )));*/
                                           Navigator.of(context)
                                               .push(_createRoute(item));
                                         } else {
@@ -450,7 +452,7 @@ class _ItemsListState extends State<ItemsList> {
                                                               ),
                                                               Center(
                                                                 child: Text(
-                                                                  'Item Unavailable',
+                                                                  'Out of stock',
                                                                   style: style
                                                                       .headerStyle2
                                                                       .copyWith(
@@ -912,7 +914,7 @@ class _ItemsListState extends State<ItemsList> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
                     child: FlatButton(
                       child: Text('OK'),
                       shape: RoundedRectangleBorder(

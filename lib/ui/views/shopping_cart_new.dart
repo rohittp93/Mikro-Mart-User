@@ -43,7 +43,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
   double _deliveryCharge = 0.0;
   double _totalAmount = 0.0;
   TextEditingController _textEditingController = TextEditingController();
-  bool paymentGatewaySelected = false;
+  bool paymentGatewaySelected = true;
 
   String _orderId = '';
 
@@ -472,8 +472,10 @@ class _ShoppingCartState extends State<ShoppingCart> {
         longitude2: _userAddress.longitude);
     double distance = gcd.haversineDistance();
 
+    double kilometers = (distance / 1000);
+
     this.setState(() {
-      _deliveryCharge = ((distance / 1000) * 6).roundToDouble();
+      _deliveryCharge = kilometers.ceilToDouble() * 6;
     });
   }
 
@@ -825,7 +827,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                       fillColor: MikroMartColors.dividerGray
                                           .withOpacity(0.1)),
                                 )),
-                           /* Padding(
+                            Padding(
                               padding: const EdgeInsets.only(top: 16.0),
                               child: Text(
                                 'Pay Using',
@@ -872,7 +874,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                           child: Align(
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              "Credit card, Debit card or UPI",
+                                              "Pay via UPI or Card on Delivery",
                                               textAlign: TextAlign.start,
                                               style: TextStyle(
                                                   fontSize: 14,
@@ -941,7 +943,20 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                   ),
                                 ],
                               ),
-                            ),*/
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'You can cancel your order by calling MikroMart support number : +919090080858',
+                                  style: style.mediumTextTitle.copyWith(
+                                      color: MikroMartColors.colorPrimary,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 14),
+                                ),
+                              ),
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(top: 24.0),
                               child: Row(
@@ -1283,7 +1298,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
           break;
 
         case CartResponseEnum.VALID:
-          if (paymentGatewaySelected) {
+          /*if (paymentGatewaySelected) {
             //openCheckout();
             //TODO : Perform orders api call. Get order Id and then open checkout with these details
             //(i.e : order id, etc)
@@ -1304,9 +1319,9 @@ class _ShoppingCartState extends State<ShoppingCart> {
                 _orderingState = ORDER_FAILED;
               });
             }
-          } else {
-            placeOrder(db, "");
-          }
+          } else {*/
+          placeOrder(db, "");
+          // }
 
           /*setState(() {
             _orderId = 'TEST';
@@ -1357,7 +1372,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
     MikromartUser user = await _auth.fetchUserDetails();
 
     var options = {
-      "order_id" : razorPayOrderResponse.id,
+      "order_id": razorPayOrderResponse.id,
       "key": "rzp_test_qhNwyWy4d05HAz",
       //"amount": num.parse(_totalAmount.toStringAsFixed(2)) * 100,
       "amount": razorPayOrderResponse.amount,
