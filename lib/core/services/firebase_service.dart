@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz_unsafe.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flushbar/flushbar.dart';
@@ -271,7 +272,55 @@ class AuthService {
         Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
 
         if (item.show_item) {
-          for (var i = 0; i < item.item_quantity_list.length; i++) {
+          for(var currentCartItem in cartItems) {
+            for(var itemQuantity in item.item_quantity_list ) {
+
+              if (currentCartItem.itemQuantity == itemQuantity.item_quantity) {
+                  if (itemQuantity.item_stock_quantity == 0) {
+                    response = CartValidationResponse(
+                        status: CartResponseEnum.OUT_OF_STOCK,
+                        cartItem: currentCartItem,
+                        currentItem: item);
+                    break;
+                  } else if (currentCartItem.cartQuantity <=
+                      itemQuantity.item_stock_quantity) {
+
+                    if (currentCartItem.itemPrice ==
+                        itemQuantity.item_price) {
+                      response = CartValidationResponse(
+                          status: CartResponseEnum.VALID,
+                          cartItem: currentCartItem,
+                          currentItem: item);
+
+                    } else {
+                      final newCartItem = currentCartItem.copyWith(
+                          itemPrice: itemQuantity.item_price,
+                          cartPrice: (itemQuantity.item_price) *
+                              currentCartItem.cartQuantity);
+
+                      await updateCartItem(newCartItem, db);
+
+                      response = CartValidationResponse(
+                          status: CartResponseEnum.PRICE_UPDATED,
+                          cartItem: currentCartItem,
+                          currentItem: item);
+
+                      break;
+                    }
+                  } else {
+                    response = CartValidationResponse(
+                        status: CartResponseEnum.OUT_OF_STOCK,
+                        cartItem: currentCartItem,
+                        currentItem: item);
+
+                    break;
+                  }
+                }
+
+            }
+          }
+
+          /*for (var i = 0; i < item.item_quantity_list.length; i++) {
             for (var j = 0; j < cartItems.length; j++) {
               if (item.item_quantity_list[i].item_quantity ==
                   cartItems[j].itemQuantity) {
@@ -311,9 +360,6 @@ class AuthService {
                     break;
                   }
                 } else {
-                  //cartMessage =
-                  //    'There are currently on ${item.item_quantity_list[i].item_stock_quantity}  ${item.item_name}s in stock';
-
                   response = CartValidationResponse(
                       status: CartResponseEnum.OUT_OF_STOCK,
                       cartItem: cartItem,
@@ -323,7 +369,7 @@ class AuthService {
                 }
               }
             }
-          }
+          }*/
 
           //Check other item to see if price was updated
           if (response.status == CartResponseEnum.PRICE_UPDATED) {
@@ -367,11 +413,9 @@ class AuthService {
 
     amount = num.parse(amount.toStringAsFixed(2)) * 100;
 
-    Map<String, dynamic> requestBody = <String,dynamic>{
-      'amount':amount
-    };
+    Map<String, dynamic> requestBody = <String, dynamic>{'amount': amount};
 
-     final response = await client.post(
+    final response = await client.post(
       Uri.parse('https://us-central1-mikromart-e69ba.cloudfunctions.net/app'),
       headers: {
         "Accept": "application/json",
@@ -398,7 +442,7 @@ class AuthService {
       bool paymentGatewaySelected,
       String payment_id) async {
     FirebaseUser user = await _auth.currentUser();
-    List<Map<String, dynamic>> orderItems = new List();
+    List<Map<String, dynamic>> orderItems = [];
     final prefs = await SharedPreferences.getInstance();
 
     for (CartItem cartItem in cartItems) {
@@ -424,7 +468,8 @@ class AuthService {
           order_status: ORDER_PLACED,
           cart_items: orderItems,
           total_amount: totalAmount,
-          outlet_name: fetchAndShowMikroMartNameIfPresent(cartItems), //[0].outletId,
+          outlet_name: fetchAndShowMikroMartNameIfPresent(cartItems),
+          //[0].outletId,
           user_name: userName,
           payment_id: payment_id,
           user_house_name: prefs.getString(PREF_USER_HOUSE_NAME),
@@ -444,8 +489,8 @@ class AuthService {
   /// If any of the cart item is from mikromart, we send the outlet_name as 'Mikro Mart'
   /// so that only the mikro mart owners gets push notification for the order
   String fetchAndShowMikroMartNameIfPresent(List<CartItem> cartItems) {
-    for(int i = 0; i< cartItems.length; i++) {
-      if(cartItems[i].outletId == 'MIKRO MART'){
+    for (int i = 0; i < cartItems.length; i++) {
+      if (cartItems[i].outletId == 'MIKRO MART') {
         return cartItems[i].outletId;
       }
     }
@@ -780,7 +825,8 @@ getCategories() async {
   List<OutletType> _categories = [];
 
   snapshot.documents.forEach((document) {
-    OutletType outletType = OutletType.fromMap(document.data, document.documentID);
+    OutletType outletType =
+        OutletType.fromMap(document.data, document.documentID);
     _categories.add(outletType);
   });
 
@@ -903,5 +949,3 @@ Future<List<DocumentSnapshot>> getMoreOrders(
     return null;
   }
 }
-
-

@@ -1064,6 +1064,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
             ),
             !dismissable ? textFormField() : Container(),
             Container(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 60),
               alignment: Alignment.centerRight,
               width: MediaQuery.of(context).size.width,
               child: Row(
