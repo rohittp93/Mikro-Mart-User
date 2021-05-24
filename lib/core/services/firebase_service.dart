@@ -272,37 +272,37 @@ class AuthService {
         Item item = Item.fromMap(datasnapshot.data, datasnapshot.documentID);
 
         if (item.show_item) {
-          for(var currentCartItem in cartItems) {
+          //for(var currentCartItem in cartItems) {
             for(var itemQuantity in item.item_quantity_list ) {
 
-              if (currentCartItem.itemQuantity == itemQuantity.item_quantity) {
+              if (cartItem.itemQuantity == itemQuantity.item_quantity) {
                   if (itemQuantity.item_stock_quantity == 0) {
                     response = CartValidationResponse(
                         status: CartResponseEnum.OUT_OF_STOCK,
-                        cartItem: currentCartItem,
+                        cartItem: cartItem,
                         currentItem: item);
                     break;
-                  } else if (currentCartItem.cartQuantity <=
+                  } else if (cartItem.cartQuantity <=
                       itemQuantity.item_stock_quantity) {
 
-                    if (currentCartItem.itemPrice ==
+                    if (cartItem.itemPrice ==
                         itemQuantity.item_price) {
                       response = CartValidationResponse(
                           status: CartResponseEnum.VALID,
-                          cartItem: currentCartItem,
+                          cartItem: cartItem,
                           currentItem: item);
 
                     } else {
-                      final newCartItem = currentCartItem.copyWith(
+                      final newCartItem = cartItem.copyWith(
                           itemPrice: itemQuantity.item_price,
                           cartPrice: (itemQuantity.item_price) *
-                              currentCartItem.cartQuantity);
+                              cartItem.cartQuantity);
 
                       await updateCartItem(newCartItem, db);
 
                       response = CartValidationResponse(
                           status: CartResponseEnum.PRICE_UPDATED,
-                          cartItem: currentCartItem,
+                          cartItem: cartItem,
                           currentItem: item);
 
                       break;
@@ -310,12 +310,12 @@ class AuthService {
                   } else {
                     response = CartValidationResponse(
                         status: CartResponseEnum.OUT_OF_STOCK,
-                        cartItem: currentCartItem,
+                        cartItem: cartItem,
                         currentItem: item);
 
                     break;
                   }
-                }
+              //  }
 
             }
           }
