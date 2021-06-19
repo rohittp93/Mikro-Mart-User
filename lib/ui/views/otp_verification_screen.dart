@@ -228,57 +228,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                     .requestFocus(FocusNode());
 
                                 if (textEditingController.text.length == 6) {
-                                  setState(() {
-                                    _buttonAnimationState = 1;
-                                  });
-                                  final code =
-                                      textEditingController.text.trim();
-                                  AuthCredential credential =
-                                      PhoneAuthProvider.getCredential(
-                                          verificationId: _verificationId,
-                                          smsCode: code);
-
-                                  String result = await _authService
-                                      .registerPhoneWithSignedInUser(
-                                          widget.mobileNumber, credential);
-
-                                  if (result == PHONE_VERIFICATION_COMPLETE) {
-                                    MikromartUser user = await _authService
-                                        .savePhoneAndCheckAddr(
-                                            widget.mobileNumber);
-
-                                    if (user.houseName == null || user.houseName.isEmpty) {
-                                      AddressModel addressModel = await Navigator.push(
-                                          context,
-                                          new MaterialPageRoute(
-                                            builder: (BuildContext context) => new AddressScreen(
-                                              isDismissable: false,
-                                            ),
-                                            fullscreenDialog: true,
-                                          ));
-
-                                      GeoPoint addressLocation = new GeoPoint(
-                                          addressModel.location.latitude, addressModel.location.longitude);
-
-                                      await DatabaseService(uid: user.id)
-                                          .updateUserAddress(addressLocation, addressModel.appartmentName);
-                                      await _authService.updateUserAddressInSharedPrefs(addressModel);
-                                      Navigator.of(context).pushNamedAndRemoveUntil(
-                                          '/mainHome', (Route<dynamic> route) => false);
-                                    } else {
-                                      Navigator.of(context).pushNamedAndRemoveUntil(
-                                          '/mainHome', (Route<dynamic> route) => false);
-                                    }
-                                  } else {
-                                    setState(() {
-                                      _buttonAnimationState = 0;
-                                    });
-                                    _scaffoldkey.currentState
-                                        .showSnackBar(SnackBar(
-                                      content: new Text('OTP did not match'),
-                                      duration: new Duration(seconds: 3),
-                                    ));
-                                  }
+                                    registerOTP(null);
                                 } else {
                                   setState(() {
                                     _buttonAnimationState = 0;
@@ -314,61 +264,80 @@ class _OTPScreenState extends State<OTPScreen> {
         phoneNumber: mobileNumber,
         timeout: Duration(seconds: 60),
         verificationCompleted: (AuthCredential credential) async {
-      /*    final result = await _authService.registerPhoneWithSignedInUser(
-              mobileNumber, credential);
-          Future(() async {
-            if (result != null) {
-              User user =
-                  await _authService.savePhoneAndCheckAddr(mobileNumber);
-
-              if (user.houseName == null || user.houseName.isEmpty) {
-                AddressModel addressModel = await Navigator.push(
-                    this.context,
-                    new MaterialPageRoute(
-                      builder: (BuildContext context) => new AddressScreen(
-                        isDismissable: false,
-                      ),
-                      fullscreenDialog: true,
-                    ));
-
-                GeoPoint addressLocation = new GeoPoint(
-                    addressModel.location.latitude,
-                    addressModel.location.longitude);
-
-                await DatabaseService(uid: user.id).updateUserAddress(
-                    addressLocation, addressModel.appartmentName);
-                await _authService.updateUserAddressInSharedPrefs(addressModel);
-
-                Navigator.of(this.context).pushNamedAndRemoveUntil(
-                    '/mainHome', (Route<dynamic> route) => false);
-              } else {
-                Navigator.of(this.context).pushNamedAndRemoveUntil(
-                    '/mainHome', (Route<dynamic> route) => false);
-              }
-            } else {
-              _scaffoldkey.currentState.showSnackBar(SnackBar(
-                content:
-                    new Text('Something went wrong. Please try again later'),
-                duration: new Duration(seconds: 3),
-              ));
-            }
-          });*/
+          registerOTP(credential);
         },
         verificationFailed: (AuthException authException) {
           print(authException.message);
-          //showErrorBottomSheet(context, authException.message);
           _scaffoldkey.currentState.showSnackBar(SnackBar(
             content: new Text(authException.message),
             duration: new Duration(seconds: 3),
           ));
-          //return Future.value(PHONE_VERIFICATION_FAILED);
         },
         codeSent: (String verificationId, [int forcedResendingToken]) {
           this.setState(() {
             _verificationId = verificationId;
           });
-          //return Future.value(PHONE_CODE_SENT);
         },
         codeAutoRetrievalTimeout: null);
+  }
+
+  Future<void> phoneNumberVerified() async {
+    MikromartUser user = await _authService
+        .savePhoneAndCheckAddr(
+        widget.mobileNumber);
+
+    if (user.houseName == null || user.houseName.isEmpty) {
+      AddressModel addressModel = await Navigator.push(
+          context,
+          new MaterialPageRoute(
+            builder: (BuildContext context) => new AddressScreen(
+              isDismissable: false,
+            ),
+            fullscreenDialog: true,
+          ));
+
+      GeoPoint addressLocation = new GeoPoint(
+          addressModel.location.latitude, addressModel.location.longitude);
+
+      await DatabaseService(uid: user.id)
+          .updateUserAddress(addressLocation, addressModel.appartmentName);
+      await _authService.updateUserAddressInSharedPrefs(addressModel);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/mainHome', (Route<dynamic> route) => false);
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/mainHome', (Route<dynamic> route) => false);
+    }
+  }
+
+  Future<void> registerOTP(AuthCredential credential) async {
+    setState(() {
+      _buttonAnimationState = 1;
+    });
+
+    if(credential == null) {
+      final code =
+      textEditingController.text.trim();
+      credential = PhoneAuthProvider.getCredential(
+          verificationId: _verificationId,
+          smsCode: code);
+    }
+
+    String result = await _authService
+        .registerPhoneWithSignedInUser(
+        widget.mobileNumber, credential);
+
+    if (result == PHONE_VERIFICATION_COMPLETE) {
+      phoneNumberVerified();
+    } else {
+      setState(() {
+        _buttonAnimationState = 0;
+      });
+      _scaffoldkey.currentState
+          .showSnackBar(SnackBar(
+        content: new Text('OTP did not match'),
+        duration: new Duration(seconds: 3),
+      ));
+    }
   }
 }

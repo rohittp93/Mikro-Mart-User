@@ -356,10 +356,6 @@ class _ItemsListState extends State<ItemsList> {
                                             displayableItemQuantity.item_mrp;
 
 
-                                    if(item.item_name == 'PREMIUM CHICKEN - CURRY CUT') {
-                                      print('found');
-                                    }
-
                                     return InkWell(
                                       onTap: () {
                                         FocusScope.of(context)
@@ -409,33 +405,11 @@ class _ItemsListState extends State<ItemsList> {
                                                         color: Colors.white,
                                                         child: Hero(
                                                           tag: item.item_name,
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            imageUrl: item
-                                                                .item_image_path,
-                                                            fit: BoxFit.cover,
-                                                            placeholder: (context,
-                                                                    url) =>
-                                                                Center(
-                                                                    child:
-                                                                        SizedBox(
-                                                              height: 15.0,
-                                                              width: 15.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                strokeWidth: 2,
-                                                                valueColor: new AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                    MikroMartColors
-                                                                        .colorPrimary),
-                                                              ),
-                                                            )),
-                                                            errorWidget:
-                                                                (context, url,
-                                                                        error) =>
-                                                                    Icon(Icons
-                                                                        .error),
-                                                          ),
+                                                          child: itemUnavailable ? Opacity(
+                                                            child: _buildItemImage(item),
+                                                            opacity: 0.4,
+                                                          ):
+                                                              _buildItemImage(item),
                                                         ),
                                                       ),
                                                     ),
@@ -995,6 +969,35 @@ class _ItemsListState extends State<ItemsList> {
           child: child,
         );
       },
+    );
+  }
+
+  _buildItemImage(Item item) {
+    return CachedNetworkImage(
+      imageUrl: item
+          .item_image_path,
+      fit: BoxFit.cover,
+      placeholder: (context,
+          url) =>
+          Center(
+              child:
+              SizedBox(
+                height: 15.0,
+                width: 15.0,
+                child:
+                CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: new AlwaysStoppedAnimation<
+                      Color>(
+                      MikroMartColors
+                          .colorPrimary),
+                ),
+              )),
+      errorWidget:
+          (context, url,
+          error) =>
+          Icon(Icons
+              .error),
     );
   }
 }

@@ -49,6 +49,8 @@ class _ShoppingCartState extends State<ShoppingCart> {
 
   bool _bookingStarted = false;
 
+  String outletId = "";
+
   @override
   Future<void> initState() {
     super.initState();
@@ -470,13 +472,25 @@ class _ShoppingCartState extends State<ShoppingCart> {
         longitude1: _outletLocation.longitude,
         latitude2: _userAddress.latitude,
         longitude2: _userAddress.longitude);
-    double distance = gcd.haversineDistance();
 
+    double distance = gcd.haversineDistance();
     double kilometers = (distance / 1000);
 
-    this.setState(() {
-      _deliveryCharge = kilometers.ceilToDouble() * 6;
-    });
+    if (outletId == 'Mikro Mart' || outletId == 'VEGETABLE HUB'|| outletId == 'FISH AND MEAT HUB') {
+      this.setState(() {
+        _deliveryCharge = kilometers.ceilToDouble() * 10;
+      });
+    } else {
+      double price = 30;
+
+      if (kilometers > 3) {
+        price = 30 + (kilometers - 3) * 10;
+      }
+
+      this.setState(() {
+        _deliveryCharge = price;
+      });
+    }
   }
 
   Widget _cartItemBuilder(BuildContext context, int index) {
@@ -1400,7 +1414,10 @@ class _ShoppingCartState extends State<ShoppingCart> {
   Future<void> computeDeliveryCharge() async {
     print('COMPUTING OUTLET LOCATION');
     //_outletLocation = new LatLng(10.065723, 76.495566);
-    _outletLocation = await _auth.getOutletLocation(_cartItems[0].outletId);
-    getDeliveryCharge();
+    if (_cartItems != null && _cartItems.length > 0) {
+      _outletLocation = await _auth.getOutletLocation(_cartItems[0].outletId);
+      outletId = _cartItems[0].outletId;
+      getDeliveryCharge();
+    }
   }
 }

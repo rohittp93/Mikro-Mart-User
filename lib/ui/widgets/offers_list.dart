@@ -114,7 +114,10 @@ class _OffersListState extends State<OffersList> {
       );
 
       showDialog(
-          context: context, barrierDismissible: false, builder: (_) => dialog);
+          context: context,
+          barrierDismissible: false,
+          builder: (_) =>
+              WillPopScope(onWillPop: () async => false, child: dialog));
     }
   }
 
@@ -305,30 +308,54 @@ _buildOfferWidgets(BuildContext context, ItemNotifier itemNotifier) {
                         ),
                       ),
                     ),
-                    displayableItemQuantity.item_mrp != null
-                        ? Container(
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(5)),
-                            ),
-                            padding: EdgeInsets.all(12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        displayableItemQuantity.item_mrp != null
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(5)),
+                                ),
+                                padding: EdgeInsets.all(6),
+                                child: Text(
+                                  calculatePercentage(
+                                              displayableItemQuantity
+                                                  .item_price,
+                                              displayableItemQuantity.item_mrp)
+                                          .toString() +
+                                      '% OFF',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: style.itemPriceText.copyWith(
+                                      color: MikroMartColors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            : Container(),
+                        Container(
+                          color:
+                              MikroMartColors.colorPrimaryDark.withOpacity(0.7),
+                          width: double.infinity,
+                          padding: EdgeInsets.all(4),
+                          child: Center(
                             child: Text(
-                              calculatePercentage(
-                                          displayableItemQuantity.item_price,
-                                          displayableItemQuantity.item_mrp)
-                                      .toString() +
-                                  '% OFF',
+                              item.outlet_id,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: style.itemPriceText.copyWith(
                                   color: MikroMartColors.white,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.bold),
                             ),
-                          )
-                        : Container(),
+                          ),
+                        )
+                      ],
+                    ),
                   ],
                 ),
                 Expanded(
+                  flex: 2,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: Text(
@@ -340,9 +367,10 @@ _buildOfferWidgets(BuildContext context, ItemNotifier itemNotifier) {
                   ),
                 ),
                 Expanded(
+                  flex: 1,
                   child: Container(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Padding(
                         padding: const EdgeInsets.only(right: 40.0),
                         child: MySeparator(color: Colors.grey),
@@ -351,7 +379,9 @@ _buildOfferWidgets(BuildContext context, ItemNotifier itemNotifier) {
                   ),
                 ),
                 Expanded(
+                  flex: 2,
                   child: Container(
+                    alignment: Alignment.topLeft,
                     child: Row(
                       children: <Widget>[
                         Padding(
@@ -364,7 +394,8 @@ _buildOfferWidgets(BuildContext context, ItemNotifier itemNotifier) {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                           child: Text(
-                            '₹ ' + displayableItemQuantity.item_price.toString(),
+                            '₹ ' +
+                                displayableItemQuantity.item_price.toString(),
                             style: TextStyle(
                                 color: MikroMartColors.colorPrimary,
                                 fontWeight: FontWeight.bold),

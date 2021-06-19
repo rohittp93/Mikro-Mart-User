@@ -17,6 +17,7 @@ class Item {
 
   //var item_price, item_mrp;
   Timestamp created_time;
+  Timestamp offer_start;
   List<ItemQuantity> item_quantity_list;
 
   Item.fromMap(Map<String, dynamic> data, String itemId) {
@@ -27,6 +28,7 @@ class Item {
     //item_stock_quantity = data['item_stock_quantity'];
     max_cart_threshold = data['max_cart_threshold'];
     created_time = data['created_time'];
+    if (data['offer_start'] != null) offer_start = data['offer_start'];
     if (data['show_item'] != null) {
       show_item = data['show_item'];
     } else {

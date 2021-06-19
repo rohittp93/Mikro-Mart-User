@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:userapp/core/data/moor_database.dart';
 import 'package:userapp/core/services/firebase_service.dart';
 import 'package:userapp/ui/shared/colors.dart';
 import 'package:userapp/ui/shared/reveal_progress.dart';
 import 'package:userapp/ui/views/otp_verification_screen.dart';
-import '../shared/text_styles.dart' as style;
 import 'curvedpainter.dart';
 
 class PhoneNumberRegister extends StatefulWidget {
@@ -165,52 +162,6 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                             ),
                           ),
                         ),
-                        /* Row(
-                              children: <Widget>[
-                                Flexible(
-                                  child: Container(),
-                                  flex: 1,
-                                ),
-                                Flexible(
-                                  child: TextFormField(
-                                    textAlign: TextAlign.center,
-                                    autofocus: false,
-                                    enabled: false,
-                                    initialValue: "+91",
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                    ),
-                                  ),
-                                  flex: 3,
-                                ),
-                                Flexible(
-                                  child: new Container(),
-                                  flex: 1,
-                                ),
-                                Flexible(
-                                  child: TextFormField(
-                                    textAlign: TextAlign.start,
-                                    autofocus: false,
-                                    enabled: true,
-                                    keyboardType: TextInputType.phone,
-                                    textInputAction: TextInputAction.done,
-                                    style: TextStyle(fontSize: 20.0),
-                                    onChanged: (val) {
-                                      setState(() {
-                                        this.phone = val;
-                                        this.isPhoneNumberValid =
-                                            validateMobile(this.phone) == null;
-                                      });
-                                    },
-                                  ),
-                                  flex: 9,
-                                ),
-                                Flexible(
-                                  child: Container(),
-                                  flex: 1,
-                                ),
-                              ],
-                            ),*/
                         SizedBox(
                           height: 50,
                         ),
@@ -248,34 +199,6 @@ class _PhoneNumberRegisterState extends State<PhoneNumberRegister> {
                                     duration: new Duration(seconds: 3),
                                   ));
                                 }
-                                /*setState(() {
-                                      _buttonAnimationState = 1;
-                                    });
-
-                                    String validationMessage = validateMobile(this.phone);
-                                    if (validationMessage == null) {
-                                      final result = await _auth.signInWithPhone('+91' + this.phone, context, db);
-
-                                      if(result != null) {
-                                        Navigator.push(
-                                            context,
-                                            new MaterialPageRoute(
-                                                builder: (BuildContext
-                                                context) =>
-                                                new OTPScreen(
-                                                  mobileNumber: this.phone,
-                                                )));
-                                      }
-                                    } else {
-                                      setState(() {
-                                        _buttonAnimationState = 0;
-                                      });
-
-                                      _scaffoldkey.currentState.showSnackBar(SnackBar(
-                                        content: new Text(validationMessage),
-                                        duration: new Duration(seconds: 3),
-                                      ));
-                                    }*/
                               }),
                         ),
                       ]),

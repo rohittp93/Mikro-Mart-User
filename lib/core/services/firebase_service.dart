@@ -273,103 +273,48 @@ class AuthService {
 
         if (item.show_item) {
           //for(var currentCartItem in cartItems) {
-            for(var itemQuantity in item.item_quantity_list ) {
-
-              if (cartItem.itemQuantity == itemQuantity.item_quantity) {
-                  if (itemQuantity.item_stock_quantity == 0) {
-                    response = CartValidationResponse(
-                        status: CartResponseEnum.OUT_OF_STOCK,
-                        cartItem: cartItem,
-                        currentItem: item);
-                    break;
-                  } else if (cartItem.cartQuantity <=
-                      itemQuantity.item_stock_quantity) {
-
-                    if (cartItem.itemPrice ==
-                        itemQuantity.item_price) {
-                      response = CartValidationResponse(
-                          status: CartResponseEnum.VALID,
-                          cartItem: cartItem,
-                          currentItem: item);
-
-                    } else {
-                      final newCartItem = cartItem.copyWith(
-                          itemPrice: itemQuantity.item_price,
-                          cartPrice: (itemQuantity.item_price) *
-                              cartItem.cartQuantity);
-
-                      await updateCartItem(newCartItem, db);
-
-                      response = CartValidationResponse(
-                          status: CartResponseEnum.PRICE_UPDATED,
-                          cartItem: cartItem,
-                          currentItem: item);
-
-                      break;
-                    }
-                  } else {
-                    response = CartValidationResponse(
-                        status: CartResponseEnum.OUT_OF_STOCK,
-                        cartItem: cartItem,
-                        currentItem: item);
-
-                    break;
-                  }
-              //  }
-
-            }
-          }
-
-          /*for (var i = 0; i < item.item_quantity_list.length; i++) {
-            for (var j = 0; j < cartItems.length; j++) {
-              if (item.item_quantity_list[i].item_quantity ==
-                  cartItems[j].itemQuantity) {
-                //item.item_quantity_list[i].item_price = 56;
-
-                if (item.item_quantity_list[i].item_stock_quantity == 0) {
-                  //cartMessage = '${item.item_name} is out of stock';
+          for (var itemQuantity in item.item_quantity_list) {
+            if (cartItem.itemQuantity == itemQuantity.item_quantity) {
+              if (itemQuantity.item_stock_quantity == 0) {
+                response = CartValidationResponse(
+                    status: CartResponseEnum.OUT_OF_STOCK,
+                    cartItem: cartItem,
+                    currentItem: item);
+                break;
+              } else if (cartItem.cartQuantity <=
+                  itemQuantity.item_stock_quantity) {
+                if (cartItem.itemPrice == itemQuantity.item_price) {
                   response = CartValidationResponse(
-                      status: CartResponseEnum.OUT_OF_STOCK,
+                      status: CartResponseEnum.VALID,
                       cartItem: cartItem,
                       currentItem: item);
-                  break;
-                } else if (cartItem.cartQuantity <=
-                    item.item_quantity_list[i].item_stock_quantity) {
-
-
-                  if (cartItem.itemPrice ==
-                      item.item_quantity_list[i].item_price) {
-                    response = CartValidationResponse(
-                        status: CartResponseEnum.VALID,
-                        cartItem: cartItem,
-                        currentItem: item);
-
-                  } else {
-                    final newCartItem = cartItem.copyWith(
-                        itemPrice: item.item_quantity_list[i].item_price,
-                        cartPrice: (item.item_quantity_list[i].item_price) *
-                            cartItem.cartQuantity);
-
-                    await updateCartItem(newCartItem, db);
-
-                    response = CartValidationResponse(
-                        status: CartResponseEnum.PRICE_UPDATED,
-                        cartItem: cartItem,
-                        currentItem: item);
-
-                    break;
-                  }
                 } else {
+                  final newCartItem = cartItem.copyWith(
+                      itemPrice: itemQuantity.item_price,
+                      cartPrice:
+                          (itemQuantity.item_price) * cartItem.cartQuantity);
+
+                  await updateCartItem(newCartItem, db);
+
                   response = CartValidationResponse(
-                      status: CartResponseEnum.OUT_OF_STOCK,
+                      status: CartResponseEnum.PRICE_UPDATED,
                       cartItem: cartItem,
                       currentItem: item);
 
                   break;
                 }
+              } else {
+                response = CartValidationResponse(
+                    status: CartResponseEnum.OUT_OF_STOCK,
+                    cartItem: cartItem,
+                    currentItem: item);
+
+                break;
               }
+              //  }
+
             }
-          }*/
+          }
 
           //Check other item to see if price was updated
           if (response.status == CartResponseEnum.PRICE_UPDATED) {
@@ -774,19 +719,23 @@ class AuthService {
 getItemOffers(ItemNotifier notifier) async {
   QuerySnapshot snapshot = await Firestore.instance
       .collection('items')
-      .where('category_id', isEqualTo: 'OFFERS')
-      //.where('category_id', isEqualTo: 'Oy86pXdMJeCMyuR46JRW')
+      .where('is_offer', isEqualTo: true)
+      .where("offer_end", isGreaterThanOrEqualTo: new DateTime.now())
       .getDocuments();
 
   List<Item> _itemList = [];
 
   snapshot.documents.forEach((document) {
     Item item = Item.fromMap(document.data, document.documentID);
-    _itemList.add(item);
+
+    if (item.offer_start != null &&
+        new DateTime.now().isAfter(new DateTime.fromMillisecondsSinceEpoch(
+            item.offer_start.millisecondsSinceEpoch))) {
+      _itemList.add(item);
+    }
   });
 
   notifier.offerList = _itemList;
-  //notifier.offerList = [];
 }
 
 checkAppVersion() async {
