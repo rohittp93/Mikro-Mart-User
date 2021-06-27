@@ -507,13 +507,16 @@ class _ItemsListState extends State<ItemsList> {
                                                       Container(
                                                         child: Row(
                                                           children: <Widget>[
+                                                            (displayableItemQuantity
+                                                                .item_mrp != displayableItemQuantity
+                                                                .item_price) ?
                                                             Padding(
                                                               padding:
                                                                   const EdgeInsets
                                                                           .fromLTRB(
                                                                       10,
                                                                       0,
-                                                                      10,
+                                                                      0,
                                                                       0),
                                                               child: Text(
                                                                 '₹ ' +
@@ -523,12 +526,12 @@ class _ItemsListState extends State<ItemsList> {
                                                                 style: style
                                                                     .strikeThroughPrice,
                                                               ),
-                                                            ),
+                                                            ) : Container(),
                                                             Padding(
                                                               padding:
                                                                   const EdgeInsets
                                                                           .fromLTRB(
-                                                                      0,
+                                                                      10,
                                                                       0,
                                                                       10,
                                                                       0),
